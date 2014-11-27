@@ -7,37 +7,29 @@
 
 int main() {
     
-    int Ni = 3;
-    int Nj = 3;
-    int Nk = 3;
+    int Ni = 50;
+    int Nj = 50;
+    int Nk = 50;
     
     int*** arr = generate_naive_array(Ni,Nj,Nk);
     
-    
-    std::vector<std::pair<int, int>> *connect = generateConnectivity(Ni,Nj,Nk, arr);
+    int **throatCounter = new int*[2];
+    throatCounter[0] = new int[Ni*Nj*Nk];
+    throatCounter[1] = new int[Ni*Nj*Nk];
+
+    std::vector<std::pair<int, int>> *connect = generateConnectivity(Ni, Nj, Nk, arr, throatCounter);
     
     // set precision output
 
     std::setprecision(8);
     //std::cout<< connect->size() << std::endl;
     
-    
     //for(int PN = 0; PN < connect->size(); PN++){
     //        std::cout<<connect->at(PN).first << " "<<connect->at(PN).second << std::endl;
     //}
     
-    location *locations = generateLocation(connect, Ni, Nj, Nk, 0.25e-4 );
+    generateLocation(0.25e-4, throatCounter, Ni, Nj, Nk);
     
-    for(int i = 1; i <= Ni*Nj*Nk; i++){
-        std::cout << '[' << i << ']'<< ' ';
-        std::cout << std::setw(8)<< std::get<0>(locations[i]) << " ";
-        std::cout << std::setw(8)<< std::get<1>(locations[i]) << " ";
-        std::cout << std::setw(8)<< std::get<2>(locations[i]) << " ";
-        std::cout << std::setw(8)<< std::get<3>(locations[i]) << " ";
-        std::cout << std::setw(8)<< std::get<4>(locations[i]) << std::endl;
-    }
-    
-
 }
 
 

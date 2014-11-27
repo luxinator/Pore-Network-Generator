@@ -9,54 +9,42 @@
 #include "Generator.h"
 #include "ArrayFunctions.h"
 
+#include <iomanip>
 
-location * generateLocation(const std::vector<std::pair<int, int>> * connectivity, const int Ni, const int Nj, const int Nk, const float Length){
+
+void generateLocation(const float Length, int **throatCounters, const int Ni, const int Nj, const int Nk){
     
-    //Locations are a list of x,y,z values with a connection count (frequency) and accumulator
-    // accumulator is the amount of pore assigned including the one being assigned
-    location *output = new location[Ni*Nj*Nk];
     
-    int nrOfThroats = 0, currentNrOfThroats = 0;
-    std::cout << "Starting Location Generation" << std::endl;
-    int *t = new int[3]; // Coordinate list
+    int *coord = new int[3];
     
-    //Pore numbering starts at 1!
-    for(int i = 1; i < connectivity->size(); i++){
-        for(int j = i; j < connectivity->size(); j++){
-            
-            if( connectivity->at(i).first != connectivity->at(j).first){
-                //Encounterd different Pore
-                
-                currentNrOfThroats = j - i;
-                nrOfThroats += currentNrOfThroats;
-                
-               deflatten_3d(i, Ni, Nj, Nk, t);
-                
-                output[i] = location(t[0] * Length, t[1] * Length, t[2] * Length,
-                    currentNrOfThroats, nrOfThroats);
-                
-                currentNrOfThroats = 0; //reset counter for new pore
-                break;
-                
-            } // if
-        } //J - Loop
-        if(i % 250 == 0)
-            std::cout << "At PN: "<<i <<std::endl;
-    } // I - Loop
-    
-    return output;
-    
+    for(int i = 1; i <= Ni*Nj*Nk; i++){
+        deflatten_3d(i, Ni, Nj, Nk, coord);
+        
+        //std::cout << '[' << i << ']'<< ' ';
+        std::cout << std::setw(8)<< coord[0] * Length << " ";
+        std::cout << std::setw(8)<< coord[1] * Length << " ";
+        std::cout << std::setw(8)<< coord[2] * Length << " ";
+        std::cout << std::setw(8)<< throatCounters[0][i] << " ";
+        std::cout << std::setw(8)<< throatCounters[1][i] << std::endl;
+    }
 }
 
-std::vector<std::pair<int, int>> *generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array){
+std::vector<std::pair<int, int>> *generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters){
     
     //Extend this to include variable connection amount based upon distance from Pore to neightbours!
     
     std::vector<std::pair<int, int>> *output= new std::vector<std::pair<int, int>>();     
     int *coord = new int[3];
+    int localNr = 0;
     
-    if (array == nullptr)
-        array = generate_naive_array(Ni, Nj, Nk);
+    if (!array)
+        return nullptr;
+    
+    if(throatCounters == nullptr){
+        throatCounters = new int*[2];
+        throatCounters[0] = new int[Ni*Nj*Nk];
+        throatCounters[1] = new int[Ni*Nj*Nk];
+    }
     
     for(int PN = 1; PN <= Ni*Nj*Nk; PN++){
         deflatten_3d(PN, Ni, Nj, Nk,coord);
@@ -64,19 +52,29 @@ std::vector<std::pair<int, int>> *generateConnectivity(const int Ni, const int N
         
         if (coord[0] < Ni -1){
             output->push_back( std::make_pair(PN, array[coord[0] + 1][coord[1]][coord[2]]));
+            throatCounters[0][PN] += 1;
+            localNr += 1;
             //std::cout << PN << ' ' << array[coord[0] + 1][coord[1]][coord[2]] << std::endl;
         }
         if (coord[1] < Nj - 1 && coord[0] != 0 && coord[0] != Ni - 1) {
             output->push_back( std::make_pair(PN, array[coord[0]] [coord[1] + 1] [coord[2]]));
             //std::cout << PN << ' ' << array[coord[0]] [coord[1] + 1] [coord[2]] << std::endl;
+            throatCounters[0][PN] += 1;
+            localNr += 1;
         }
         if (coord[2] < Nk -1 && coord[0] != 0 && coord[0] != Ni - 1){
             output->push_back( std::make_pair(PN, array[coord[0]] [coord[1]] [coord[2] + 1]));
             //std::cout << PN << ' ' << array[coord[0]] [coord[1]] [coord[2] + 1] << std::endl;
+            throatCounters[0][PN] += 1;
+            localNr += 1;
         }
+        throatCounters[1][PN] += localNr;
         
-    }
-    output->shrink_to_fit();
+        
+    } // For Loop
     
+    
+    output->shrink_to_fit();
+   
     return output;
 }

@@ -19,16 +19,13 @@ int *** generate_naive_array(const int Ni, const int Nj, const int Nk){
     
     for(i = 0; i < Ni; i++){
         porebodies[i] = new int*[Nj];
-        for(j = 0; j < Nj; j++)
+        for(j = 0; j < Nj; j++){
             porebodies[i][j] = new int[Nk];
-        }
-    
-    for(j = 0; j < Nj; j++)
-        for(i = 0; i <Ni; i++)
             for(k = 0; k < Nk; k++){
                 porebodies[i][j][k] = i * Nj * Nk + j * Nk + k + 1;
             }
-    
+        }
+    }
     return porebodies;
 }
 

@@ -17,8 +17,8 @@
 typedef std::tuple<float, float, float, int, int> location;
 
 
-location* generateLocation(const std::vector<std::pair<int, int>> * connectivity,const int Ni, const int Nj, const int N, const float Length);
+void generateLocation(const float Length, int **throatCounters, const int Ni, const int Nj, const int Nk);
 
-std::vector<std::pair<int, int>> *generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array);
+std::vector<std::pair<int, int>> *generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters);
 
 #endif /* defined(__networkgen__Generator__) */
