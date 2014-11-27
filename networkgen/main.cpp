@@ -7,9 +7,9 @@
 
 int main() {
     
-    int Ni = 5;
-    int Nj = 5;
-    int Nk = 5;
+    int Ni = 3;
+    int Nj = 3;
+    int Nk = 3;
     
     int*** arr = generate_naive_array(Ni,Nj,Nk);
     
@@ -19,18 +19,16 @@ int main() {
     // set precision output
 
     std::setprecision(8);
-    std::cout<< connect->size() << std::endl;
+    //std::cout<< connect->size() << std::endl;
     
     
-    for(int PN = 0; PN <= Ni*Nj*Nk; PN++){
-    //        std::cout<< connect->at(PN).first << " "<<connect->at(PN).second << std::endl;
-    }
+    //for(int PN = 0; PN < connect->size(); PN++){
+    //        std::cout<<connect->at(PN).first << " "<<connect->at(PN).second << std::endl;
+    //}
     
-    location *locations = generateLocation(connect, Ni, Nj, Nk, 1.0f);
-   
+    location *locations = generateLocation(connect, Ni, Nj, Nk, 0.25e-4 );
     
-    
-     for(int i = 1; i <= Ni*Nj*Nk; i++){
+    for(int i = 1; i <= Ni*Nj*Nk; i++){
         std::cout << '[' << i << ']'<< ' ';
         std::cout << std::setw(8)<< std::get<0>(locations[i]) << " ";
         std::cout << std::setw(8)<< std::get<1>(locations[i]) << " ";

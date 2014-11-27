@@ -52,8 +52,7 @@ std::vector<std::pair<int, int>> *generateConnectivity(const int Ni, const int N
     
     //Extend this to include variable connection amount based upon distance from Pore to neightbours!
     
-    std::vector<std::pair<int, int>> *output= new std::vector<std::pair<int, int>>(); //max size
-    
+    std::vector<std::pair<int, int>> *output= new std::vector<std::pair<int, int>>();     
     int *coord = new int[3];
     
     if (array == nullptr)
@@ -67,11 +66,11 @@ std::vector<std::pair<int, int>> *generateConnectivity(const int Ni, const int N
             output->push_back( std::make_pair(PN, array[coord[0] + 1][coord[1]][coord[2]]));
             //std::cout << PN << ' ' << array[coord[0] + 1][coord[1]][coord[2]] << std::endl;
         }
-        if (coord[1] < Nj - 1 && (coord[0] != 0 && coord[0] != Ni - 1)) {
+        if (coord[1] < Nj - 1 && coord[0] != 0 && coord[0] != Ni - 1) {
             output->push_back( std::make_pair(PN, array[coord[0]] [coord[1] + 1] [coord[2]]));
             //std::cout << PN << ' ' << array[coord[0]] [coord[1] + 1] [coord[2]] << std::endl;
         }
-        if (coord[2] < Nk -1 && (coord[0] != 0 && coord[0] != Ni - 1)){
+        if (coord[2] < Nk -1 && coord[0] != 0 && coord[0] != Ni - 1){
             output->push_back( std::make_pair(PN, array[coord[0]] [coord[1]] [coord[2] + 1]));
             //std::cout << PN << ' ' << array[coord[0]] [coord[1]] [coord[2] + 1] << std::endl;
         }
