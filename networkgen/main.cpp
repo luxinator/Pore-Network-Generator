@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <iomanip>
 #include "ArrayFunctions.h"
 #include "Generator.h"
@@ -10,6 +9,9 @@ int main() {
     int Ni = 50;
     int Nj = 50;
     int Nk = 50;
+    
+    std::string cFile = "connectivity.txt";
+    std::string lFile = "location.txt";
     
     int*** arr = generate_naive_array(Ni,Nj,Nk);
     
@@ -28,7 +30,9 @@ int main() {
     //        std::cout<<connect->at(PN).first << " "<<connect->at(PN).second << std::endl;
     //}
     
-    generateLocation(0.25e-4, throatCounter, Ni, Nj, Nk);
+    writeConnectivity(cFile.c_str(), connect);
+    generateLocation(lFile.c_str(), 0.25e-4, throatCounter, Ni, Nj, Nk);
+    
     
 }
 

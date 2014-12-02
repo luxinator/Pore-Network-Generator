@@ -9,31 +9,46 @@
 #include "Generator.h"
 #include "ArrayFunctions.h"
 
+
+#include <iostream>
+#include <fstream>
 #include <iomanip>
 
-
-void generateLocation(const float Length, int **throatCounters, const int Ni, const int Nj, const int Nk){
+void generateLocation(const char* filename, const float Length, int **throatCounters, const int Ni, const int Nj, const int Nk){
     
+    std::ofstream file;
+    if( filename == nullptr){
+        std::cerr << "No filename specified! " << std::endl;
+    }
+    
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename,std::ios::trunc);
+    if(!file){
+        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        return;
+    }
     
     int *coord = new int[3];
     
     for(int i = 1; i <= Ni*Nj*Nk; i++){
         deflatten_3d(i, Ni, Nj, Nk, coord);
         
-        //std::cout << '[' << i << ']'<< ' ';
-        std::cout << std::setw(8)<< coord[0] * Length << " ";
-        std::cout << std::setw(8)<< coord[1] * Length << " ";
-        std::cout << std::setw(8)<< coord[2] * Length << " ";
-        std::cout << std::setw(8)<< throatCounters[0][i] << " ";
-        std::cout << std::setw(8)<< throatCounters[1][i] << std::endl;
+        file << std::setw(8)<< coord[0] * Length << " ";
+        file << std::setw(8)<< coord[1] * Length << " ";
+        file << std::setw(8)<< coord[2] * Length << " ";
+        file << std::setw(8)<< throatCounters[0][i] << " ";
+        file << std::setw(8)<< throatCounters[1][i] << std::endl;
+        
     }
+    
+    file.close();
 }
 
 std::vector<std::pair<int, int>> *generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters){
     
     //Extend this to include variable connection amount based upon distance from Pore to neightbours!
     
-    std::vector<std::pair<int, int>> *output= new std::vector<std::pair<int, int>>();     
+    std::vector<std::pair<int, int>> *output= new std::vector<std::pair<int, int>>(Ni*Nj*Nk * 3);
     int *coord = new int[3];
     int localNr = 0;
     
@@ -77,4 +92,26 @@ std::vector<std::pair<int, int>> *generateConnectivity(const int Ni, const int N
     output->shrink_to_fit();
    
     return output;
+}
+
+
+void writeConnectivity(const char * filename, std::vector<std::pair<int,int>> *connect){
+    
+    std::ofstream file;
+    if( filename == nullptr){
+        std::cerr << "No filename specified! " << std::endl;
+    }
+    
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename, std::ios::trunc);
+    if(!file){
+        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        return;
+    }
+    
+    for(int i = 0; i < connect->size(); i ++){
+        file << connect->at(i).first << '\t' << connect->at(i).second << std::endl;
+    }
+    
+    file.close();
 }
