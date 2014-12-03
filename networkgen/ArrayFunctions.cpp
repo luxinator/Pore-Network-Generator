@@ -22,7 +22,7 @@ int *** generate_naive_array(const int Ni, const int Nj, const int Nk){
         for(j = 0; j < Nj; j++){
             porebodies[i][j] = new int[Nk];
             for(k = 0; k < Nk; k++){
-                porebodies[i][j][k] = i * Nj * Nk + j * Nk + k + 1;
+                porebodies[i][j][k] = i * Nj * Nk + j * Nk + k;
             }
         }
     }
@@ -33,9 +33,9 @@ void deflatten_3d(const int i, const int Ni, const int Nj, const int Nk, int* co
     
     //Since it is not really nice to return stack memory we malloc on the heap.
 
-    coord[0] = ((i-1) / (Nj * Nk)) % Ni;
-    coord[1] = ((i-1) / Nk) % Nj;
-    coord[2] = (i-1) % Nk;
+    coord[0] = (i / (Nj * Nk)) % Ni;
+    coord[1] = (i / Nk) % Nj;
+    coord[2] = i % Nk;
     
 }
 

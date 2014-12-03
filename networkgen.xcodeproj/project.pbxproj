@@ -10,6 +10,7 @@
 		A069DE311A25CDB800DC9A5F /* ArrayFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A069DE2F1A25CDB800DC9A5F /* ArrayFunctions.cpp */; };
 		A069DE341A25FA5800DC9A5F /* Generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A069DE321A25FA5800DC9A5F /* Generator.cpp */; };
 		A0E571241A24CB0D00EA860F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0E571231A24CB0D00EA860F /* main.cpp */; };
+		A0F44E461A2E0A5900D769A7 /* vtk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0F44E441A2E0A5900D769A7 /* vtk.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,6 +34,8 @@
 		A069DE331A25FA5800DC9A5F /* Generator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Generator.h; sourceTree = "<group>"; };
 		A0E571201A24CB0D00EA860F /* networkgen */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = networkgen; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0E571231A24CB0D00EA860F /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = main.cpp; sourceTree = "<group>"; usesTabs = 0; };
+		A0F44E441A2E0A5900D769A7 /* vtk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vtk.cpp; sourceTree = "<group>"; };
+		A0F44E451A2E0A5900D769A7 /* vtk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vtk.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +75,8 @@
 				A0E571231A24CB0D00EA860F /* main.cpp */,
 				A069DE2F1A25CDB800DC9A5F /* ArrayFunctions.cpp */,
 				A069DE301A25CDB800DC9A5F /* ArrayFunctions.h */,
+				A0F44E441A2E0A5900D769A7 /* vtk.cpp */,
+				A0F44E451A2E0A5900D769A7 /* vtk.h */,
 			);
 			path = networkgen;
 			sourceTree = "<group>";
@@ -133,6 +138,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A069DE341A25FA5800DC9A5F /* Generator.cpp in Sources */,
+				A0F44E461A2E0A5900D769A7 /* vtk.cpp in Sources */,
 				A0E571241A24CB0D00EA860F /* main.cpp in Sources */,
 				A069DE311A25CDB800DC9A5F /* ArrayFunctions.cpp in Sources */,
 			);

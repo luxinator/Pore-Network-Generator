@@ -1,37 +1,39 @@
-#include <iostream>
-#include <iomanip>
+
 #include "ArrayFunctions.h"
 #include "Generator.h"
+#include "vtk.h"
 
 
 int main() {
     
-    int Ni = 50;
-    int Nj = 50;
-    int Nk = 50;
     
-    std::string cFile = "connectivity.txt";
-    std::string lFile = "location.txt";
+    // make it so that Ni = Ni + 2, for the boundaries
+    int Ni = 3;
+    int Nj = 3;
+    int Nk = 1;
+    
+    std::string cFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/connectivity.txt";
+    std::string vtkFile = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/data.vtk";
+    std::string lFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/location.txt";
     
     int*** arr = generate_naive_array(Ni,Nj,Nk);
     
+    //Allocate a Larte Part of Memory
+    int *t = new int[2 * Ni*Nj*Nk];
+    
+    //Make a pointer to a list of 2 pointers to ints
     int **throatCounter = new int*[2];
-    throatCounter[0] = new int[Ni*Nj*Nk];
-    throatCounter[1] = new int[Ni*Nj*Nk];
-
-    std::vector<std::pair<int, int>> *connect = generateConnectivity(Ni, Nj, Nk, arr, throatCounter);
+    //Point the two pointers to their places in the Large Part of memory
+    throatCounter[0] = t;
+    throatCounter[1] = t + (Ni*Nj*Nk);
     
-    // set precision output
-
-    std::setprecision(8);
-    //std::cout<< connect->size() << std::endl;
-    
-    //for(int PN = 0; PN < connect->size(); PN++){
-    //        std::cout<<connect->at(PN).first << " "<<connect->at(PN).second << std::endl;
-    //}
+    // Generate the Network
+    connectionList *connect = generateConnectivity(Ni, Nj, Nk, arr, throatCounter);
+    float** locationList = generateLocation(0.25e-4, throatCounter, Ni, Nj, Nk);
     
     writeConnectivity(cFile.c_str(), connect);
-    generateLocation(lFile.c_str(), 0.25e-4, throatCounter, Ni, Nj, Nk);
+    writeLocation(lFile.c_str(), locationList, throatCounter, Ni*Nj*Nk);
+    writeVTK(vtkFile.c_str(), connect, locationList, Ni, Nj, Nk);
     
     
 }

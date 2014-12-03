@@ -13,14 +13,15 @@
 #include <tuple>
 
 
-// Just a Wrapper for a tuple containing x,y,z, nr of throats, nr of total throats incl.
-typedef std::tuple<float, float, float, int, int> location;
+// Just a Wrapper.
+typedef std::vector<std::pair<int, int>> connectionList;
 
+float **generateLocation(const float Length, int **throatCounters, const int Ni, const int Nj, const int Nk);
 
-void generateLocation(const char* filename, const float Length, int **throatCounters, const int Ni, const int Nj, const int Nk);
-
-std::vector<std::pair<int, int>> *generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters);
+connectionList *generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters);
 
 void writeConnectivity(const char * filename, std::vector<std::pair<int,int>> *connect);
+
+void writeLocation(const char * filename, float ** locationList, int ** throatCounters, int PNMax);
 
 #endif /* defined(__networkgen__Generator__) */
