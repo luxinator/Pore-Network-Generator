@@ -13,14 +13,13 @@
 #include <tuple>
 
 
-// Just a Wrapper.
-typedef std::vector<std::pair<int, int>> connectionList;
+int ** generateConnectivity_2(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters);
 
 float **generateLocation(const float Length, int **throatCounters, const int Ni, const int Nj, const int Nk);
 
-connectionList *generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters);
+int **generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters);
 
-void writeConnectivity(const char * filename, std::vector<std::pair<int,int>> *connect);
+void writeConnectivity(const char * filename, int **connect, int nrPB);
 
 void writeLocation(const char * filename, float ** locationList, int ** throatCounters, int PNMax);
 

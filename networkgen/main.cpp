@@ -8,9 +8,9 @@ int main() {
     
     
     // make it so that Ni = Ni + 2, for the boundaries
-    int Ni = 3;
-    int Nj = 3;
-    int Nk = 1;
+    int Ni = 50;
+    int Nj = 50;
+    int Nk = 50;
     
     std::string cFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/connectivity.txt";
     std::string vtkFile = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/data.vtk";
@@ -28,10 +28,11 @@ int main() {
     throatCounter[1] = t + (Ni*Nj*Nk);
     
     // Generate the Network
-    connectionList *connect = generateConnectivity(Ni, Nj, Nk, arr, throatCounter);
-    float** locationList = generateLocation(0.25e-4, throatCounter, Ni, Nj, Nk);
+    int ** connect = generateConnectivity_2(Ni, Nj, Nk, arr, throatCounter);
+    float** locationList = generateLocation(1.0f, throatCounter, Ni, Nj, Nk);
     
-    writeConnectivity(cFile.c_str(), connect);
+    writeConnectivity(cFile.c_str(), connect, Ni*Nj*Nk);
+    
     writeLocation(lFile.c_str(), locationList, throatCounter, Ni*Nj*Nk);
     writeVTK(vtkFile.c_str(), connect, locationList, Ni, Nj, Nk);
     
