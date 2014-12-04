@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A036462E1A308A300007C3A1 /* inputParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A036462C1A308A300007C3A1 /* inputParser.cpp */; };
 		A069DE311A25CDB800DC9A5F /* ArrayFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A069DE2F1A25CDB800DC9A5F /* ArrayFunctions.cpp */; };
 		A069DE341A25FA5800DC9A5F /* Generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A069DE321A25FA5800DC9A5F /* Generator.cpp */; };
 		A0E571241A24CB0D00EA860F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0E571231A24CB0D00EA860F /* main.cpp */; };
@@ -26,6 +27,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A03646281A3089D60007C3A1 /* connectivity.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = connectivity.txt; sourceTree = "<group>"; };
+		A03646291A3089D60007C3A1 /* data.vtk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = data.vtk; sourceTree = "<group>"; };
+		A036462A1A3089D60007C3A1 /* location.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = location.txt; sourceTree = "<group>"; };
+		A036462B1A3089D60007C3A1 /* quisa_out.21398.vtk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = quisa_out.21398.vtk; sourceTree = "<group>"; };
+		A036462C1A308A300007C3A1 /* inputParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = inputParser.cpp; sourceTree = "<group>"; };
+		A036462D1A308A300007C3A1 /* inputParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = inputParser.h; sourceTree = "<group>"; };
+		A036462F1A30942F0007C3A1 /* NetworkSpecs.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NetworkSpecs.in; sourceTree = "<group>"; };
 		A03DD7071A2623EF003563DF /* connectivity_pt.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = connectivity_pt.txt; sourceTree = "<group>"; };
 		A03DD7081A2623EF003563DF /* location_pb.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = location_pb.txt; sourceTree = "<group>"; };
 		A069DE2F1A25CDB800DC9A5F /* ArrayFunctions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArrayFunctions.cpp; sourceTree = "<group>"; };
@@ -49,9 +57,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A03646271A3089D60007C3A1 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				A03646281A3089D60007C3A1 /* connectivity.txt */,
+				A03646291A3089D60007C3A1 /* data.vtk */,
+				A036462A1A3089D60007C3A1 /* location.txt */,
+				A036462B1A3089D60007C3A1 /* quisa_out.21398.vtk */,
+				A036462F1A30942F0007C3A1 /* NetworkSpecs.in */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
 		A0E571171A24CB0D00EA860F = {
 			isa = PBXGroup;
 			children = (
+				A03646271A3089D60007C3A1 /* data */,
 				A03DD7071A2623EF003563DF /* connectivity_pt.txt */,
 				A03DD7081A2623EF003563DF /* location_pb.txt */,
 				A0E571221A24CB0D00EA860F /* networkgen */,
@@ -77,6 +98,8 @@
 				A069DE301A25CDB800DC9A5F /* ArrayFunctions.h */,
 				A0F44E441A2E0A5900D769A7 /* vtk.cpp */,
 				A0F44E451A2E0A5900D769A7 /* vtk.h */,
+				A036462C1A308A300007C3A1 /* inputParser.cpp */,
+				A036462D1A308A300007C3A1 /* inputParser.h */,
 			);
 			path = networkgen;
 			sourceTree = "<group>";
@@ -140,6 +163,7 @@
 				A069DE341A25FA5800DC9A5F /* Generator.cpp in Sources */,
 				A0F44E461A2E0A5900D769A7 /* vtk.cpp in Sources */,
 				A0E571241A24CB0D00EA860F /* main.cpp in Sources */,
+				A036462E1A308A300007C3A1 /* inputParser.cpp in Sources */,
 				A069DE311A25CDB800DC9A5F /* ArrayFunctions.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

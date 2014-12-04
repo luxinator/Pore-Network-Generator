@@ -2,13 +2,17 @@
 #include "ArrayFunctions.h"
 #include "Generator.h"
 #include "vtk.h"
+#include "inputParser.h"
 
 
 int main() {
     
+    NetworkSpecs *ns = readSpecsFile("/Users/lucas/Programming/Xcode/PoreNetworkgen/data/NetworkSpecs.in");
     
+    
+    /*
     // make it so that Ni = Ni + 2, for the boundaries
-    int Ni = 50;
+    int Ni = 20;
     int Nj = 50;
     int Nk = 50;
     
@@ -28,7 +32,7 @@ int main() {
     throatCounter[1] = t + (Ni*Nj*Nk);
     
     // Generate the Network
-    int ** connect = generateConnectivity_2(Ni, Nj, Nk, arr, throatCounter);
+    int ** connect = generateConnectivity(Ni, Nj, Nk, arr, throatCounter);
     float** locationList = generateLocation(1.0f, throatCounter, Ni, Nj, Nk);
     
     writeConnectivity(cFile.c_str(), connect, Ni*Nj*Nk);
@@ -36,7 +40,7 @@ int main() {
     writeLocation(lFile.c_str(), locationList, throatCounter, Ni*Nj*Nk);
     writeVTK(vtkFile.c_str(), connect, locationList, Ni, Nj, Nk);
     
-    
+    */
 }
 
 

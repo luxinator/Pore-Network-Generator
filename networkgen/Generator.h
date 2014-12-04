@@ -9,11 +9,6 @@
 #ifndef __networkgen__Generator__
 #define __networkgen__Generator__
 
-#include <vector>
-#include <tuple>
-
-
-int ** generateConnectivity_2(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters);
 
 float **generateLocation(const float Length, int **throatCounters, const int Ni, const int Nj, const int Nk);
 
