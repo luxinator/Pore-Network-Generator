@@ -7,6 +7,7 @@
 //
 
 #include "inputParser.h"
+#include <ctype.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -32,12 +33,19 @@ int find_char(char *input, int size, char c){
     return -1;
 }
 
+void tolowercase(char *input, int size){
+    for (int i =0; i < size; i++) {
+        input[i] = tolower(input[i]);
+    }
+}
+
 NetworkSpecs *readSpecsFile(const char *filename){
     
     NetworkSpecs *NS = new NetworkSpecs;
     
     std::fstream file;
     
+    // Bugy!
     if( strcmp(filename, "NetworkSpecs.in")){
         std::cerr << "No Network Specification File"    << std::endl;
         std::cout << "Assuming Standard File location" << std::endl;
@@ -51,14 +59,14 @@ NetworkSpecs *readSpecsFile(const char *filename){
     }
     
     char buff[255];
-    char sub[8];
     char c = ' ';
     int i = 0;
     
     while(file.getline(buff, 255)){
         //TRIM THE STRING OF SPACES!!!
         trim_chars(buff, 255, c);
-        
+        tolowercase(buff, 255);
+    
         if(buff[0] == '\n' || buff[0] == '#')
             continue;
         
@@ -67,17 +75,19 @@ NetworkSpecs *readSpecsFile(const char *filename){
         //use the smart ass string function of C++
         std::string s = std::string(buff);
         
-        if ( s == "Ni") {
-            NS->Ni = std::stoi(s.substr(i));
+        if ( s.compare(0,2,"ni")  == 0) {
+            NS->Ni = std::stoi(s.substr(i+1));
         }
-        else if ( strcmp(sub,"Nj"))
-            NS->Nj = std::stoi(buff.substr(i));
+        else if ( s.compare(0,2,"nj")  == 0) {
+            NS->Nj = std::stoi(s.substr(i+1));
+        }
         
-        else if ( strcmp(sub,"Nk"))
-            NS->Nk = std::stoi(buff.substr(i));
-        
-        else if ( strcmp(sub,"L"))
-            NS->Length = std::stof(buff.substr(i));
+        else if( s.compare(0,2,"nk") == 0) {
+            NS->Nk = std::stoi(s.substr(i+1));
+        }
+        else if( s.compare(0,6,"length")  == 0) {
+            NS->Length = std::stoi(s.substr(i+1));
+        }
     }
     
     return NS;
