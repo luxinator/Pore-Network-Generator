@@ -8,15 +8,7 @@
 
 #ifndef __networkgen__inputParser__
 #define __networkgen__inputParser__
-
-#include <stdio.h>
-
-
-struct NetworkSpecs {
-    int Ni, Nj, Nk;
-    float Length;
-    
-};
+#include "PoreNetwork.h"
 
 NetworkSpecs *readSpecsFile(const char *filename = "NetworkSpecs.in");
 

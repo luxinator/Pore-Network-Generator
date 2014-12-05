@@ -10,6 +10,8 @@
 		A036462E1A308A300007C3A1 /* inputParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A036462C1A308A300007C3A1 /* inputParser.cpp */; };
 		A069DE311A25CDB800DC9A5F /* ArrayFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A069DE2F1A25CDB800DC9A5F /* ArrayFunctions.cpp */; };
 		A069DE341A25FA5800DC9A5F /* Generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A069DE321A25FA5800DC9A5F /* Generator.cpp */; };
+		A0E48D621A31C2F0005839D4 /* Eliminator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0E48D601A31C2F0005839D4 /* Eliminator.cpp */; };
+		A0E48D651A31C47B005839D4 /* PoreNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0E48D641A31C47B005839D4 /* PoreNetwork.cpp */; };
 		A0E571241A24CB0D00EA860F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0E571231A24CB0D00EA860F /* main.cpp */; };
 		A0F44E461A2E0A5900D769A7 /* vtk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A0F44E441A2E0A5900D769A7 /* vtk.cpp */; };
 /* End PBXBuildFile section */
@@ -34,12 +36,14 @@
 		A036462C1A308A300007C3A1 /* inputParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = inputParser.cpp; sourceTree = "<group>"; };
 		A036462D1A308A300007C3A1 /* inputParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = inputParser.h; sourceTree = "<group>"; };
 		A036462F1A30942F0007C3A1 /* NetworkSpecs.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NetworkSpecs.in; sourceTree = "<group>"; };
-		A03DD7071A2623EF003563DF /* connectivity_pt.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = connectivity_pt.txt; sourceTree = "<group>"; };
-		A03DD7081A2623EF003563DF /* location_pb.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = location_pb.txt; sourceTree = "<group>"; };
 		A069DE2F1A25CDB800DC9A5F /* ArrayFunctions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArrayFunctions.cpp; sourceTree = "<group>"; };
 		A069DE301A25CDB800DC9A5F /* ArrayFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArrayFunctions.h; sourceTree = "<group>"; };
 		A069DE321A25FA5800DC9A5F /* Generator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Generator.cpp; sourceTree = "<group>"; };
 		A069DE331A25FA5800DC9A5F /* Generator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Generator.h; sourceTree = "<group>"; };
+		A0E48D601A31C2F0005839D4 /* Eliminator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Eliminator.cpp; sourceTree = "<group>"; };
+		A0E48D611A31C2F0005839D4 /* Eliminator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Eliminator.h; sourceTree = "<group>"; };
+		A0E48D631A31C30F005839D4 /* PoreNetwork.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PoreNetwork.h; sourceTree = "<group>"; };
+		A0E48D641A31C47B005839D4 /* PoreNetwork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PoreNetwork.cpp; sourceTree = "<group>"; };
 		A0E571201A24CB0D00EA860F /* networkgen */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = networkgen; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0E571231A24CB0D00EA860F /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = main.cpp; sourceTree = "<group>"; usesTabs = 0; };
 		A0F44E441A2E0A5900D769A7 /* vtk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vtk.cpp; sourceTree = "<group>"; };
@@ -73,8 +77,6 @@
 			isa = PBXGroup;
 			children = (
 				A03646271A3089D60007C3A1 /* data */,
-				A03DD7071A2623EF003563DF /* connectivity_pt.txt */,
-				A03DD7081A2623EF003563DF /* location_pb.txt */,
 				A0E571221A24CB0D00EA860F /* networkgen */,
 				A0E571211A24CB0D00EA860F /* Products */,
 			);
@@ -100,6 +102,10 @@
 				A0F44E451A2E0A5900D769A7 /* vtk.h */,
 				A036462C1A308A300007C3A1 /* inputParser.cpp */,
 				A036462D1A308A300007C3A1 /* inputParser.h */,
+				A0E48D601A31C2F0005839D4 /* Eliminator.cpp */,
+				A0E48D611A31C2F0005839D4 /* Eliminator.h */,
+				A0E48D631A31C30F005839D4 /* PoreNetwork.h */,
+				A0E48D641A31C47B005839D4 /* PoreNetwork.cpp */,
 			);
 			path = networkgen;
 			sourceTree = "<group>";
@@ -162,9 +168,11 @@
 			files = (
 				A069DE341A25FA5800DC9A5F /* Generator.cpp in Sources */,
 				A0F44E461A2E0A5900D769A7 /* vtk.cpp in Sources */,
+				A0E48D651A31C47B005839D4 /* PoreNetwork.cpp in Sources */,
 				A0E571241A24CB0D00EA860F /* main.cpp in Sources */,
 				A036462E1A308A300007C3A1 /* inputParser.cpp in Sources */,
 				A069DE311A25CDB800DC9A5F /* ArrayFunctions.cpp in Sources */,
+				A0E48D621A31C2F0005839D4 /* Eliminator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

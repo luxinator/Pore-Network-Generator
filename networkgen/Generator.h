@@ -14,8 +14,5 @@ float **generateLocation(const float Length, int **throatCounters, const int Ni,
 
 int **generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters);
 
-void writeConnectivity(const char * filename, int **connect, int nrPB);
-
-void writeLocation(const char * filename, float ** locationList, int ** throatCounters, int PNMax);
 
 #endif /* defined(__networkgen__Generator__) */

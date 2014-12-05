@@ -9,10 +9,7 @@
 #include "Generator.h"
 #include "ArrayFunctions.h"
 
-
 #include <iostream>
-#include <fstream>
-#include <iomanip>
 #include <math.h>
 
 
@@ -52,7 +49,8 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
     
     //Extend this to include variable connection amount based upon distance from Pore to neightbours!
     int *t = new int[2 * 13  *  Ni*Nj*Nk];// 3 connections per pb, we have Ni*Nj*Nk pbs and connection is a pair of 2 ints
-    memset(t, 13 *2 * Nj*Nj*Nk, 0);
+    memset(t, 0, 13 *2 * Nj*Nj*Nk);
+	
     int **connection = new int*[2]; //[0] from [1] to
     connection[0] = t;
     connection[1] = t + (13 * Ni*Nj*Nk);
@@ -61,9 +59,11 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
     int *coord = new int[3];
     int *coord_n = new int[3];
     
-    if (!array)
-        return nullptr;
-    
+    if (!array){
+        delete[] coord;
+		delete[] coord_n;
+		return nullptr;
+    }
     //throatCounters [0] = amount of connection of pb
     //throatcounters [1] = total nr of connected pb including this one, excluding the ones to come
     if(throatCounters == nullptr){
@@ -114,7 +114,7 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
                      pow((double)(coord[1] - coord_n[1]), 2.0)+
                      pow((double)(coord[2] - coord_n[2]), 2.0));
             
-            if(L <= sqrt(3.0)){
+            if(L <= sqrt(2.0)){
                 connection[0][i] = pn; //Pb nr
                 connection[1][i] = pn_n; //connected to pb
                 throatCounters[0][pn] += 1; //amount of forward connections of pb
@@ -127,64 +127,10 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
         throatCounters[1][pn] += i; //nr of connection made in total
     }// for
     
-    delete coord;
-    delete coord_n;
+    delete[] coord;
+    delete[] coord_n;
     
     return connection;
 }
 
 
-void writeConnectivity(const char * filename, int** connect,int nrPB){
-    
-    std::ofstream file;
-    if( filename == nullptr){
-        std::cerr << "No filename specified! " << std::endl;
-    }
-    
-    std::cout << "Opening File: " << filename << std::endl;
-    file.open(filename, std::ios::trunc);
-    if(!file){
-        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
-        return;
-    }
-    
-    for(int i = 0; i < nrPB * 13; i ++){
-        if (connect[0][i] == 0)
-            break;
-        else
-            file << connect[0][i]<< '\t' << connect[1][i] << std::endl;
-    }
-    
-    file.close();
-}
-
-
-void writeLocation(const char * filename, float ** locationList, int ** throatCounters, int PNMax){
-    
-    
-    
-    std::ofstream file;
-    if( filename == nullptr){
-        std::cerr << "No filename specified! " << std::endl;
-    }
-    
-    std::cout << "Opening File: " << filename << std::endl;
-    file.open(filename, std::ios::trunc);
-    if(!file){
-        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
-        return;
-    }
-    
-    file.setf(std::ios_base::scientific);
-    for(int pn = 1; pn <= PNMax; pn++){
-        
-        file << '[' << pn << ']' << '\t';
-        file << std::setw(8)<< locationList[0][pn]   << ' ';
-        file << std::setw(8)<< locationList[1][pn]   << ' ';
-        file << std::setw(8)<< locationList[2][pn]   << ' ';
-        file << std::setw(8)<< throatCounters[0][pn] << ' ';
-        file << std::setw(8)<< throatCounters[1][pn] << '\n';
-    }
-    
-    file.close();
-}
