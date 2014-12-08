@@ -66,6 +66,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
     while(file.getline(buff, 255)){
         //TRIM THE STRING OF SPACES!!!
         trim_chars(buff, 255, c);
+        //Convert to Lower Case
         tolowercase(buff, 255);
     
         if(buff[0] == '\n' || buff[0] == '#')

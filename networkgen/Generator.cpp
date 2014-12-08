@@ -42,7 +42,7 @@ float ** generateLocation(const float Length, int **throatCounters, const int Ni
 
 
 /*
- * Generate the Connectivity map based upon the lattice distance between points
+ * Generate a half Connectivity map based upon the lattice distance between points
  */
 
 int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters = nullptr){
@@ -83,20 +83,22 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
             connection[0][i] = pn; //Pb nr
             connection[1][i] =  array[coord[0] + 1][coord[1]][coord[2]]; //connected to pb
             throatCounters[0][pn] += 1; //amount of connections of pb
-            
+            throatCounters[1][pn] += 1; // inlet has one throat in forward no more, no less!
             i++;
-            
-            continue; // Skip the rest
+            continue; // skip the rest, no more connections for this pb
         }
         // Connect to Boundary Outlet in x-dir and no more
+        
         else if (coord[0] == Ni - 2){
             connection[0][i] = pn; //Pb nr
             connection[1][i] =  array[coord[0] + 1][coord[1]][coord[2]]; //connected to pb
             throatCounters[0][pn] += 1; //amount of connections of pb
-            
+            throatCounters[1][pn] += 1; // outlet has one throat in forward no more, no less!
             i++;
             
-        }
+            continue; // skip the rest, no more connections for this pb
+        }//else if
+        
         // (pn+ Nj*Nk + (Nj*Nk /2 + 1) -> distance of one x-slice in x-dir
         //  Ni*Nj*Nk - Nj*Nk -> do not go further then second to last layer in x-dir
         //
@@ -106,7 +108,9 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
         // the max pn_n = pn + Nj*Nk +Nk + 1
         // By using 2 for loops we lose the need to loop over half of the x-plane in front of pn
         //
-        for( int pn_n = pn+1; pn_n < (pn+ Nj*Nk + (Nj*Nk /2 + 1)) && pn_n <= Ni*Nj*Nk - Nj*Nk; pn_n++){
+        else
+            for( int pn_n = pn+1; pn_n < (pn+ Nj*Nk + (Nj*Nk /2 + 1)) &&
+                pn_n <= Ni*Nj*Nk - Nj*Nk; pn_n++){
             
             deflatten_3d(pn_n-1, Ni, Nj, Nk, coord_n);
             
@@ -133,4 +137,56 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
     return connection;
 }
 
+
+
+int **generateFullConnectivity(const int Ni, const int Nj, const int Nk, int **halfConnectivity){
+    
+    int i = 0;
+    //maximum number of connections is:
+    for(i = 0; i < Ni*Nj*Nk * 13; i++){
+        if(halfConnectivity[0][i] == 0)
+            break;
+    }
+    
+    int maxConnections = i * 2 + 1;
+    
+    
+    int *t = new int[maxConnections];
+    memset(t, 0, maxConnections);
+    
+    int **connection = new int*[2]; //[0] from [1] to
+    connection[0] = t;
+    connection[1] = t + (maxConnections);
+    
+    for(i = 0; i < maxConnections; i++){
+        //copy
+        connection[0][i * 2] = halfConnectivity[0][i];
+        connection[1][i * 2] = halfConnectivity[1][i];
+        //swap values and add as well...
+        connection[0][i * 2 + 1] = halfConnectivity[1][i];
+        connection[1][i * 2 + 1] = halfConnectivity[0][i];
+    }
+    
+    //bubble sort -> maybe quickSort will do as well... no time to implement...
+    bool sorted = false;
+    int t1, t2; // temp values
+    while (!sorted){
+        sorted = true;
+        
+        for(int i = 0; i < maxConnections - 2; i++)
+            if (connection[0][i] > connection[0][i]) {
+                sorted = false;
+                t1 = connection[0][i];
+                t2 = connection[1][0];
+                
+                connection[0][i] = connection[0][i+1];
+                connection[1][0] = connection[1][i+1];
+                
+                connection[0][i+1] = t1;
+                connection[1][i+1] = t2;
+            }
+    }
+    
+    return connection;
+}
 

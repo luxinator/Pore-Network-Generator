@@ -93,8 +93,12 @@
 		A0E571221A24CB0D00EA860F /* networkgen */ = {
 			isa = PBXGroup;
 			children = (
+				A0E48D631A31C30F005839D4 /* PoreNetwork.h */,
+				A0E48D641A31C47B005839D4 /* PoreNetwork.cpp */,
 				A069DE321A25FA5800DC9A5F /* Generator.cpp */,
 				A069DE331A25FA5800DC9A5F /* Generator.h */,
+				A0E48D601A31C2F0005839D4 /* Eliminator.cpp */,
+				A0E48D611A31C2F0005839D4 /* Eliminator.h */,
 				A0E571231A24CB0D00EA860F /* main.cpp */,
 				A069DE2F1A25CDB800DC9A5F /* ArrayFunctions.cpp */,
 				A069DE301A25CDB800DC9A5F /* ArrayFunctions.h */,
@@ -102,10 +106,6 @@
 				A0F44E451A2E0A5900D769A7 /* vtk.h */,
 				A036462C1A308A300007C3A1 /* inputParser.cpp */,
 				A036462D1A308A300007C3A1 /* inputParser.h */,
-				A0E48D601A31C2F0005839D4 /* Eliminator.cpp */,
-				A0E48D611A31C2F0005839D4 /* Eliminator.h */,
-				A0E48D631A31C30F005839D4 /* PoreNetwork.h */,
-				A0E48D641A31C47B005839D4 /* PoreNetwork.cpp */,
 			);
 			path = networkgen;
 			sourceTree = "<group>";

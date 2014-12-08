@@ -38,8 +38,6 @@ void writeConnectivity(const char * filename, int** connect,int nrPB){
 
 void writeLocation(const char * filename, float ** locationList, int ** throatCounters, int PNMax){
     
-    
-    
     std::ofstream file;
     if( filename == nullptr){
         std::cerr << "No filename specified! " << std::endl;

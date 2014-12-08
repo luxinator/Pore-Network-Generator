@@ -15,6 +15,7 @@ struct NetworkSpecs {
     int Ni, Nj, Nk;
     float Length;
     float Pi, Pj, Pk;
+    float *C;
     
 };
 

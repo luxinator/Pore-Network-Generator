@@ -15,6 +15,6 @@
 #include "ArrayFunctions.h"
 #include "PoreNetwork.h"
 
-std::vector<int> *EliminateThroats(PoreNetwork *P_net, float * C, int coordNr);
+void EliminateThroats(PoreNetwork *P_net, float * C, int coordNr);
 
 #endif /* defined(__networkgen__Eliminator__) */

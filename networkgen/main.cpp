@@ -21,9 +21,11 @@ int main() {
     float L = ns->Length;
     
     std::string cFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/connectivity.txt";
+    std::string dFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/deleted.txt";
     std::string vtkFile = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/data.vtk";
     std::string lFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/location.txt";
     
+    std::cout<< "Generating PoreBodies Nrs" << std::endl;
     P->arr = generate_naive_array(Ni,Nj,Nk);
     
     //Allocate a Part of Memory
@@ -35,10 +37,13 @@ int main() {
     P->throatCounter[1] = t + (Ni*Nj*Nk);
     
     // Generate the Network
+    std::cout<< "Generating Network" << std::endl;
     P->throatList = generateConnectivity(Ni, Nj, Nk, P->arr, P->throatCounter);
     P->locationList = generateLocation(L, P->throatCounter, Ni, Nj, Nk);
     
-    //writeConnectivity(cFile.c_str(), connect, Ni*Nj*Nk);
+    int **test = generateFullConnectivity(Ni, Nj, Nk, P->throatList);
+    
+    writeConnectivity(cFile.c_str(),test, Ni*Nj*Nk);
     
     //writeLocation(lFile.c_str(), locationList, throatCounter, Ni*Nj*Nk);
     //writeVTK(vtkFile.c_str(), connect, locationList, Ni, Nj, Nk);
@@ -49,12 +54,9 @@ int main() {
         C[i] = 0.5;
     }
     
-    std::vector<int> *list= EliminateThroats(P, C, 6);
-    list->shrink_to_fit();
-    
-    for (int i = 0; i < list->size(); i++) {
-        std::cout << list->at(i) << std::endl;
-    }
+    EliminateThroats(P, C, 6);
+    writeConnectivity(dFile.c_str(), P->throatList, Ni*Nj*Nk);
+
     
 }
 

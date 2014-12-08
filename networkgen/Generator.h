@@ -14,5 +14,6 @@ float **generateLocation(const float Length, int **throatCounters, const int Ni,
 
 int **generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters);
 
+int **generateFullConnectivity(const int Ni, const int Nj, const int Nk, int **halfConnectivity);
 
 #endif /* defined(__networkgen__Generator__) */
