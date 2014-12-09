@@ -30,6 +30,12 @@ struct PoreNetwork{
     
 };
 
+/*
+ * Cleans out a throatList in a PN, deleting all Flagged Entries
+ * It does so by doing a member copy to an new array! NOT inplace!
+ */
+void cleanThroatList(PoreNetwork *pn, const int Flag = 0);
+
 
 void writeConnectivity(const char * filename, int **connect, int nrPB);
 

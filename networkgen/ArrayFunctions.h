@@ -16,4 +16,6 @@ int *** generate_naive_array(const int Ni, const int Nj, const int Nk);
 
 void deflatten_3d(const int i, const int Ni, const int Nj, const int Nk, int* coord);
 
+void bubbleSortList(int **list, int l);
+
 #endif /* defined(__networkgen__ArrayFunctions__) */

@@ -9,9 +9,67 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include "PoreNetwork.h"
 
+/*
+ * Cleans out a throatList in a PN, deleting all Flagged Entries
+ * It does so by doing a member copy to an new array! NOT inplace!
+ */
 
-void writeConnectivity(const char * filename, int** connect,int nrPB){
+void cleanThroatList(PoreNetwork *pn, const int Flag){
+    
+    
+    if(!pn->throatList){
+        return;
+    }
+    
+    int flagCounter = 0;
+    int i = 0;
+    
+    while(pn->throatList[0][i] != 0){
+        if(Flag != 0 && (pn->throatList[0][i] == Flag || pn->throatList[1][i] == Flag))
+            flagCounter++;
+        i++;
+    }
+    // gives index of 0 entry, which is also the length of the list
+    
+    int nrConnections = i;
+    std::cout<< "Cleaning ThroatList ..." << std::endl;
+    std::cout<< "  Amount of Connection: \t" << nrConnections << std::endl;
+    std::cout<< "  Amount of Flagged:    \t" << flagCounter   << std::endl;
+    std::cout<< "  Max throats:          \t" << pn->ns->Ni * pn->ns->Nj * pn->ns->Nk  * 13 << std::endl;
+    
+    // Copy
+    int newAmountOfConnections =  nrConnections - flagCounter; // keep one extra for the [0,0] entry!
+    int *t = new int[newAmountOfConnections * 2];
+    int **newTL = new int*[2];
+    newTL[0] = t;
+    newTL[1] = t + newAmountOfConnections;
+    
+    // Copy all the connections
+    int j = 0;
+    for(i = 0; i < nrConnections; i++){
+        if(pn->throatList[1][i] != Flag && pn->throatList[0][i] != Flag){
+            newTL[0][j] = pn->throatList[0][i];
+            newTL[1][j] = pn->throatList[1][i];
+            j++;
+        }
+    }
+    //guards
+    newTL[0][j] = 0;
+    newTL[1][j] = 0;
+    
+    //free the old throatList data
+    //delete [] pn->throatList[0];
+    
+    // Repopulate the pointers
+    pn->throatList[0] = newTL[0];
+    pn->throatList[1] = newTL[1];
+    
+    
+}
+
+void writeConnectivity(const char * filename, int** connect,int nrConnections = INT32_MAX){
     
     std::ofstream file;
     if(!filename){
@@ -25,7 +83,7 @@ void writeConnectivity(const char * filename, int** connect,int nrPB){
         return;
     }
     
-    for(int i = 0; i < nrPB * 13; i ++){
+    for(int i = 0; i < nrConnections; i ++){
         if (connect[0][i] == 0)
             break;
         else
@@ -49,7 +107,7 @@ void writeLocation(const char * filename, float ** locationList, int ** throatCo
         std::cerr<< "Error opening file [" << filename << ']' << std::endl;
         return;
     }
-    
+    // set output type to scientific
     file.setf(std::ios_base::scientific);
     for(int pn = 1; pn <= PNMax; pn++){
         
@@ -59,6 +117,7 @@ void writeLocation(const char * filename, float ** locationList, int ** throatCo
         file << std::setw(8)<< locationList[2][pn]   << ' ';
         file << std::setw(8)<< throatCounters[0][pn] << ' ';
         file << std::setw(8)<< throatCounters[1][pn] << '\n';
+        //std::cout<< throatCounters[0][pn] << '\t' <<  throatCounters[1][pn] << std::endl;
     }
     
     file.close();

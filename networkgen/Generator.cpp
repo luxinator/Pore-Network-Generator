@@ -42,35 +42,48 @@ float ** generateLocation(const float Length, int **throatCounters, const int Ni
 
 
 /*
- * Generate a half Connectivity map based upon the lattice distance between points
+ * return: connect[0][i] = source pb -> connect[1][i] = destination
+ * Generate a half Connectivity map based upon the lattice distance between points.
+ * The array return is huge and bulky.
  */
 
 int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters = nullptr){
     
+    
+    if (!array){
+        std::cerr << "No pb Array supplied to generateConnectivity!" << std::endl;
+        return nullptr;
+    }
     //Extend this to include variable connection amount based upon distance from Pore to neightbours!
-    int *t = new int[2 * 13  *  Ni*Nj*Nk];// 3 connections per pb, we have Ni*Nj*Nk pbs and connection is a pair of 2 ints
-    memset(t, 0, 13 *2 * Nj*Nj*Nk);
-	
+    int *t = new int[2 * 13  *  Ni*Nj*Nk];// 13 connections per pb, we have Ni*Nj*Nk pbs and connection is a pair of 2 ints
+    
     int **connection = new int*[2]; //[0] from [1] to
     connection[0] = t;
     connection[1] = t + (13 * Ni*Nj*Nk);
+    
+    for(int i = 0; i < 13  *  Ni*Nj*Nk; i ++){
+        connection[0][i] = 0;
+        connection[1][i] = 0;
+    }
     
     // coords of pb under consideration
     int *coord = new int[3];
     int *coord_n = new int[3];
     
-    if (!array){
-        delete[] coord;
-		delete[] coord_n;
-		return nullptr;
-    }
     //throatCounters [0] = amount of connection of pb
     //throatcounters [1] = total nr of connected pb including this one, excluding the ones to come
-    if(throatCounters == nullptr){
-        int *temp = new int[2 * Ni*Nj*Nk];
-        throatCounters = new int*[2];
-        throatCounters[0] = temp;
-        throatCounters[1] = temp + (Ni*Nj*Nk);
+    if(!throatCounters || !throatCounters[1] || !throatCounters[0]){
+        std::cerr << "No frequency array given!" << std::endl;
+		delete[] coord;
+		delete[] coord_n;
+        return nullptr;
+    }
+    
+    std::cout << 2 * Ni*Nj*Nk << std::endl;
+    
+    for(int i = 0; i < Ni*Nj*Nk; i++){
+        throatCounters[0][i] = 0;
+        throatCounters[1][i] = 0;
     }
     
     int i = 0;
@@ -83,9 +96,7 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
             connection[0][i] = pn; //Pb nr
             connection[1][i] =  array[coord[0] + 1][coord[1]][coord[2]]; //connected to pb
             throatCounters[0][pn] += 1; //amount of connections of pb
-            throatCounters[1][pn] += 1; // inlet has one throat in forward no more, no less!
-            i++;
-            continue; // skip the rest, no more connections for this pb
+            i++;//continue; // skip the rest, no more connections for this pb
         }
         // Connect to Boundary Outlet in x-dir and no more
         
@@ -95,8 +106,7 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
             throatCounters[0][pn] += 1; //amount of connections of pb
             throatCounters[1][pn] += 1; // outlet has one throat in forward no more, no less!
             i++;
-            
-            continue; // skip the rest, no more connections for this pb
+            //continue; // skip the rest, no more connections for this pb
         }//else if
         
         // (pn+ Nj*Nk + (Nj*Nk /2 + 1) -> distance of one x-slice in x-dir
@@ -108,27 +118,29 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
         // the max pn_n = pn + Nj*Nk +Nk + 1
         // By using 2 for loops we lose the need to loop over half of the x-plane in front of pn
         //
-        else
+        else{
             for( int pn_n = pn+1; pn_n < (pn+ Nj*Nk + (Nj*Nk /2 + 1)) &&
                 pn_n <= Ni*Nj*Nk - Nj*Nk; pn_n++){
-            
-            deflatten_3d(pn_n-1, Ni, Nj, Nk, coord_n);
-            
-            L = sqrt(pow((double)(coord[0] - coord_n[0]), 2.0) +
-                     pow((double)(coord[1] - coord_n[1]), 2.0)+
-                     pow((double)(coord[2] - coord_n[2]), 2.0));
-            
-            if(L <= sqrt(2.0)){
-                connection[0][i] = pn; //Pb nr
-                connection[1][i] = pn_n; //connected to pb
-                throatCounters[0][pn] += 1; //amount of forward connections of pb
                 
-                i++;
+                deflatten_3d(pn_n-1, Ni, Nj, Nk, coord_n);
                 
-            }
-        } // for
+                L = sqrt(pow((double)(coord[0] - coord_n[0]), 2.0) +
+                         pow((double)(coord[1] - coord_n[1]), 2.0)+
+                         pow((double)(coord[2] - coord_n[2]), 2.0));
+                
+                if(L <= sqrt(2.0)){
+                    connection[0][i] = pn; //Pb nr
+                    connection[1][i] = pn_n; //connected to pb
+                    throatCounters[0][pn] += 1; //amount of forward connections of pb
+                    
+                    i++;
+                    
+                } // if
+            } // for
+        } // else
         
         throatCounters[1][pn] += i; //nr of connection made in total
+                
     }// for
     
     delete[] coord;
@@ -137,55 +149,54 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
     return connection;
 }
 
-
-
-int **generateFullConnectivity(const int Ni, const int Nj, const int Nk, int **halfConnectivity){
+/*
+ * Returns a sorted list of throats with connect[0][i] is source pb
+ * Array is exactly as long as needed, will output length to *length
+ */
+int **generateFullConnectivity(const int Ni, const int Nj, const int Nk,int **halfConnectivity, int *length){
     
+    std::cout << "Generating Full Connectivity" << std::endl;
     int i = 0;
+    int halfLength = 0;
     //maximum number of connections is:
     for(i = 0; i < Ni*Nj*Nk * 13; i++){
-        if(halfConnectivity[0][i] == 0)
+        if(halfConnectivity[0][i] == 0){
+            halfLength = i;
             break;
+        }
     }
+    int maxConnections = halfLength  * 2;
     
-    int maxConnections = i * 2 + 1;
     
+    int *t = new int[maxConnections * 2];
+    //memset(t, 0, maxConnections);
     
-    int *t = new int[maxConnections];
-    memset(t, 0, maxConnections);
-    
-    int **connection = new int*[2]; //[0] from [1] to
+    int **connection = new int*[2]; //from [0] to [1]
     connection[0] = t;
     connection[1] = t + (maxConnections);
-    
     for(i = 0; i < maxConnections; i++){
+        connection[0][i] = 0; //guards in case off
+        connection[1][i] = 0;
+    }
+    
+    for(i = 0; i < halfLength; i++){
         //copy
         connection[0][i * 2] = halfConnectivity[0][i];
         connection[1][i * 2] = halfConnectivity[1][i];
+        
+        //if(halfConnectivity[1][i] == 0 || halfConnectivity[0][i] == 0){
+        //    std::cout<<"BS!"<<std::endl;
+        //    std::cout<<halfConnectivity[1][i] << '\t' << halfConnectivity[0][i]<<std::endl;
+        //}
+        
         //swap values and add as well...
         connection[0][i * 2 + 1] = halfConnectivity[1][i];
         connection[1][i * 2 + 1] = halfConnectivity[0][i];
+        //std::cout<<halfConnectivity[1][i] << '\t' << halfConnectivity[0][i]<<std::endl;
     }
     
-    //bubble sort -> maybe quickSort will do as well... no time to implement...
-    bool sorted = false;
-    int t1, t2; // temp values
-    while (!sorted){
-        sorted = true;
-        
-        for(int i = 0; i < maxConnections - 2; i++)
-            if (connection[0][i] > connection[0][i]) {
-                sorted = false;
-                t1 = connection[0][i];
-                t2 = connection[1][0];
-                
-                connection[0][i] = connection[0][i+1];
-                connection[1][0] = connection[1][i+1];
-                
-                connection[0][i+1] = t1;
-                connection[1][i+1] = t2;
-            }
-    }
+    bubbleSortList(connection, maxConnections);
+    length[0] = maxConnections;
     
     return connection;
 }
