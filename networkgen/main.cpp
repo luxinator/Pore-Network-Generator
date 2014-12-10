@@ -41,33 +41,33 @@ int main() {
     // --- Generate the Network
     std::cout<< "Generating Network" << std::endl;
     P->throatList = generateConnectivity(Ni, Nj, Nk, P->arr, P->throatCounter);
-    
     P->locationList = generateLocation(L, P->throatCounter, Ni, Nj, Nk);
     
-    // --- Testing Full connect generator--- \\
-    //int connectLenth = 0;
-//    int **test = generateFullConnectivity(Ni, Nj, Nk, P->throatList, &connectLenth);
-//    writeConnectivity(cFile.c_str(),test, connectLenth);
-//    writeLocation(lFile.c_str(), P->locationList, P->throatCounter, Ni*Nj*Nk);
-   
-    
-    //writeVTK(vtkFile.c_str(), connect, locationList, Ni, Nj, Nk);
-    
-    
     // --- Update input Parser to include the changes per forward direction
-    std::cout<<"Deleting throats" << std::endl;
     float *C = new float[8];
     for(int i = 0; i < 8; i++){
         C[i] = 0.5;
     }
     
     EliminateThroats(P, C, 6);
-    
-    //searchIsolated(P, connectLenth);
-    
-    writeConnectivity(dFile.c_str(), P->throatList);
     cleanThroatList(P, -1);
-    writeConnectivity(cFile.c_str(), P->throatList);
+    
+    
+    // --- Testing Full connect generator--- \\
+    
+    int **test = generateFullConnectivity(Ni, Nj, Nk, P->throatList);
+    delete [] P->throatList[0];
+    P->throatList[0] = test[0];
+    P->throatList[1] = test[1];
+    
+    //writeConnectivity(cFile.c_str(),test);
+    //writeLocation(lFile.c_str(), P->locationList, P->throatCounter, Ni*Nj*Nk);
+   
+    
+    //writeVTK(vtkFile.c_str(), connect, locationList, Ni, Nj, Nk);
+    
+    searchIsolated(P);
+    
     
     
 

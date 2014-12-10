@@ -153,7 +153,7 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
  * Returns a sorted list of throats with connect[0][i] is source pb
  * Array is exactly as long as needed, will output length to *length
  */
-int **generateFullConnectivity(const int Ni, const int Nj, const int Nk,int **halfConnectivity, int *length){
+int **generateFullConnectivity(const int Ni, const int Nj, const int Nk,int **halfConnectivity){
     
     std::cout << "Generating Full Connectivity" << std::endl;
     int i = 0;
@@ -165,17 +165,17 @@ int **generateFullConnectivity(const int Ni, const int Nj, const int Nk,int **ha
             break;
         }
     }
-    int maxConnections = halfLength  * 2;
+    int maxConnections = halfLength  * 2 +1; // Full connectivity is twich the size of half connectivity, and we need one extra place for the [0][0] guards
     
-    
+    //For Details see [generateConnectivity]
     int *t = new int[maxConnections * 2];
     //memset(t, 0, maxConnections);
     
-    int **connection = new int*[2]; //from [0] to [1]
+    int **connection = new int*[2];
     connection[0] = t;
-    connection[1] = t + (maxConnections);
+    connection[1] = t + maxConnections;
     for(i = 0; i < maxConnections; i++){
-        connection[0][i] = 0; //guards in case off
+        connection[0][i] = 0;
         connection[1][i] = 0;
     }
     
@@ -184,20 +184,15 @@ int **generateFullConnectivity(const int Ni, const int Nj, const int Nk,int **ha
         connection[0][i * 2] = halfConnectivity[0][i];
         connection[1][i * 2] = halfConnectivity[1][i];
         
-        //if(halfConnectivity[1][i] == 0 || halfConnectivity[0][i] == 0){
-        //    std::cout<<"BS!"<<std::endl;
-        //    std::cout<<halfConnectivity[1][i] << '\t' << halfConnectivity[0][i]<<std::endl;
-        //}
-        
+    
         //swap values and add as well...
         connection[0][i * 2 + 1] = halfConnectivity[1][i];
         connection[1][i * 2 + 1] = halfConnectivity[0][i];
-        //std::cout<<halfConnectivity[1][i] << '\t' << halfConnectivity[0][i]<<std::endl;
+        
     }
     
-    bubbleSortList(connection, maxConnections);
-    length[0] = maxConnections;
-    
+    bubbleSortList(connection, maxConnections-1); // Do NOT sort with the guards...
+
     return connection;
 }
 

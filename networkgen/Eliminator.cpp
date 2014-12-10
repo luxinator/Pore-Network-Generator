@@ -24,6 +24,9 @@
 
 void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
 
+    
+    std::cout<<"Deleting throats" << std::endl;
+    
     if(!P_net){
         std::cerr << "Eliminator Error! \n No PoreNetwork Specified!" << std::endl;
         return;
@@ -188,7 +191,7 @@ void DFS(int start, int ** TL, char* flagged_PB, int TL_Length){
  * if pbs are connected to inlet AND outlet
  */
 
-void searchIsolated(PoreNetwork *P_net, int connectionLength){
+void searchIsolated(PoreNetwork *P_net){
     
     
     std::cout<< "Starting Search for Isolated PBs and Clusters" << std::endl;
@@ -196,20 +199,32 @@ void searchIsolated(PoreNetwork *P_net, int connectionLength){
     int Nj = P_net->ns->Nj;
     int Nk = P_net->ns->Nk;
     
+    int i;
+    for(i = 0; P_net->throatList[0][i] != 0; i++)
+        ;
+    int lengthTL = i;
+    
     // Allocata a chunk and set it to zero
     char *flagged_PB = new char[Ni*Nj*Nk];
     
+    for(i = 0; i < Ni*Nj*Nk; i++)
+        flagged_PB[i] = 0;
+    
     //Do a DepthFirst Search on all inlets
-    for(int i = 0; i < Nj*Nk; i++){
+    for(i = 0; i < Nj*Nk; i++){
         // First test if Inlet has connection
         if(P_net->throatList[0][i] > 0  && P_net->throatList[0][i] < Nj*Nk){
-            DFS(i, P_net->throatList, flagged_PB, connectionLength);
+            DFS(i, P_net->throatList, flagged_PB, lengthTL - 1); // same as with sorting, do not allow guards to be searched!
         }
     }
     
     // we now have a flagged list of pb's which are connected to the inlets
-
-
+    for(i = 0; i < Ni*Nj*Nk; i++){
+        //if (flagged_PB[i]== 1) {
+            std::cout<<'[' << i << ']'<< '\t' << (int)flagged_PB[i] << std::endl;
+        //}
+        
+    }
 }
 
 
