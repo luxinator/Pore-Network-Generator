@@ -65,9 +65,9 @@ int main() {
     
     //searchIsolated(P, connectLenth);
     
-    writeConnectivity(dFile.c_str(), P->throatList, Ni*Nj*Nk);
-    cleanThroatList(P, 0);
-    writeConnectivity(cFile.c_str(), P->throatList, Ni*Nj*Nk);
+    writeConnectivity(dFile.c_str(), P->throatList);
+    cleanThroatList(P, -1);
+    writeConnectivity(cFile.c_str(), P->throatList);
     
     
 

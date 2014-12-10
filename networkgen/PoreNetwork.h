@@ -37,7 +37,7 @@ struct PoreNetwork{
 void cleanThroatList(PoreNetwork *pn, const int Flag = 0);
 
 
-void writeConnectivity(const char * filename, int **connect, int nrPB);
+void writeConnectivity(const char * filename, int **connect);
 
 void writeLocation(const char * filename, float ** locationList, int ** throatCounters, int PNMax);
 

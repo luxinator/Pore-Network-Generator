@@ -40,7 +40,7 @@ void cleanThroatList(PoreNetwork *pn, const int Flag){
     std::cout<< "  Max throats:          \t" << pn->ns->Ni * pn->ns->Nj * pn->ns->Nk  * 13 << std::endl;
     
     // Copy
-    int newAmountOfConnections =  nrConnections - flagCounter; // keep one extra for the [0,0] entry!
+    int newAmountOfConnections =  nrConnections - flagCounter + 1; // keep one extra for the [0,0] entry!
     int *t = new int[newAmountOfConnections * 2];
     int **newTL = new int*[2];
     newTL[0] = t;
@@ -56,20 +56,22 @@ void cleanThroatList(PoreNetwork *pn, const int Flag){
         }
     }
     //guards
-    newTL[0][j] = 0;
-    newTL[1][j] = 0;
-    
+    newTL[0][newAmountOfConnections-1] = 0;
+    newTL[1][newAmountOfConnections-1] = 0;
+
     //free the old throatList data
-    //delete [] pn->throatList[0];
+    delete [] pn->throatList[0];
     
     // Repopulate the pointers
     pn->throatList[0] = newTL[0];
     pn->throatList[1] = newTL[1];
     
-    
 }
 
-void writeConnectivity(const char * filename, int** connect,int nrConnections = INT32_MAX){
+/*
+ * Writes out the throatList until as entry with [0][0] is encounterd
+ */
+void writeConnectivity(const char * filename, int** connect){
     
     std::ofstream file;
     if(!filename){
@@ -83,8 +85,8 @@ void writeConnectivity(const char * filename, int** connect,int nrConnections = 
         return;
     }
     
-    for(int i = 0; i < nrConnections; i ++){
-        if (connect[0][i] == 0)
+    for(int i = 0; ; i ++){
+        if (connect[0][i] == 0 && connect[1][i] == 0)
             break;
         else
             file << connect[0][i]<< '\t' << connect[1][i] << std::endl;
