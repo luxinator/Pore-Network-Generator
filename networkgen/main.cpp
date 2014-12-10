@@ -5,6 +5,7 @@
 #include "inputParser.h"
 #include "Eliminator.h"
 
+
 int main() {
     
     NetworkSpecs *ns = readSpecsFile("/Users/lucas/Programming/Xcode/PoreNetworkgen/data/NetworkSpecs.in");
@@ -46,7 +47,7 @@ int main() {
     // --- Update input Parser to include the changes per forward direction
     float *C = new float[8];
     for(int i = 0; i < 8; i++){
-        C[i] = 0.5;
+        C[i] = 0.3;
     }
     
     EliminateThroats(P, C, 6);
@@ -65,6 +66,10 @@ int main() {
    
     
     //writeVTK(vtkFile.c_str(), connect, locationList, Ni, Nj, Nk);
+    
+    
+    
+    
     
     searchIsolated(P);
     
