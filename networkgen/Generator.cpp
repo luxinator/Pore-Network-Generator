@@ -79,7 +79,7 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
         return nullptr;
     }
     
-    std::cout << 2 * Ni*Nj*Nk << std::endl;
+    std::cout << "number of PBs: "<<2 * Ni*Nj*Nk << std::endl;
     
     for(int i = 0; i < Ni*Nj*Nk; i++){
         throatCounters[0][i] = 0;
@@ -87,7 +87,9 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
     }
     
     int i = 0;
-    double L= 0;
+    double L = 0;
+    float dist = 2.0f;
+    
     for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
         deflatten_3d(pn-1, Ni, Nj, Nk, coord); //coord from pb[pn]
         
@@ -96,7 +98,8 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
             connection[0][i] = pn; //Pb nr
             connection[1][i] =  array[coord[0] + 1][coord[1]][coord[2]]; //connected to pb
             throatCounters[0][pn] += 1; //amount of connections of pb
-            i++;//continue; // skip the rest, no more connections for this pb
+            i++;//
+            continue; // skip the rest, no more connections for this pb
         }
         // Connect to Boundary Outlet in x-dir and no more
         
@@ -118,27 +121,27 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
         // the max pn_n = pn + Nj*Nk +Nk + 1
         // By using 2 for loops we lose the need to loop over half of the x-plane in front of pn
         //
-        else{
-            for( int pn_n = pn+1; pn_n < (pn+ Nj*Nk + (Nj*Nk /2 + 1)) &&
-                pn_n <= Ni*Nj*Nk - Nj*Nk; pn_n++){
+    
+        for( int pn_n = pn+1; pn_n < (pn+ Nj*Nk + (Nj*Nk /2 + 1)) &&
+            pn_n <= Ni*Nj*Nk - Nj*Nk; pn_n++){
+            
+            deflatten_3d(pn_n-1, Ni, Nj, Nk, coord_n);
+            
+            L = sqrt(pow((double)(coord[0] - coord_n[0]), 2.0) +
+                     pow((double)(coord[1] - coord_n[1]), 2.0)+
+                     pow((double)(coord[2] - coord_n[2]), 2.0));
+            
+            if(L <= sqrt(dist)){
+                connection[0][i] = pn; //Pb nr
+                connection[1][i] = pn_n; //connected to pb
+                throatCounters[0][pn] += 1; //amount of forward connections of pb
                 
-                deflatten_3d(pn_n-1, Ni, Nj, Nk, coord_n);
+                i++;
                 
-                L = sqrt(pow((double)(coord[0] - coord_n[0]), 2.0) +
-                         pow((double)(coord[1] - coord_n[1]), 2.0)+
-                         pow((double)(coord[2] - coord_n[2]), 2.0));
-                
-                if(L <= sqrt(2.0)){
-                    connection[0][i] = pn; //Pb nr
-                    connection[1][i] = pn_n; //connected to pb
-                    throatCounters[0][pn] += 1; //amount of forward connections of pb
-                    
-                    i++;
-                    
-                } // if
-            } // for
-        } // else
-        
+            } // if
+        } // for
+
+    
         throatCounters[1][pn] += i; //nr of connection made in total
                 
     }// for

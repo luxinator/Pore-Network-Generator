@@ -45,12 +45,12 @@ int main() {
     P->locationList = generateLocation(L, P->throatCounter, Ni, Nj, Nk);
     
     // --- Update input Parser to include the changes per forward direction
-    float *C = new float[8];
-    for(int i = 0; i < 8; i++){
-        C[i] = 0.0002;
+    float *C = new float[10];
+    for(int i = 0; i < 10; i++){
+        C[i] = 1.00000;
     }
     
-    EliminateThroats(P, C, 6);
+    //EliminateThroats(P, C, 6);
     cleanThroatList(P, -1);
     
     

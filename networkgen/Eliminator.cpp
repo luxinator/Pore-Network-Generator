@@ -13,10 +13,10 @@
 
 /*
  * C[0] = x-dir; C[1] = y-dir; C[2] = z-dir
- * C[3] = x - -y diag; 
- * x++ plane
- * C[4] = x - +y diag; C[5] = x - -y; C[6] = x - -z diag
- * C[7] = x - +z diag;
+ * C[3] = x - -y; C[4] = x - +y;
+ * C[5] = x - -z; C[6] = x - +z;
+ * C[7] = y - -z; C[8] = y - +z;
+ * C[9] = -y - -z;C[10]= -y - + z;
  *
  * Max coordination number is 6 at the moment (in forward x dir!)
  *
@@ -46,24 +46,29 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
     int deleted = 0;
     int pn, i;
     
+    i = 0;
     // Go through throatList
-    for(i = 0; P_net->throatList[0][i] != 0; i++){
+    while(P_net->throatList[0][i] != 0){
     
         //Get coordnaites for pb
         deflatten_3d(P_net->throatList[0][i], Ni, Nj, Nk, coord);
+        
         pn = P_net->throatList[0][i];
         
         while (P_net->throatList[0][i] == pn) {
             // check for this pore, all its connections
             deflatten_3d(P_net->throatList[1][i], Ni, Nj, Nk, coord_n);
-
+           
+            //std::cout << P_net->throatList[0][i] <<'\t' << P_net->throatList[1][i] << '\t';
+            std::cout << coord[0] << '\t'<< coord[1] << '\t'<< coord[2] << '\t';
+            std::cout << "vs " << coord_n[0] << '\t'<< coord_n[1] << '\t'<< coord_n[2] << '\t' << std::endl;
             // ------
             // We have a connection in the x-dir
             if(d(e) >= ChanceList[0] && coord[2] == coord_n[2] && coord[1] == coord_n[1]){
                 //P_net->throatList[0][i] = -1; // from pb
                 P_net->throatList[1][i] = -1; // to pb
                 deleted++;
-                }
+            }
             
             // Connection in y-dir
             else if(d(e) >= ChanceList[1] && coord[0] == coord_n[0] && coord[2] == coord_n[2]){
@@ -78,56 +83,74 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
                 deleted++;
             }
             
-
+            
             //------
-            else if(coordNr > 3){
-                // Connection in x - y diagonal
-                if(d(e) >= ChanceList[3] && coord[0] != coord_n[0] && coord[1] != coord_n[1] && coord[2] == coord_n[2]){
-                    //P_net->throatList[0][i] = -1; // from pb
-                    P_net->throatList[1][i] = -1; // to pb
-                    deleted++;
-                }
-                // x++ plane connection
-                // Connection in x - -y diagonal
-                else if(d(e) >= ChanceList[4] && coord[0] != coord_n[0]
-                   && coord[1] - coord_n[1] == 1
-                   && coord[2] == coord_n[2]){
-                    //P_net->throatList[0][i] = -1; // from pb
-                    P_net->throatList[1][i] = -1; // to pbt
-                    deleted++;
-                }
-                
-                // Connection in x - +y diagonal
-                else if(d(e) >= ChanceList[5] && coord[0] != coord_n[0]
-                   && coord[1]  - coord_n[2] == -1
-                   && coord[2] == coord_n[1]){
-                   // P_net->throatList[0][i] = -1; // from pb
-                    P_net->throatList[1][i] = -1; // to pb
-                    deleted++;
-                }
-                
-                // Connection in x - +z diagonal
-                else if(d(e) >= ChanceList[6] && coord[0] != coord_n[0]
-                   && coord[1] == coord_n[1]
-                   && coord[2] - coord_n[2] == -1){
-                    //P_net->throatList[0][i] = -1; // from pb
-                    P_net->throatList[1][i] = -1; // to pb
-                    deleted++;
-                }
-                
-                // Connection in x - -z diagonal
-                else if(d(e) >= ChanceList[7] && coord[0] != coord_n[0]
-                        && coord[1] == coord_n[1]
-                        && coord[2] - coord_n[2] == 1){
-                   // P_net->throatList[0][i] = -1; // from pb
-                    P_net->throatList[1][i] = -1; // to pb
-                    deleted++;
-                }
-                
-            }// Coord If
+            // Connection in x - -y diagonal
+            if(d(e) >= ChanceList[3] && coord[0] != coord_n[0] && coord[1] - coord_n[1] == 1
+               && coord[2] == coord_n[2]){
+                //P_net->throatList[0][i] = -1; // from pb
+                P_net->throatList[1][i] = -1; // to pb
+                deleted++;
+            }
+            // Connection in x - +y diagonal
+            else if(d(e) >= ChanceList[4] && coord[0] != coord_n[0] && coord[1] - coord_n[1] == -1
+                    && coord[2] == coord_n[2]){
+                //P_net->throatList[0][i] = -1; // from pb
+                P_net->throatList[1][i] = -1; // to pb
+                deleted++;
+            }
+            
+            // Connection in x - -z diagonal
+            else if(d(e) >= ChanceList[5] && coord[0] != coord_n[0] && coord[1] == coord_n[1]
+                    && coord[2] - coord_n[2] == 1){
+                // P_net->throatList[0][i] = -1; // from pb
+                P_net->throatList[1][i] = -1; // to pb
+                deleted++;
+            }
+            
+            // Connection in x - +z diagonal
+            else if(d(e) >= ChanceList[6] && coord[0] != coord_n[0] && coord[1] == coord_n[1]
+                    && coord[2] - coord_n[2] == -1){
+                //P_net->throatList[0][i] = -1; // from pb
+                P_net->throatList[1][i] = -1; // to pb
+                deleted++;
+            }
+            
+            // Connection in y - -z diagonal
+            else if(d(e) >= ChanceList[7] && coord[0] == coord_n[0] && coord[1] - coord_n[1] == -1
+                    && coord[2] - coord_n[2] == 1){
+                // P_net->throatList[0][i] = -1; // from pb
+                P_net->throatList[1][i] = -1; // to pb
+                deleted++;
+            }
+            
+            // Connection in y - +z diagonal
+            else if(d(e) >= ChanceList[8] && coord[0] == coord_n[0] && coord[1] - coord_n[1] == -1
+                    && coord[2] - coord_n[2] == -1){
+                // P_net->throatList[0][i] = -1; // from pb
+                P_net->throatList[1][i] = -1; // to pb
+                deleted++;
+            }
+            // Connection in -y - +z diagonal
+            else if(d(e) >= ChanceList[9] && coord[0] == coord_n[0] && coord[1] - coord_n[1] == 1
+                    && coord[2] - coord_n[2] == -1){
+                // P_net->throatList[0][i] = -1; // from pb
+                P_net->throatList[1][i] = -1; // to pb
+                deleted++;
+            }
+            // Connection in -y - -z diagonal
+            else if(d(e) >= ChanceList[10] && coord[0] == coord_n[0] && coord[1] - coord_n[1] == 1
+                    && coord[2] - coord_n[2] == 1){
+                // P_net->throatList[0][i] = -1; // from pb
+                P_net->throatList[1][i] = -1; // to pb
+                deleted++;
+            }
+            
             
             i++;
         }// while
+        std::cout<< "Fall through While " << i <<std::endl;
+        
     }// for
     
     delete [] coord;

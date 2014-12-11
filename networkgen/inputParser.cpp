@@ -7,6 +7,7 @@
 //
 
 #include "inputParser.h"
+#include "string.h" //strcmp under Linux is not in <string>
 #include <ctype.h>
 #include <iostream>
 #include <fstream>

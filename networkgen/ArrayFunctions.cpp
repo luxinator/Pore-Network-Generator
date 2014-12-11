@@ -31,8 +31,6 @@ int *** generate_naive_array(const int Ni, const int Nj, const int Nk){
 }
 
 void deflatten_3d(const int i, const int Ni, const int Nj, const int Nk, int* coord){
-    
-    //Since it is not really nice to return stack memory we malloc on the heap.
 
     coord[0] = (i / (Nj * Nk)) % Ni;
     coord[1] = (i / Nk) % Nj;
