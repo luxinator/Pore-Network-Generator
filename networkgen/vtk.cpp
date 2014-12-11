@@ -14,10 +14,7 @@
 /*
  * Write current network to vtk file
  */
-void writeVTK(const char* filename, int** connect , float** locationList, int Ni, int Nj, int Nk){
-    
-    
-    
+void writeVTK(const char* filename, int** connect , float** locationList, char* pb_flags,int Ni, int Nj, int Nk){
     
     int PNMax = Ni*Nj*Nk;
     
@@ -59,8 +56,6 @@ void writeVTK(const char* filename, int** connect , float** locationList, int Ni
      * Write throat data
      */
     
-//    file << "LINES" << '\t'<<Ni*Nj*Nk << '\t'<< Ni*Nj*Nk * 3 <<std::endl;
-//    file << "LINES" << '\t'<< nrOfThroats << '\t'<< nrOfThroats * 3 <<std::endl;
     int i;
     for(i = 0; i < Ni*Nj*Nk * 13; i ++){
         if (connect[0][i] == 0)
@@ -80,7 +75,7 @@ void writeVTK(const char* filename, int** connect , float** locationList, int Ni
     file << "LOOKUP_TABLE default" <<std::endl;
      // Pn Size
     for(int pn = 1; pn < PNMax; pn++){
-        file << 1.0f << '\n';
+        file << (float)(int)pb_flags[pn] << '\n';
     }
     
     file.close();

@@ -41,4 +41,6 @@ void writeConnectivity(const char * filename, int **connect);
 
 void writeLocation(const char * filename, float ** locationList, int ** throatCounters, int PNMax);
 
+void removeIsolatedPBs(PoreNetwork *pn, char *pb_flag_list, int minFlag);
+
 #endif

@@ -69,6 +69,41 @@ void cleanThroatList(PoreNetwork *pn, const int Flag){
 }
 
 /*
+ * Removes all porebodies who have a flag lower then minFlag
+ * Renumbers and Updates the ThroatList and PB-list and location
+ */
+void removeIsolatedPBs(PoreNetwork *pn, char *pb_flag_list, int minFlag){
+    
+    int TL_Length = 0;
+    
+    // Look for gaurd, this is the amount of throats in the network
+    while(pn->throatList[0][TL_Length] != 0){
+        TL_Length++;
+    }
+    
+    int Ni = pn->ns->Ni;
+    int Nj = pn->ns->Nj;
+    int Nk = pn->ns->Nk;
+    
+    int *mappingList= new int[Ni*Nj*Nk]; // A list of how much pn should be lowerd -> mappingList[pn]
+    int cummulator = 0;
+    for(int i = 1; i < Ni*Nj*Nk; i++){
+        if(pb_flag_list[i] < minFlag)
+            cummulator += 1;
+        mappingList[i] = cummulator;
+        std::cout<<mappingList[i] << std::endl;
+        
+        // Change the Throatlist
+        
+        // Change the ThroatCounters
+        
+        // Change the locationList
+    }
+    
+    
+}
+
+/*
  * Writes out the throatList until as entry with [0][0] is encounterd
  */
 void writeConnectivity(const char * filename, int** connect){

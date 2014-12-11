@@ -47,7 +47,7 @@ int main() {
     // --- Update input Parser to include the changes per forward direction
     float *C = new float[8];
     for(int i = 0; i < 8; i++){
-        C[i] = 0.3;
+        C[i] = 0.0002;
     }
     
     EliminateThroats(P, C, 6);
@@ -65,15 +65,10 @@ int main() {
     //writeLocation(lFile.c_str(), P->locationList, P->throatCounter, Ni*Nj*Nk);
    
     
-    //writeVTK(vtkFile.c_str(), connect, locationList, Ni, Nj, Nk);
+    char * pb_list = searchIsolated(P);
     
-    
-    
-    
-    
-    searchIsolated(P);
-    
-    
+    writeVTK(vtkFile.c_str(), P->throatList,P->locationList,pb_list, Ni, Nj, Nk);
+    //removeIsolatedPBs(P, pb_list, 1);
     
 
 }

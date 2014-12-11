@@ -203,7 +203,7 @@ void DFS(int start, int ** TL, char* flagged_PB, int TL_Length){
  * if pbs are connected to inlet AND outlet
  */
 
-void searchIsolated(PoreNetwork *P_net){
+char * searchIsolated(PoreNetwork *P_net){
     
     
     std::cout<< "Starting Search for Isolated PBs and Clusters" << std::endl;
@@ -234,7 +234,7 @@ void searchIsolated(PoreNetwork *P_net){
     }
     
     // we now have a flagged list of pb's which are connected to the inlets
-    
+    return flagged_PB;
 }
 
 
