@@ -50,7 +50,7 @@ int main() {
     // --- Update input Parser to include the changes per forward direction
     float *C = new float[11];
     for(int i = 0; i < 11; i++){
-        C[i] = 0.100f;
+        C[i] = 0.800f;
     }
     
     EliminateThroats(P, C, 6);
@@ -69,9 +69,12 @@ int main() {
     
     //for(int i = 0; i < Ni*Nj*Nk; i ++)
     //    std::cout<< (int)pb_list[i] << std::endl;
+    writeConnectivity(cFile.c_str(),P->throatList);
+    removeIsolatedPBs(P, pb_list, 2);
+    writeLocation(lFile.c_str(), P->locationList, P->throatCounter, Ni*Nj*Nk);
+    writeConnectivity(dFile.c_str(),P->throatList);
     
-    //removeIsolatedPBs(P, pb_list, 1);
-    writeVTK(vtkFile.c_str(), P->throatList,P->locationList, pb_list, Ni, Nj, Nk);
+    //writeVTK(vtkFile.c_str(), P->throatList,P->locationList, pb_list, Ni, Nj, Nk);
     
     
     

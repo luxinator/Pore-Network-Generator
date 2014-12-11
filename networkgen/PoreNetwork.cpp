@@ -87,18 +87,25 @@ void removeIsolatedPBs(PoreNetwork *pn, char *pb_flag_list, int minFlag){
     
     int *mappingList= new int[Ni*Nj*Nk]; // A list of how much pn should be lowerd -> mappingList[pn]
     int cummulator = 0;
-    for(int i = 1; i < Ni*Nj*Nk; i++){
-        if(pb_flag_list[i] < minFlag)
+    for(int i = 1; i <= Ni*Nj*Nk; i++){
+        if(pb_flag_list[i] < minFlag){
             cummulator += 1;
+            
+        }
         mappingList[i] = cummulator;
-        //std::cout<<mappingList[i] << std::endl;
-        
-        // Change the Throatlist
-        
-        // Change the ThroatCounters
-        
-        // Change the locationList
+        std::cout<<'[' << i << "]\t" << mappingList[i] << std::endl;
     }
+    
+    // Change the Throatlist,
+    for(int i = 0; pn->throatList[0][i] != 0; i ++)
+    {
+        pn->throatList[0][i] = pn->throatList[0][i] - mappingList[pn->throatList[0][i]];
+        pn->throatList[1][i] = pn->throatList[1][i] - mappingList[pn->throatList[1][i]];
+        
+    }
+    // Clean the ThroatCounters, delete all that are eleminated thats it not change to the data
+    
+    // Change the locationList, Same here
     
     
 }
@@ -120,10 +127,7 @@ void writeConnectivity(const char * filename, int** connect){
         return;
     }
     
-    for(int i = 0; ; i ++){
-        if (connect[0][i] == 0 && connect[1][i] == 0)
-            break;
-        else
+    for(int i = 0;connect[0][i] != 0 ; i ++){
             file << connect[0][i]<< '\t' << connect[1][i] << std::endl;
     }
     
@@ -148,7 +152,7 @@ void writeLocation(const char * filename, float ** locationList, int ** throatCo
     file.setf(std::ios_base::scientific);
     for(int pn = 1; pn <= PNMax; pn++){
         
-        file << '[' << pn << ']' << '\t';
+        //file << '[' << pn << ']' << '\t';
         file << std::setw(8)<< locationList[0][pn]   << ' ';
         file << std::setw(8)<< locationList[1][pn]   << ' ';
         file << std::setw(8)<< locationList[2][pn]   << ' ';
