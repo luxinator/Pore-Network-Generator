@@ -91,7 +91,7 @@ void removeIsolatedPBs(PoreNetwork *pn, char *pb_flag_list, int minFlag){
         if(pb_flag_list[i] < minFlag)
             cummulator += 1;
         mappingList[i] = cummulator;
-        std::cout<<mappingList[i] << std::endl;
+        //std::cout<<mappingList[i] << std::endl;
         
         // Change the Throatlist
         

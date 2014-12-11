@@ -194,7 +194,7 @@ int **generateFullConnectivity(const int Ni, const int Nj, const int Nk,int **ha
         
     }
     
-    bubbleSortList(connection, maxConnections-1); // Do NOT sort with the guards...
+    bubbleSortList(connection, maxConnections-1); // Do NOT sort WITH the guards...
 
     return connection;
 }

@@ -8,6 +8,9 @@
 
 int main() {
     
+    std::cout << "Pore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__<<std::endl;
+    std::cout << "Copyright Lucas van Oosterhout. All Rights Reserverd. \n\n" << std::endl;
+    
     NetworkSpecs *ns = readSpecsFile("/Users/lucas/Programming/Xcode/PoreNetworkgen/data/NetworkSpecs.in");
     
     PoreNetwork *P = new PoreNetwork;
@@ -45,15 +48,15 @@ int main() {
     P->locationList = generateLocation(L, P->throatCounter, Ni, Nj, Nk);
     
     // --- Update input Parser to include the changes per forward direction
-    float *C = new float[10];
-    for(int i = 0; i < 10; i++){
-        C[i] = 0.0000;
+    float *C = new float[11];
+    for(int i = 0; i < 11; i++){
+        C[i] = 0.100f;
     }
     
     EliminateThroats(P, C, 6);
     cleanThroatList(P, -1);
-    writeConnectivity(cFile.c_str(),P->throatList);
-    writeVTK(vtkFile.c_str(), P->throatList,P->locationList, Ni, Nj, Nk);    
+    
+    //writeConnectivity(cFile.c_str(),P->throatList);
     
     // --- Testing Full connect generator--- \\
     
@@ -61,15 +64,16 @@ int main() {
     delete [] P->throatList[0];
     P->throatList[0] = test[0];
     P->throatList[1] = test[1];
-    
-    //writeConnectivity(cFile.c_str(),test);
-    //writeLocation(lFile.c_str(), P->locationList, P->throatCounter, Ni*Nj*Nk);
 
-    
-    
     char * pb_list = searchIsolated(P);
     
+    //for(int i = 0; i < Ni*Nj*Nk; i ++)
+    //    std::cout<< (int)pb_list[i] << std::endl;
+    
     //removeIsolatedPBs(P, pb_list, 1);
+    writeVTK(vtkFile.c_str(), P->throatList,P->locationList, pb_list, Ni, Nj, Nk);
+    
+    
     
 
 }

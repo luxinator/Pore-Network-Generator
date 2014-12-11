@@ -7,9 +7,7 @@
 //
 
 #include "Eliminator.h"
-
 #include <random>
-
 
 /*
  * C[0] = x-dir; C[1] = y-dir; C[2] = z-dir
@@ -31,6 +29,7 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
         std::cerr << "Eliminator Error! \n No PoreNetwork Specified!" << std::endl;
         return;
     }
+
 //    int nrPB = P_net->ns->Ni * P_net->ns->Nj * P_net->ns->Nk;
     int Ni = P_net->ns->Ni;
     int Nj = P_net->ns->Nj;
@@ -59,9 +58,6 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
             // check for this pore, all its connections
             deflatten_3d(P_net->throatList[1][i], Ni, Nj, Nk, coord_n);
            
-            //std::cout << P_net->throatList[0][i] <<'\t' << P_net->throatList[1][i] << '\t';
-           
-            // ------
             // We have a connection in the x-dir
             if(d(e) >= ChanceList[0]
                && coord[0] - coord_n[0] == -1
@@ -89,9 +85,6 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
                 //P_net->throatList[0][i] = -1; // from pb
                 P_net->throatList[1][i] = -1; // to pb
                 deleted++;
-                //std::cout << "pn: " << pn << '\t'<<coord[0] << '\t'<< coord[1] << '\t'<< coord[2] << '\t';
-                //std::cout << "vs " << coord_n[0] << '\t'<< coord_n[1] << '\t'<< coord_n[2] << '\t' << std::endl;
-                
             }
             
             
@@ -176,15 +169,8 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
             
             i++;
         }// while
-        std::cout<< "Fall through While " << i <<std::endl;
         
     }// for
-    
-    
-    
-    for(int k = 0; P_net->throatList[0][k] != 0; k++)
-        std::cout << P_net->throatList[0][k]<< '\t' << P_net->throatList[1][k] << std::endl;
-    
     delete [] coord;
     delete [] coord_n;
     
@@ -222,35 +208,32 @@ int returnAdjecentNodes(int **throatList, int i, int max){
 
 /*
  * Recursive Depth-first Search
+ * Places a flag in the flagged_pb array, when check is found!
  */
 
-void DFS(int start, int ** TL, char* flagged_PB, int TL_Length){
+void DFS(int start, int ** TL, char* flagged_PB, int TL_Length, char flag, char check){
     // Flag PB as discoverd
-    flagged_PB[TL[0][start]] = 1;
+    flagged_PB[TL[0][start]] = flag;
 
     int max = returnAdjecentNodes(TL, start, TL_Length);
     // from TL[1][start] to TL[1][max] are connected pbs
     
-    
-    // We are on a leaf
-    //if( max == start)
-    //    return;
-    
     //For all throats connected to pb do:
     
     for(int i = start; i < max; i++){
-        if(flagged_PB[TL[1][i]] == 0){
+        if(flagged_PB[TL[1][i]] == check){
             //search for edges from TL[1][j]
             for(int j = 0; j < TL_Length; j++)
             {
                 //connection to pb
                 if(TL[0][j] == TL[1][i]){
-                    DFS(j, TL, flagged_PB, TL_Length);
+                    DFS(j, TL, flagged_PB, TL_Length, flag, check);
                 }
             }
         }
     }
 }
+
 
 /*
  * Search for isolated PoreBodies and update PB list accordingly
@@ -279,14 +262,14 @@ char * searchIsolated(PoreNetwork *P_net){
         flagged_PB[i] = 0;
     }
     //Do a DepthFirst Search on all inlets
-    for(i = 0; i < Nj*Nk; i++){
-        // First test if Inlet has connection
-        
-        if(P_net->throatList[0][i] < Nj*Nk){
-            //std::cout << "\t Searching connections to pb: "<<P_net->throatList[0][i] << std::endl;
-            DFS(i, P_net->throatList, flagged_PB, lengthTL - 1); // same as with sorting, do not allow guards to be searched
-        }
+    for(i = 0; P_net->throatList[0][i] < Nj*Nk; i++){
+            DFS(i, P_net->throatList, flagged_PB, lengthTL - 1, (char)1, (char) 0); // same as with sorting, do not allow guards to be searched
     }
+    //Do a Depth First Search on all outlets
+    for(i = lengthTL -1 ; P_net->throatList[0][i] > (Ni*Nj*Nk - Nj*Nk); i--){
+            DFS(i, P_net->throatList, flagged_PB, lengthTL - 1, (char)2, (char) 1);
+    }
+
     
     // we now have a flagged list of pb's which are connected to the inlets
     return flagged_PB;
