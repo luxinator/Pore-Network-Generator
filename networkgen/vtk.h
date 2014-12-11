@@ -13,4 +13,5 @@
 
 void writeVTK(const char* filename, int** connect , float** locationList, char* pb_flags,int Ni, int Nj, int Nk);
 
+void writeVTK(const char* filename, int** connect , float** locationList,int Ni, int Nj, int Nk);
 #endif /* defined(__networkgen__vtk__) */

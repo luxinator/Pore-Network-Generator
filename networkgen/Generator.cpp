@@ -29,7 +29,7 @@ float ** generateLocation(const float Length, int **throatCounters, const int Ni
     int *coord = new int[3];
     
     for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
-        deflatten_3d(pn - 1, Ni, Nj, Nk, coord);
+        deflatten_3d(pn, Ni, Nj, Nk, coord);
         
         locationList[0][pn] = coord[0] * Length;
         locationList[1][pn] = coord[1] * Length;
@@ -91,7 +91,7 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
     float dist = 2.0f;
     
     for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
-        deflatten_3d(pn-1, Ni, Nj, Nk, coord); //coord from pb[pn]
+        deflatten_3d(pn, Ni, Nj, Nk, coord); //coord from pb[pn]
         
         // boundary inlet only connect in flow dir
         if (coord[0] == 0){
@@ -125,7 +125,7 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
         for( int pn_n = pn+1; pn_n < (pn+ Nj*Nk + (Nj*Nk /2 + 1)) &&
             pn_n <= Ni*Nj*Nk - Nj*Nk; pn_n++){
             
-            deflatten_3d(pn_n-1, Ni, Nj, Nk, coord_n);
+            deflatten_3d(pn_n, Ni, Nj, Nk, coord_n);
             
             L = sqrt(pow((double)(coord[0] - coord_n[0]), 2.0) +
                      pow((double)(coord[1] - coord_n[1]), 2.0)+

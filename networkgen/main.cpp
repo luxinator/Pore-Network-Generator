@@ -47,12 +47,13 @@ int main() {
     // --- Update input Parser to include the changes per forward direction
     float *C = new float[10];
     for(int i = 0; i < 10; i++){
-        C[i] = 1.00000;
+        C[i] = 0.0000;
     }
     
-    //EliminateThroats(P, C, 6);
+    EliminateThroats(P, C, 6);
     cleanThroatList(P, -1);
-    
+    writeConnectivity(cFile.c_str(),P->throatList);
+    writeVTK(vtkFile.c_str(), P->throatList,P->locationList, Ni, Nj, Nk);    
     
     // --- Testing Full connect generator--- \\
     
@@ -63,11 +64,11 @@ int main() {
     
     //writeConnectivity(cFile.c_str(),test);
     //writeLocation(lFile.c_str(), P->locationList, P->throatCounter, Ni*Nj*Nk);
-   
+
+    
     
     char * pb_list = searchIsolated(P);
     
-    writeVTK(vtkFile.c_str(), P->throatList,P->locationList,pb_list, Ni, Nj, Nk);
     //removeIsolatedPBs(P, pb_list, 1);
     
 
