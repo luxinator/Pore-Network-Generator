@@ -14,7 +14,9 @@
 
 
 
-float ** generateLocation(const float Length, int **throatCounters, const int Ni, const int Nj, const int Nk){
+float ** generateLocation(const int Ni, const int Nj, const int Nk, PoreNetwork *P_net){
+    
+    float Length = P_net->ns->Length;
     
     //Allocate a large part of memory
     float *temp = new float[3 * Ni*Nj*Nk];
@@ -24,7 +26,7 @@ float ** generateLocation(const float Length, int **throatCounters, const int Ni
     // Point at exactly the right places in the Large Part of memory.
     locationList[0] = temp;
     locationList[1] = temp + (Ni*Nj*Nk);
-    locationList[2] = temp + (Ni*Nj*Nk*2);
+    locationList[2] = temp + 2*(Ni*Nj*Nk);
     
     int *coord = new int[3];
     
@@ -36,6 +38,7 @@ float ** generateLocation(const float Length, int **throatCounters, const int Ni
         locationList[2][pn] = coord[2] * Length;
         
     }
+    P_net->locationList = locationList;
     
     return locationList;
 }
@@ -47,15 +50,34 @@ float ** generateLocation(const float Length, int **throatCounters, const int Ni
  * The array return is huge and bulky.
  */
 
-int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters = nullptr){
+int ** generateConnectivity(const int Ni, const int Nj, const int Nk, PoreNetwork *P_net){
     
-    
-    if (!array){
+    if (!P_net->arr){
         std::cerr << "No pb Array supplied to generateConnectivity!" << std::endl;
         return nullptr;
     }
-    //Extend this to include variable connection amount based upon distance from Pore to neightbours!
-    int *t = new int[2 * 13  *  Ni*Nj*Nk];// 13 connections per pb, we have Ni*Nj*Nk pbs and connection is a pair of 2 ints
+    int *** array = P_net->arr;
+    
+    // --- coords of pb under consideration
+    int *coord = new int[3];
+    int *coord_n = new int[3];
+    
+    // --- Init throatCounters arrays
+
+    //Allocate a Part of Memory
+    int *t = new int[2 * Ni*Nj*Nk + 2];
+    P_net->throatCounter = new int*[2];
+    //Point the two pointers to their places in the Large Part of memory
+    P_net->throatCounter[0] = t;
+    P_net->throatCounter[1] = t + Ni*Nj*Nk + 1;
+    
+    // Make a local variable
+    int ** throatCounters = P_net->throatCounter;
+    
+    
+    
+    // --- Extend this to include variable connection amount based upon distance from Pore to neightbours!
+    t = new int[2 * 13  *  Ni*Nj*Nk];// 13 connections per pb, we have Ni*Nj*Nk pbs and connection is a pair of 2 ints
     
     int **connection = new int*[2]; //[0] from [1] to
     connection[0] = t;
@@ -65,25 +87,15 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
         connection[0][i] = 0;
         connection[1][i] = 0;
     }
+    // Add to P_net
+    P_net->throatList = connection;
     
-    // coords of pb under consideration
-    int *coord = new int[3];
-    int *coord_n = new int[3];
-    
-    //throatCounters [0] = amount of connection of pb
-    //throatcounters [1] = total nr of connected pb including this one, excluding the ones to come
-    if(!throatCounters || !throatCounters[1] || !throatCounters[0]){
-        std::cerr << "No frequency array given!" << std::endl;
-		delete[] coord;
-		delete[] coord_n;
-        return nullptr;
-    }
     
     std::cout << "number of PBs: "<<2 * Ni*Nj*Nk << std::endl;
     
-    for(int i = 0; i < Ni*Nj*Nk; i++){
-        throatCounters[0][i] = 0;
-        throatCounters[1][i] = 0;
+    for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
+        throatCounters[0][pn] = 0;
+        throatCounters[1][pn] = 0;
     }
     
     int i = 0;
@@ -99,6 +111,8 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
             connection[1][i] =  array[coord[0] + 1][coord[1]][coord[2]]; //connected to pb
             throatCounters[0][pn] += 1; //amount of connections of pb
             i++;//
+            throatCounters[1][pn] += i;
+            
             continue; // skip the rest, no more connections for this pb
         }
         // Connect to Boundary Outlet in x-dir and no more
@@ -107,9 +121,10 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
             connection[0][i] = pn; //Pb nr
             connection[1][i] =  array[coord[0] + 1][coord[1]][coord[2]]; //connected to pb
             throatCounters[0][pn] += 1; //amount of connections of pb
-            throatCounters[1][pn] += 1; // outlet has one throat in forward no more, no less!
             i++;
-            //continue; // skip the rest, no more connections for this pb
+            throatCounters[1][pn] = i; // outlet has one throat in forward no more, no less!
+            
+            continue; // skip the rest, no more connections for this pb
         }//else if
         
         // (pn+ Nj*Nk + (Nj*Nk /2 + 1) -> distance of one x-slice in x-dir
@@ -146,6 +161,7 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
                 
     }// for
     
+    
     delete[] coord;
     delete[] coord_n;
     
@@ -156,7 +172,9 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, int ***arr
  * Returns a sorted list of throats with connect[0][i] is source pb
  * Array is exactly as long as needed, will output length to *length
  */
-int **generateFullConnectivity(const int Ni, const int Nj, const int Nk,int **halfConnectivity){
+int **generateFullConnectivity(const int Ni, const int Nj, const int Nk,PoreNetwork *P_net){
+    
+    int **halfConnectivity = P_net->throatList;
     
     std::cout << "Generating Full Connectivity" << std::endl;
     int i = 0;
@@ -172,7 +190,6 @@ int **generateFullConnectivity(const int Ni, const int Nj, const int Nk,int **ha
     
     //For Details see [generateConnectivity]
     int *t = new int[maxConnections * 2];
-    //memset(t, 0, maxConnections);
     
     int **connection = new int*[2];
     connection[0] = t;
@@ -196,6 +213,8 @@ int **generateFullConnectivity(const int Ni, const int Nj, const int Nk,int **ha
     
     bubbleSortList(connection, maxConnections-1); // Do NOT sort WITH the guards...
 
+    
+    P_net->throatList_full = connection;
     return connection;
 }
 

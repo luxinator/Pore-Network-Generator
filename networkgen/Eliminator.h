@@ -15,7 +15,19 @@
 #include "ArrayFunctions.h"
 #include "PoreNetwork.h"
 
+/*
+ * C[0] = x-dir; C[1] = y-dir; C[2] = z-dir
+ * C[3] = x - -y; C[4] = x - +y;
+ * C[5] = x - -z; C[6] = x - +z;
+ * C[7] = y - -z; C[8] = y - +z;
+ * C[9] = -y - -z;C[10]= -y - + z;
+ *
+ * Max coordination number is 6 at the moment (in forward x dir!)
+ *
+ */
 void EliminateThroats(PoreNetwork *P_net, float * C, int coordNr);
+
+
 
 char * searchIsolated(PoreNetwork *P_net);
 

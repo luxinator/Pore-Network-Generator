@@ -25,7 +25,9 @@ struct PoreNetwork{
     int ***arr; //contains the pb number at the lattic coordinates
     int **throatCounter; //number of prore throats per pb nr (1 based!) and number of throats preceding.
     int **throatList; // Connection map from pb nr -> pb nr. Is the half map!
+    int **throatList_full; //Full Connection map
     int nrOfConnections;
+    int nrOfActivePBs;
     float **locationList; // Location of a pb using its nr as index
     
 };
@@ -36,11 +38,11 @@ struct PoreNetwork{
  */
 void cleanThroatList(PoreNetwork *pn, const int Flag = 0);
 
-
-void writeConnectivity(const char * filename, int **connect);
-
-void writeLocation(const char * filename, float ** locationList, int ** throatCounters, int PNMax);
-
 void removeIsolatedPBs(PoreNetwork *pn, char *pb_flag_list, int minFlag);
+
+void writeConnectivity(const char * filename, PoreNetwork *P_net);
+
+void writeLocation(const char * filename, PoreNetwork *P_net);
+
 
 #endif

@@ -39,7 +39,8 @@ void cleanThroatList(PoreNetwork *pn, const int Flag){
     std::cout<< "  Amount of Flagged:    \t" << flagCounter   << std::endl;
     std::cout<< "  Max throats:          \t" << pn->ns->Ni * pn->ns->Nj * pn->ns->Nk  * 13 << std::endl;
     
-    // Copy
+    
+    // Since resizing an array in C++ is not done... we need to do a selective copy and delete the old array
     int newAmountOfConnections =  nrConnections - flagCounter + 1; // keep one extra for the [0,0] entry!
     int *t = new int[newAmountOfConnections * 2];
     int **newTL = new int*[2];
@@ -72,18 +73,20 @@ void cleanThroatList(PoreNetwork *pn, const int Flag){
  * Removes all porebodies who have a flag lower then minFlag
  * Renumbers and Updates the ThroatList and PB-list and location
  */
-void removeIsolatedPBs(PoreNetwork *pn, char *pb_flag_list, int minFlag){
+void removeIsolatedPBs(PoreNetwork *P_net, char *pb_flag_list, int minFlag){
     
     int TL_Length = 0;
     
     // Look for gaurd, this is the amount of throats in the network
-    while(pn->throatList[0][TL_Length] != 0){
+    while(P_net->throatList[0][TL_Length] != 0){
         TL_Length++;
     }
     
-    int Ni = pn->ns->Ni;
-    int Nj = pn->ns->Nj;
-    int Nk = pn->ns->Nk;
+    int Ni = P_net->ns->Ni;
+    int Nj = P_net->ns->Nj;
+    int Nk = P_net->ns->Nk;
+    int i = 0;
+    
     
     int *mappingList= new int[Ni*Nj*Nk]; // A list of how much pn should be lowerd -> mappingList[pn]
     int cummulator = 0;
@@ -93,27 +96,49 @@ void removeIsolatedPBs(PoreNetwork *pn, char *pb_flag_list, int minFlag){
             
         }
         mappingList[i] = cummulator;
-        std::cout<<'[' << i << "]\t" << mappingList[i] << std::endl;
+        //std::cout<<'[' << i << "]\t" << mappingList[i] << std::endl;
     }
-    
-    // Change the Throatlist,
-    for(int i = 0; pn->throatList[0][i] != 0; i ++)
+    std::cout<< "\t PoreBodies set to Inactive: "<< cummulator << std::endl;
+    // Change the Throatlist, according to the deletion of pbs.
+    for(i = 0; P_net->throatList[0][i] != 0; i ++)
     {
-        pn->throatList[0][i] = pn->throatList[0][i] - mappingList[pn->throatList[0][i]];
-        pn->throatList[1][i] = pn->throatList[1][i] - mappingList[pn->throatList[1][i]];
+        P_net->throatList[0][i] = P_net->throatList[0][i] - mappingList[P_net->throatList[0][i]];
+        P_net->throatList[1][i] = P_net->throatList[1][i] - mappingList[P_net->throatList[1][i]];
         
     }
-    // Clean the ThroatCounters, delete all that are eleminated thats it not change to the data
     
-    // Change the locationList, Same here
     
+    
+    // Clean the ThroatCounters and locations, delete all that are eleminated that's it, no re-numbering
+    i = 1;
+    for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
+        if(pb_flag_list[pn] >= minFlag){ //keep the value at pn
+            P_net->throatCounter[0][i] = P_net->throatCounter[0][pn];
+            P_net->throatCounter[1][i] = P_net->throatCounter[1][pn];
+            
+            P_net->locationList[0][i] = P_net->locationList[0][pn];
+            P_net->locationList[1][i] = P_net->locationList[1][pn];
+            P_net->locationList[2][i] = P_net->locationList[2][pn];
+            i++;
+        }
+    }
+    P_net->nrOfActivePBs = i-1;
+    //flag the rest as garbage:
+    for( ; i <= Ni*Nj*Nk; i++){
+        P_net->throatCounter[0][i] = -1;
+        P_net->throatCounter[1][i] = -1;
+        P_net->locationList[0][i]  = -1.0f;
+        P_net->locationList[1][i]  = -1.0f;
+        P_net->locationList[2][i]  = -1.0f;
+    }
     
 }
 
 /*
  * Writes out the throatList until as entry with [0][0] is encounterd
  */
-void writeConnectivity(const char * filename, int** connect){
+void writeConnectivity(const char * filename, PoreNetwork *P_net){
+    
     
     std::ofstream file;
     if(!filename){
@@ -127,15 +152,17 @@ void writeConnectivity(const char * filename, int** connect){
         return;
     }
     
-    for(int i = 0;connect[0][i] != 0 ; i ++){
-            file << connect[0][i]<< '\t' << connect[1][i] << std::endl;
+    for(int i = 0;P_net->throatList[0][i] != 0 ; i ++){
+            file << P_net->throatList[0][i]<< '\t' << P_net->throatList[1][i] << std::endl;
     }
     
     file.close();
 }
 
 
-void writeLocation(const char * filename, float ** locationList, int ** throatCounters, int PNMax){
+void writeLocation(const char * filename, PoreNetwork *P_net){
+    
+    
     
     std::ofstream file;
     if( filename == nullptr){
@@ -150,14 +177,14 @@ void writeLocation(const char * filename, float ** locationList, int ** throatCo
     }
     // set output type to scientific
     file.setf(std::ios_base::scientific);
-    for(int pn = 1; pn <= PNMax; pn++){
+    for(int pn = 1; pn <= P_net->nrOfActivePBs; pn++){
         
         //file << '[' << pn << ']' << '\t';
-        file << std::setw(8)<< locationList[0][pn]   << ' ';
-        file << std::setw(8)<< locationList[1][pn]   << ' ';
-        file << std::setw(8)<< locationList[2][pn]   << ' ';
-        file << std::setw(8)<< throatCounters[0][pn] << ' ';
-        file << std::setw(8)<< throatCounters[1][pn] << '\n';
+        file << std::setw(8)<< P_net->locationList[0][pn]   << ' ';
+        file << std::setw(8)<< P_net->locationList[1][pn]   << ' ';
+        file << std::setw(8)<< P_net->locationList[2][pn]   << ' ';
+        file << std::setw(8)<< P_net->throatCounter[0][pn] << ' ';
+        file << std::setw(8)<< P_net->throatCounter[1][pn] << '\n';
         //std::cout<< throatCounters[0][pn] << '\t' <<  throatCounters[1][pn] << std::endl;
     }
     

@@ -12,11 +12,13 @@
 #include <fstream>
 
 /*
- * Write current network to vtk file
+ * Write current network to vtk file,
+ * Enhance the shit out of this, we want te select what to put in the files
+ * Or even better put any and everything in the file!
  */
-void writeVTK(const char* filename, int** connect , float** locationList, char* pb_flags,int Ni, int Nj, int Nk){
+void writeVTK(const char* filename, char * pb_flags, PoreNetwork *P_net){
     
-    int PNMax = Ni*Nj*Nk;
+    int PNMax = P_net->ns->Ni*P_net->ns->Nj*P_net->ns->Nk;
     
     std::ofstream file;
     if( filename == nullptr){
@@ -41,40 +43,37 @@ void writeVTK(const char* filename, int** connect , float** locationList, char* 
     file << "DATASET POLYDATA "             << std::endl;
     file << "POINTS "<<'\t' << PNMax <<'\t'<< "FLOAT"   << std::endl;
     
-    PNMax++;
+    
     /*
      * Write pb location data
      */
-    for(int pn = 1; pn < PNMax; pn++){
-        file << locationList[0][pn]<< '\t';
-        file << locationList[1][pn]<< '\t';
-        file << locationList[2][pn] << '\n';
+    for(int pn = 1; pn < (PNMax + 1); pn++){
+        file << P_net->locationList[0][pn]<< '\t';
+        file << P_net->locationList[1][pn]<< '\t';
+        file << P_net->locationList[2][pn] << '\n';
         
     }
     
     /*
      * Write throat data
      */
-    
     int i;
-    for(i = 0; i < Ni*Nj*Nk * 13; i ++){
-        if (connect[0][i] == 0)
+    for(i = 0; i < PNMax * 13; i ++){
+        if (P_net->throatList[0][i] == 0)
             break;
     }
     
     int nrOfThroats = i;
     file << "LINES" << '\t'<< nrOfThroats << '\t'<< nrOfThroats * 3 <<std::endl;
     for(i = 0; i < nrOfThroats; i ++){
-                file<< 2<< '\t' << connect[0][i] - 1 << '\t' << connect[1][i] - 1 << std::endl;
+        file<< 2<< '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << std::endl;
         // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
     }
     
-    
-   
-    file << "POINT_DATA" << ' '<<PNMax-1 << '\n'<< "SCALARS size_pb float" << '\n';
+    file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
     file << "LOOKUP_TABLE default" <<std::endl;
-     // Pn Size
-    for(int pn = 1; pn < PNMax; pn++){
+    // Pn Size
+    for(int pn = 1; pn < PNMax + 1; pn++){
         file << (float)(int)pb_flags[pn] << '\n';
     }
     
@@ -82,9 +81,11 @@ void writeVTK(const char* filename, int** connect , float** locationList, char* 
     
 }
 
-void writeVTK(const char* filename, int** connect , float** locationList, int Ni, int Nj, int Nk){
+void writeVTK(const char* filename, PoreNetwork *P_net){
     
-    int PNMax = Ni*Nj*Nk;
+   
+    
+    int PNMax = P_net->ns->Ni*P_net->ns->Nj*P_net->ns->Nk;
     
     std::ofstream file;
     if( filename == nullptr){
@@ -109,40 +110,37 @@ void writeVTK(const char* filename, int** connect , float** locationList, int Ni
     file << "DATASET POLYDATA "             << std::endl;
     file << "POINTS "<<'\t' << PNMax <<'\t'<< "FLOAT"   << std::endl;
     
-    PNMax++;
+    
     /*
      * Write pb location data
      */
-    for(int pn = 1; pn < PNMax; pn++){
-        file << locationList[0][pn]<< '\t';
-        file << locationList[1][pn]<< '\t';
-        file << locationList[2][pn] << '\n';
+    for(int pn = 1; pn < (PNMax + 1); pn++){
+        file << P_net->locationList[0][pn]<< '\t';
+        file << P_net->locationList[1][pn]<< '\t';
+        file << P_net->locationList[2][pn] << '\n';
         
     }
     
     /*
      * Write throat data
      */
-    
     int i;
-    for(i = 0; i < Ni*Nj*Nk * 13; i ++){
-        if (connect[0][i] == 0)
+    for(i = 0; i < PNMax * 13; i ++){
+        if (P_net->throatList[0][i] == 0)
             break;
     }
     
     int nrOfThroats = i;
     file << "LINES" << '\t'<< nrOfThroats << '\t'<< nrOfThroats * 3 <<std::endl;
     for(i = 0; i < nrOfThroats; i ++){
-        file<< 2<< '\t' << connect[0][i] - 1 << '\t' << connect[1][i] - 1 << std::endl;
+        file<< 2<< '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << std::endl;
         // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
     }
     
-    
-    
-    file << "POINT_DATA" << ' '<<PNMax-1 << '\n'<< "SCALARS size_pb float" << '\n';
+    file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
     file << "LOOKUP_TABLE default" <<std::endl;
     // Pn Size
-    for(int pn = 1; pn < PNMax; pn++){
+    for(int pn = 1; pn < PNMax + 1; pn++){
         file << 1.0 << '\n';
     }
     

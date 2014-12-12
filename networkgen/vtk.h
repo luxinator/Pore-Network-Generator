@@ -9,9 +9,10 @@
 #ifndef __networkgen__vtk__
 #define __networkgen__vtk__
 
-#include <stdio.h>
+#include "PoreNetwork.h"
 
-void writeVTK(const char* filename, int** connect , float** locationList, char* pb_flags,int Ni, int Nj, int Nk);
+void writeVTK(const char* filename, PoreNetwork *P_net);
 
-void writeVTK(const char* filename, int** connect , float** locationList,int Ni, int Nj, int Nk);
+void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags);
+
 #endif /* defined(__networkgen__vtk__) */

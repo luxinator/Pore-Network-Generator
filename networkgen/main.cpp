@@ -22,6 +22,7 @@ int main() {
     int Nj = ns->Nj;
     int Nk = ns->Nk;
     float L = ns->Length;
+    P->nrOfActivePBs = Ni*Nj*Nk;
     
     std::string cFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/connectivity.txt";
     std::string dFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/deleted.txt";
@@ -30,51 +31,44 @@ int main() {
     
     std::cout<< "Generating PoreBodies Nrs" << std::endl;
     P->arr = generate_naive_array(Ni,Nj,Nk);
-    
-    /*
-     * This should most defentily go somewhere else!
-     */
-    //Allocate a Part of Memory 
-    int *t = new int[2 * Ni*Nj*Nk];
-    P->throatCounter = new int*[2];
-    //Point the two pointers to their places in the Large Part of memory
-    P->throatCounter[0] = t;
-    P->throatCounter[1] = t + (Ni*Nj*Nk);
-    
+
     
     // --- Generate the Network
     std::cout<< "Generating Network" << std::endl;
-    P->throatList = generateConnectivity(Ni, Nj, Nk, P->arr, P->throatCounter);
-    P->locationList = generateLocation(L, P->throatCounter, Ni, Nj, Nk);
+    P->throatList = generateConnectivity(Ni, Nj, Nk, P);
+    P->locationList = generateLocation(Ni, Nj, Nk, P);
     
     // --- Update input Parser to include the changes per forward direction
     float *C = new float[11];
     for(int i = 0; i < 11; i++){
-        C[i] = 0.800f;
+        C[i] = 0.50000f;
     }
+    
     
     EliminateThroats(P, C, 6);
     cleanThroatList(P, -1);
     
-    //writeConnectivity(cFile.c_str(),P->throatList);
+   // writeConnectivity(cFile.c_str(),P->throatList);
+    writeLocation(dFile.c_str(), P);
     
     // --- Testing Full connect generator--- \\
     
-    int **test = generateFullConnectivity(Ni, Nj, Nk, P->throatList);
-    delete [] P->throatList[0];
-    P->throatList[0] = test[0];
-    P->throatList[1] = test[1];
+    generateFullConnectivity(Ni, Nj, Nk, P);
+  
+    
+    // !--- keep hold of the half connectivity map! need it for hte model runs with dynamic pressure!
 
     char * pb_list = searchIsolated(P);
     
     //for(int i = 0; i < Ni*Nj*Nk; i ++)
     //    std::cout<< (int)pb_list[i] << std::endl;
-    writeConnectivity(cFile.c_str(),P->throatList);
+    writeConnectivity(cFile.c_str(),P);
     removeIsolatedPBs(P, pb_list, 2);
-    writeLocation(lFile.c_str(), P->locationList, P->throatCounter, Ni*Nj*Nk);
-    writeConnectivity(dFile.c_str(),P->throatList);
     
-    //writeVTK(vtkFile.c_str(), P->throatList,P->locationList, pb_list, Ni, Nj, Nk);
+    writeLocation(lFile.c_str(), P);
+    //writeConnectivity(dFile.c_str(),P->throatList);
+    
+    writeVTK(vtkFile.c_str(), P);
     
     
     

@@ -9,11 +9,13 @@
 #ifndef __networkgen__Generator__
 #define __networkgen__Generator__
 
+#include "PoreNetwork.h"
 
-float **generateLocation(const float Length, int **throatCounters, const int Ni, const int Nj, const int Nk);
 
-int **generateConnectivity(const int Ni, const int Nj, const int Nk, int ***array, int **throatCounters);
+float ** generateLocation(const int Ni, const int Nj, const int Nk, PoreNetwork *P_net);
 
-int **generateFullConnectivity(const int Ni, const int Nj, const int Nk, int **halfConnectivity);
+int ** generateConnectivity(const int Ni, const int Nj, const int Nk, PoreNetwork *P_net);
+
+int **generateFullConnectivity(const int Ni, const int Nj, const int Nk, PoreNetwork *P_net);
 
 #endif /* defined(__networkgen__Generator__) */
