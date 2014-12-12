@@ -11,8 +11,8 @@
 
 #include "PoreNetwork.h"
 
-void writeVTK(const char* filename, PoreNetwork *P_net);
-
 void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags);
+
+void writeVTK(const char* filename, PoreNetwork *P_net);
 
 #endif /* defined(__networkgen__vtk__) */

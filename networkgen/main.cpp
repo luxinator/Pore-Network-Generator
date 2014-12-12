@@ -41,7 +41,7 @@ int main() {
     // --- Update input Parser to include the changes per forward direction
     float *C = new float[11];
     for(int i = 0; i < 11; i++){
-        C[i] = 0.50000f;
+        C[i] = 0.6000f;
     }
     
     
@@ -69,8 +69,6 @@ int main() {
     //writeConnectivity(dFile.c_str(),P->throatList);
     
     writeVTK(vtkFile.c_str(), P);
-    
-    
     
 
 }

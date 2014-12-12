@@ -256,11 +256,11 @@ char * searchIsolated(PoreNetwork *P_net){
     }
     //Do a DepthFirst Search on all inlets
     for(i = 0; P_net->throatList_full[0][i] < Nj*Nk; i++){
-        DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)1, (char) 0); // same as with sorting, do not allow guards to be searched
+        DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)1, (char)0); // same as with sorting, do not allow guards to be searched
     }
     //Do a Depth First Search on all outlets
     for(i = lengthTL -1 ; P_net->throatList_full[0][i] > (Ni*Nj*Nk - Nj*Nk); i--){
-        DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)2, (char) 1);
+        DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)2, (char)1);
     }
     
     

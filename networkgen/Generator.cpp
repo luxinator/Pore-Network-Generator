@@ -124,7 +124,7 @@ int ** generateConnectivity(const int Ni, const int Nj, const int Nk, PoreNetwor
             i++;
             throatCounters[1][pn] = i; // outlet has one throat in forward no more, no less!
             
-            continue; // skip the rest, no more connections for this pb
+            //continue; // skip the rest, no more connections for this pb
         }//else if
         
         // (pn+ Nj*Nk + (Nj*Nk /2 + 1) -> distance of one x-slice in x-dir

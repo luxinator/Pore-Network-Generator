@@ -122,9 +122,11 @@ void removeIsolatedPBs(PoreNetwork *P_net, char *pb_flag_list, int minFlag){
             i++;
         }
     }
-    P_net->nrOfActivePBs = i-1;
+    // Update the number of active porebodies in the network
+    P_net->nrOfActivePBs = i;
+    
     //flag the rest as garbage:
-    for( ; i <= Ni*Nj*Nk; i++){
+    for( i = i + 1; i <= Ni*Nj*Nk; i++){
         P_net->throatCounter[0][i] = -1;
         P_net->throatCounter[1][i] = -1;
         P_net->locationList[0][i]  = -1.0f;
