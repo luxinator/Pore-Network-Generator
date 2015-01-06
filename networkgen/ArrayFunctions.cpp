@@ -9,26 +9,7 @@
 #include "ArrayFunctions.h"
 
 
-int *** generate_naive_array(const int Ni, const int Nj, const int Nk){
-    
-    
-    int i,j,k;
-    //  Allocate 3D Array, Yess Pointer->Pointer->Pointer->int ...
-    // continous block needs some work, I do not understand it probably
-    int ***porebodies = new int**[Ni];
-    
-    for(i = 0; i < Ni; i++){
-        porebodies[i] = new int*[Nj];
-        for(j = 0; j < Nj; j++){
-            porebodies[i][j] = new int[Nk];
-            for(k = 0; k < Nk; k++){
-                porebodies[i][j][k] = i * Nj * Nk + j * Nk + k + 1;
-            }
-        }
-    }
-    return porebodies;
 
-}
 
 
 /*

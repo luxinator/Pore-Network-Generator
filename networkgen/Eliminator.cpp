@@ -9,16 +9,6 @@
 #include "Eliminator.h"
 #include <random>
 
-
-int delelteThroat(PoreNetwork *P_net, int i, int deleted){
-    
-    P_net->throatList[1][i] = -1;
-    deleted++;
-    P_net->throatCounter[0][P_net->throatList[0][i]] -= 1;
-    //P_net->throatCounter[1][P_net->throatList[0][i]] -= deleted;
-    return deleted;
-}
-
 /*
  * C[0] = x-dir; C[1] = y-dir; C[2] = z-dir
  * C[3] = x - -y; C[4] = x - +y;
@@ -30,13 +20,13 @@ int delelteThroat(PoreNetwork *P_net, int i, int deleted){
  *
  */
 
-void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
+void eliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
     
     
     std::cout<<"Deleting throats" << std::endl;
     
     if(!P_net){
-        std::cerr << "Eliminator Error! \n No PoreNetwork Specified!" << std::endl;
+        std::cerr << "Eliminator Error! \n\t No PoreNetwork Specified!" << std::endl;
         return;
     }
     
@@ -69,11 +59,10 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
             
             // We have a connection in the x-dir
             if(d(e) >= ChanceList[0]
-               && coord[0] - coord_n[0] == -1
-               && coord[1] - coord_n[1] == 0
-               && coord[2] - coord_n[2] == 0){
-                deleted = delelteThroat(P_net, i, deleted);
-                
+                    && coord[0] - coord_n[0] == -1
+                    && coord[1] - coord_n[1] == 0
+                    && coord[2] - coord_n[2] == 0){
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             
             // Connection in y-dir
@@ -81,14 +70,14 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
                     && coord[0] - coord_n[0] == 0
                     && coord[1] - coord_n[1] == -1
                     && coord[2] - coord_n[2] == 0){
-                deleted = delelteThroat(P_net, i, deleted);
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             // Connection in z-dir
             else if(d(e) >= ChanceList[2]
                     && coord[0] - coord_n[0] == 0
                     && coord[1] - coord_n[1] == 0
                     && coord[2] - coord_n[2] == -1){
-                deleted = delelteThroat(P_net, i, deleted);
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             
             //------
@@ -97,14 +86,14 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
                     && coord[0] - coord_n[0] == -1
                     && coord[1] - coord_n[1] == 1
                     && coord[2] - coord_n[2] == 0){
-                deleted = delelteThroat(P_net, i, deleted);
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             // Connection in x - +y diagonal
             else if(d(e) >= ChanceList[4]
                     && coord[0] - coord_n[0] == -1
                     && coord[1] - coord_n[1] == -1
                     && coord[2] - coord_n[2] == 0){
-                deleted = delelteThroat(P_net, i, deleted);
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             
             // Connection in x - -z diagonal
@@ -112,7 +101,7 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
                     && coord[0] - coord_n[0] == -1
                     && coord[1] - coord_n[1] == 0
                     && coord[2] - coord_n[2] == 1){
-                deleted = delelteThroat(P_net, i, deleted);
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             
             // Connection in x - +z diagonal
@@ -120,7 +109,7 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
                     && coord[0] - coord_n[0] == -1
                     && coord[1] - coord_n[1] == 0
                     && coord[2] - coord_n[2] == -1){
-                deleted = delelteThroat(P_net, i, deleted);
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             
             // Connection in y - -z diagonal
@@ -128,7 +117,7 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
                     && coord[0] - coord_n[0] == 0
                     && coord[1] - coord_n[1] == 1
                     && coord[2] - coord_n[2] == 1){
-                deleted = delelteThroat(P_net, i, deleted);
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             
             // Connection in y - +z diagonal
@@ -136,27 +125,27 @@ void EliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
                     && coord[0] - coord_n[0] == 0
                     && coord[1] - coord_n[1] == 1
                     && coord[2] - coord_n[2] == -1){
-                deleted = delelteThroat(P_net, i, deleted);
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             // Connection in -y - -z diagonal
             else if(d(e) >= ChanceList[9]
                     && coord[0] - coord_n[0] == 0
                     && coord[1] - coord_n[1] == -1
                     && coord[2] - coord_n[2] == 1){
-                deleted = delelteThroat(P_net, i, deleted);
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             // Connection in -y - +z diagonal
             else if(d(e) >= ChanceList[10]
                     && coord[0] - coord_n[0] == 0
                     && coord[1] - coord_n[1] == -1
                     && coord[2] - coord_n[2] == -1){
-                deleted = delelteThroat(P_net, i, deleted);
+                deleted = P_net->delelteThroat(i, deleted, -1);
             }
             
             i++;
         }// while
         
-        P_net->throatCounter[1][pn] -= deleted;
+        P_net->throatCounter[1][pn] -= deleted; //Not really nice, Only the PoreNetwork Class should change the PoreNetwork... 
     }// while
     
     //Update the outlet throatcounters as well
@@ -229,12 +218,12 @@ void DFS(int start, int ** TL, char* flagged_PB, int TL_Length, char flag, char 
 
 
 /*
- * Search for isolated PoreBodies and update PB list accordingly
+ * Search for isolated PoreBodies and return a Flagged Pore Bodies List
  * Search the FULL connectivity map foward and backward, checking
  * if pbs are connected to inlet AND outlet
  */
 
-char * searchIsolated(PoreNetwork *P_net){
+char * searchForIsolatedPB(PoreNetwork *P_net){
     
     
     std::cout<< "Starting Search for Isolated PBs and Clusters" << std::endl;
@@ -244,6 +233,7 @@ char * searchIsolated(PoreNetwork *P_net){
     
     int i;
     for(i = 0; P_net->throatList_full[0][i] != 0; i++){
+        ;
         //std::cout << P_net->throatList[0][i] << '\t' << P_net->throatList[1][i] << std::endl;
     }
     
@@ -254,6 +244,7 @@ char * searchIsolated(PoreNetwork *P_net){
     for(i = 0; i < Ni*Nj*Nk; i++){
         flagged_PB[i] = 0;
     }
+    
     //Do a DepthFirst Search on all inlets
     for(i = 0; P_net->throatList_full[0][i] < Nj*Nk; i++){
         DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)1, (char)0); // same as with sorting, do not allow guards to be searched

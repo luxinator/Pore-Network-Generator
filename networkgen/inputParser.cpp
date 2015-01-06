@@ -35,7 +35,7 @@ int find_char(char *input, int size, char c){
 }
 
 void tolowercase(char *input, int size){
-    for (int i =0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         input[i] = tolower(input[i]);
     }
 }
@@ -46,7 +46,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
     
     std::fstream file;
     
-    // Bugy!
+    // Insanly bad... need to check against workingdir and do checks... no time, no need!
     if( strcmp(filename, "NetworkSpecs.in")){
         std::cerr << "No Network Specification File"    << std::endl;
         std::cout << "Assuming Standard File location" << std::endl;

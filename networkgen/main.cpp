@@ -11,32 +11,24 @@ int main() {
     std::cout << "Pore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__<<std::endl;
     std::cout << "Copyright Lucas van Oosterhout. All Rights Reserverd. \n\n" << std::endl;
     
-    NetworkSpecs *ns = readSpecsFile("/Users/lucas/Programming/Xcode/PoreNetworkgen/data/NetworkSpecs.in");
-    
-    PoreNetwork *P = new PoreNetwork;
-    P->ns = ns;
-    
-    
-    // make it so that Ni = Ni + 2, for the boundaries
-    int Ni = ns->Ni;
-    int Nj = ns->Nj;
-    int Nk = ns->Nk;
-    float L = ns->Length;
-    P->nrOfActivePBs = Ni*Nj*Nk;
+    std::string nSpecs = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/NetworkSpecs.in";
     
     std::string cFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/connectivity.txt";
     std::string dFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/deleted.txt";
     std::string vtkFile = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/data.vtk";
     std::string lFile   = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/location.txt";
     
+    
+    
+    PoreNetwork *P = new PoreNetwork(nSpecs.c_str());
+    
     std::cout<< "Generating PoreBodies Nrs" << std::endl;
-    P->arr = generate_naive_array(Ni,Nj,Nk);
-
+    P->generate_naive_array();
     
     // --- Generate the Network
     std::cout<< "Generating Network" << std::endl;
-    P->throatList = generateConnectivity(Ni, Nj, Nk, P);
-    P->locationList = generateLocation(Ni, Nj, Nk, P);
+    P->generateConnectivity();
+    P->generateLocation();
     
     // --- Update input Parser to include the changes per forward direction
     float *C = new float[11];
@@ -45,25 +37,24 @@ int main() {
     }
     
     
-    EliminateThroats(P, C, 6);
-    cleanThroatList(P, -1);
+    eliminateThroats(P, C, 6);
+    P->removeFlaggedThroats(-1);
     
    // writeConnectivity(cFile.c_str(),P->throatList);
     writeLocation(dFile.c_str(), P);
     
-    // --- Testing Full connect generator--- \\
-    
-    generateFullConnectivity(Ni, Nj, Nk, P);
+    // --- Testing Full connect generator---
+    P->generateFullConnectivity();
   
     
-    // !--- keep hold of the half connectivity map! need it for hte model runs with dynamic pressure!
+    // !--- keep hold of the half connectivity map! need it for the model runs with dynamic pressure!
 
-    char * pb_list = searchIsolated(P);
+    char * pb_list = searchForIsolatedPB(P);
     
     //for(int i = 0; i < Ni*Nj*Nk; i ++)
     //    std::cout<< (int)pb_list[i] << std::endl;
     writeConnectivity(cFile.c_str(),P);
-    removeIsolatedPBs(P, pb_list, 2);
+    P->removeFlaggedPBs(pb_list, 2);
     
     writeLocation(lFile.c_str(), P);
     //writeConnectivity(dFile.c_str(),P->throatList);

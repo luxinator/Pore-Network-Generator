@@ -16,6 +16,8 @@
 #include "PoreNetwork.h"
 
 /*
+ * Eliminate throats based upthen there chance to survive
+ *
  * C[0] = x-dir; C[1] = y-dir; C[2] = z-dir
  * C[3] = x - -y; C[4] = x - +y;
  * C[5] = x - -z; C[6] = x - +z;
@@ -25,10 +27,8 @@
  * Max coordination number is 6 at the moment (in forward x dir!)
  *
  */
-void EliminateThroats(PoreNetwork *P_net, float * C, int coordNr);
+void eliminateThroats(PoreNetwork *P_net, float * C, int coordNr);
 
-
-
-char * searchIsolated(PoreNetwork *P_net);
+char * searchForIsolatedPB(PoreNetwork *P_net);
 
 #endif /* defined(__networkgen__Eliminator__) */
