@@ -42,8 +42,8 @@ void eliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
     
     int *coord   = new int[3];
     int *coord_n = new int[3];
-    int deleted = 0;
-    int pn = 1, i = 0;
+    size_t deleted = 0;
+    size_t pn = 1, i = 0;
     
     // Go through throatList
     while(P_net->throatList[0][i] != 0){
@@ -166,7 +166,7 @@ void eliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
  * Maybe INLINE?
  */
 
-int returnAdjecentNodes(int **throatList, int i, int max){
+size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
     
     int pn = throatList[0][i];
     int pn_n;
@@ -193,16 +193,16 @@ int returnAdjecentNodes(int **throatList, int i, int max){
  * Places a flag in the flagged_pb array, when check is found!
  */
 
-void DFS(int start, int ** TL, char* flagged_PB, int TL_Length, char flag, char check){
+void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag, char check){
     // Flag PB as discoverd
     flagged_PB[TL[0][start]] = flag;
     
-    int max = returnAdjecentNodes(TL, start, TL_Length);
+    size_t max = returnAdjecentNodes(TL, start, TL_Length);
     // from TL[1][start] to TL[1][max] are connected pbs
     
     //For all throats connected to pb do:
     
-    for(int i = start; i < max; i++){
+    for(size_t i = start; i < max; i++){
         if(flagged_PB[TL[1][i]] == check){
             //search for edges from TL[1][j]
             for(int j = 0; j < TL_Length; j++)
@@ -231,13 +231,13 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
     int Nj = P_net->ns->Nj;
     int Nk = P_net->ns->Nk;
     
-    int i;
+    size_t i;
     for(i = 0; P_net->throatList_full[0][i] != 0; i++){
         ;
         //std::cout << P_net->throatList[0][i] << '\t' << P_net->throatList[1][i] << std::endl;
     }
     
-    int lengthTL = i;
+    size_t lengthTL = i;
     
     // Allocata a chunk and set it to zero
     char *flagged_PB = new char[Ni*Nj*Nk];

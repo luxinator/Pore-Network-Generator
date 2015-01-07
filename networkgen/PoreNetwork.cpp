@@ -48,7 +48,7 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     }
     
     int flagCounter = 0;
-    int i = 0;
+    size_t i = 0;
     
     while(this->throatList[0][i] != 0){
         if((this->throatList[0][i] == Flag || this->throatList[1][i] == Flag))
@@ -57,7 +57,7 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     }
     // gives index of 0 entry, which is also the length of the list
     
-    int nrConnections = i;
+    size_t nrConnections = i;
     std::cout<< "Cleaning ThroatList ..." << std::endl;
     std::cout<< "  Amount of Connections: \t" << nrConnections << std::endl;
     std::cout<< "  Amount of Flagged pbs:    \t" << flagCounter   << std::endl;
@@ -65,14 +65,15 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     
     
     // Since resizing an array in C++ is not done... we need to do a selective copy and delete the old array
-    int newAmountOfConnections =  nrConnections - flagCounter + 1; // keep one extra for the [0,0] entry!
+    size_t newAmountOfConnections =  nrConnections - flagCounter + 1; // keep one extra for the [0,0] entry!
+    
     int *t = new int[newAmountOfConnections * 2]; //temp
     int **newTL = new int*[2];
     newTL[0] = t;
     newTL[1] = t + newAmountOfConnections;
     
     // Copy all the connections
-    int j = 0;
+    size_t j = 0;
     for(i = 0; i < nrConnections; i++){
         if(this->throatList[1][i] != Flag && this->throatList[0][i] != Flag){
             newTL[0][j] = this->throatList[0][i];
@@ -100,7 +101,7 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
 void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, int minFlag){
     
     std::cout<< "Removing Porebodies with a Flag value lower then: " << minFlag;
-    int TL_Length = 0;
+    size_t TL_Length = 0;
     
     // Look for gaurd, we now have the amount of throats in the network
     while(this->throatList[0][TL_Length] != 0){
@@ -110,7 +111,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, int minFlag){
     int Ni = ns->Ni;
     int Nj = ns->Nj;
     int Nk = ns->Nk;
-    int i = 0;
+    size_t i = 0;
     
     
     int *mappingList= new int[Ni*Nj*Nk]; // A list of how much a PBnumber should be lowerd -> mappingList[pn]
@@ -133,7 +134,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, int minFlag){
     
     // Clean the ThroatCounters and locations, delete all that are eleminated that's it, no re-numbering
     i = 1;
-    for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
+    for(size_t pn = 1; pn <= Ni*Nj*Nk; pn++){
         if(pb_flag_list[pn] >= minFlag){ //keep the value at pn
             this->throatCounter[0][i] = this->throatCounter[0][pn];
             this->throatCounter[1][i] = this->throatCounter[1][pn];
@@ -205,7 +206,7 @@ void PoreNetwork::generateConnectivity(){
     connection[0] = t;
     connection[1] = t + (13 * Ni*Nj*Nk);
     
-    for(int i = 0; i < 13  *  Ni*Nj*Nk; i ++){
+    for(size_t i = 0; i < 13  *  Ni*Nj*Nk; i ++){
         connection[0][i] = 0;
         connection[1][i] = 0;
     }
@@ -214,7 +215,7 @@ void PoreNetwork::generateConnectivity(){
     
     std::cout << "number of PBs: "<<Ni*Nj*Nk << std::endl;
     
-    for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
+    for(size_t pn = 1; pn <= Ni*Nj*Nk; pn++){
         throatCounters[0][pn] = 0;
         throatCounters[1][pn] = 0;
     }
@@ -366,8 +367,8 @@ void PoreNetwork::generateFullConnectivity(){
     int **halfConnectivity = this->throatList;
     
     std::cout << "Generating Full Connectivity" << std::endl;
-    int i = 0;
-    int halfLength = 0;
+    size_t i = 0;
+    size_t halfLength = 0;
     //maximum number of connections is:
     for(i = 0; i < Ni*Nj*Nk * 13; i++){
         if(halfConnectivity[0][i] == 0){
@@ -375,7 +376,7 @@ void PoreNetwork::generateFullConnectivity(){
             break;
         }
     }
-    int maxConnections = halfLength  * 2 +1; // Full connectivity is twich the size of half connectivity, and we need one extra place for the [0][0] guards
+    size_t maxConnections = halfLength  * 2 + 1; // Full connectivity is twich the size of half connectivity, and we need one extra place for the [0][0] guards
     
     //For Details see [generateConnectivity]
     int *t = new int[maxConnections * 2];
@@ -412,12 +413,16 @@ void PoreNetwork::generateFullConnectivity(){
 /*
  * Delete Pore with PoreNumber i, a flag is placed in the throatlist and throatcounters
  */
-int PoreNetwork::delelteThroat(int i, int deleted, int flag){
+size_t PoreNetwork::delelteThroat(size_t i, size_t deleted, int flag){
     
     this->throatList[1][i] = flag;
     deleted++;
     this->throatCounter[0][this->throatList[0][i]] -= 1;
     return deleted;
+}
+
+size_t PoreNetwork::delelteThroat(int i, int deleted, int flag){
+    return this->delelteThroat(i, deleted, flag);
 }
 
 /*
@@ -438,7 +443,7 @@ void writeConnectivity(const char * filename, PoreNetwork *pn){
         return;
     }
     
-    for(int i = 0;pn->throatList[0][i] != 0 ; i ++){
+    for(size_t i = 0;pn->throatList[0][i] != 0 ; i ++){
             file << pn->throatList[0][i]<< '\t' << pn->throatList[1][i] << std::endl;
     }
     
@@ -463,7 +468,7 @@ void writeLocation(const char * filename, PoreNetwork *P){
     }
     // set output type to scientific
     file.setf(std::ios_base::scientific);
-    for(int pn = 1; pn <= P->nrOfActivePBs; pn++){
+    for(size_t pn = 1; pn <= P->nrOfActivePBs; pn++){
         
         //file << '[' << pn << ']' << '\t';
         file << std::setw(8)<< P->locationList[0][pn]   << ' ';

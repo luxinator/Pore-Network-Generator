@@ -1,6 +1,5 @@
 
 #include "ArrayFunctions.h"
-#include "Generator.h"
 #include "vtk.h"
 #include "inputParser.h"
 #include "Eliminator.h"
@@ -8,7 +7,7 @@
 
 int main() {
     
-    std::cout << "Pore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__<<std::endl;
+    std::cout << "\nPore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__<<std::endl;
     std::cout << "Copyright Lucas van Oosterhout. All Rights Reserverd. \n\n" << std::endl;
     
     std::string nSpecs = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/NetworkSpecs.in";

@@ -12,18 +12,9 @@
 
 
 
-/*
- * Insert pb nr and returns the lattice coordinates in the coord array
- */
-void deflatten_3d(int i, const int Ni, const int Nj, const int Nk, int* coord){
-    i -= 1;
-    coord[0] = (i / (Nj * Nk)) % Ni;
-    coord[1] = (i / Nk) % Nj;
-    coord[2] = i % Nk;
-    
-}
 
-void bubbleSortList(int **list, const int l){
+
+void bubbleSortList(int **list, const size_t l){
     
     std::cout<< "\t Bubble Sorting " << l << " values" << std::endl;
     bool sorted = false;
@@ -31,7 +22,7 @@ void bubbleSortList(int **list, const int l){
     while (!sorted){
         sorted = true;
     
-        for(int i = 0; i < l - 1; i++){
+        for(size_t i = 0; i < l - 1; i++){
             if (list[0][i] > list[0][i+1]) {
                 sorted = false;
                 //if (list[1][i] == 0 || list[0][i] == 0
@@ -52,4 +43,8 @@ void bubbleSortList(int **list, const int l){
             }
         }
     }
+}
+
+void bubbleSortList(int **list, const int l){
+    bubbleSortList(list, l);
 }

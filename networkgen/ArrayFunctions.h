@@ -12,9 +12,18 @@
 #include <iostream>
 #include <vector>
 
+/*
+ * Insert pb nr and returns the lattice coordinates in the coord array
+ */
+inline void deflatten_3d(size_t i, const int Ni, const int Nj, const int Nk, int* coord){
+    i -= 1;
+    coord[0] = (i / (Nj * Nk)) % Ni;
+    coord[1] = (i / Nk) % Nj;
+    coord[2] = i % Nk;
+    
+}
 
-void deflatten_3d(const int i, const int Ni, const int Nj, const int Nk, int* coord);
-
+void bubbleSortList(int **list, size_t l);
 void bubbleSortList(int **list, int l);
 
 #endif /* defined(__networkgen__ArrayFunctions__) */

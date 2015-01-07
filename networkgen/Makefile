@@ -6,7 +6,6 @@ LIBS	=
 
 GENSOURCES =  ArrayFunctions.cpp\
 Eliminator.cpp\
-Generator.cpp \
 PoreNetwork.cpp \
 inputParser.cpp \
 main.cpp \

@@ -16,10 +16,10 @@
  * Enhance the shit out of this, we want te select what to put in the files
  * Or even better put any and everything in the file!
  */
-void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags ){
+void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags, const int precision){
     
     //int PNMax = P_net->ns->Ni*P_net->ns->Nj*P_net->ns->Nk;
-    int PNMax = P_net->nrOfActivePBs;
+    size_t PNMax = P_net->nrOfActivePBs;
     std::ofstream file;
     if( filename == nullptr){
         std::cerr << "Invalid filename specified! " << std::endl;
@@ -31,8 +31,10 @@ void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags ){
         std::cerr<< "Error opening file [" << filename << ']' << std::endl;
         return;
     }
-    
+    //Set output Format
     file.setf(std::ios_base::scientific );
+    if(precision)
+        file.precision(precision);
     
     /*
      * Write the header
@@ -51,8 +53,8 @@ void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags ){
         file << P_net->locationList[0][pn]<< '\t';
         file << P_net->locationList[1][pn]<< '\t';
         file << P_net->locationList[2][pn] << '\n';
-        
     }
+    
     
     /*
      * Write throat data
@@ -65,13 +67,17 @@ void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags ){
     
     int nrOfThroats = i;
     file << "LINES" << '\t'<< nrOfThroats << '\t'<< nrOfThroats * 3 <<std::endl;
-    for(i = 0; i < PNMax * 13; i ++){
-        if (P_net->throatList[0][i] != 0){
-            file<< 2<< '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << std::endl;
+    for(i = 0; i < nrOfThroats; i++){
+        //if (P_net->throatList[0][i] != 0){
+            file << 2 << '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
         // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
-        } else
-            break;
+       // } else
+       //     break;
     }
+    
+    /*
+     * Write Point Data is any
+     */
     
     file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
     file << "LOOKUP_TABLE default" <<std::endl;
@@ -85,7 +91,7 @@ void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags ){
     
 }
 
-void writeVTK(const char* filename, PoreNetwork *P_net){
+void writeVTK(const char* filename, PoreNetwork *P_net, const int precision){
     
    
     
@@ -104,6 +110,8 @@ void writeVTK(const char* filename, PoreNetwork *P_net){
     }
     
     file.setf(std::ios_base::scientific );
+    if(precision)
+        file.precision(precision);
     
     /*
      * Write the header
@@ -137,7 +145,7 @@ void writeVTK(const char* filename, PoreNetwork *P_net){
     int nrOfThroats = i;
     file << "LINES" << '\t'<< nrOfThroats << '\t'<< nrOfThroats * 3 <<std::endl;
     for(i = 0; i < nrOfThroats; i ++){
-        file<< 2<< '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << std::endl;
+        file<< 2<< '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
         // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
     }
     

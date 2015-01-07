@@ -8,7 +8,7 @@
 
 #ifndef networkgen_PoreNetwork_h
 #define networkgen_PoreNetwork_h
-
+#include <cstdlib>
 
 
 struct NetworkSpecs {
@@ -31,8 +31,8 @@ public:
     int **throatCounter; //number of prore throats per pb nr (1 based!) and number of throats preceding.
     int **throatList; // Connection map from pb nr -> pb nr. Is the half map!
     int **throatList_full; //Full Connection map
-    int nrOfConnections;
-    int nrOfActivePBs;
+    size_t nrOfConnections;
+    size_t nrOfActivePBs;
     float **locationList; // Location of a pb using its nr as index
   
 
@@ -53,7 +53,9 @@ public:
     
     void generate_naive_array();
     
-    int delelteThroat(int i, int deleted, int flag);
+    size_t delelteThroat(size_t i, size_t deleted, int flag);
+    
+    size_t delelteThroat(int i, int deleted, int flag);
 
 };
 void writeConnectivity(const char * filename, PoreNetwork *P_net);
