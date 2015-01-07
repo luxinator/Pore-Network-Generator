@@ -1,7 +1,7 @@
 srcdir  = .
 
 CC      = c++
-CFLAGS  = -g -Wuninitialized -std=c++11 -O3 -fomit-frame-pointer
+CFLAGS  = -g -Wuninitialized -std=c++11 -O3 -fomit-frame-pointer -Wall -fno-strict-aliasing
 LIBS	=  
 
 GENSOURCES =  ArrayFunctions.cpp\

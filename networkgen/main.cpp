@@ -5,10 +5,13 @@
 #include "Eliminator.h"
 
 
-int main() {
+int main(int argc, char *argv[]) {
     
     std::cout << "\nPore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__<<std::endl;
     std::cout << "Copyright Lucas van Oosterhout. All Rights Reserverd. \n\n" << std::endl;
+    
+    
+    
     
     std::string nSpecs = "/Users/lucas/Programming/Xcode/PoreNetworkgen/data/NetworkSpecs.in";
     
@@ -40,7 +43,7 @@ int main() {
     P->removeFlaggedThroats(-1);
     
    // writeConnectivity(cFile.c_str(),P->throatList);
-    writeLocation(dFile.c_str(), P);
+    //writeLocation(dFile.c_str(), P);
     
     // --- Testing Full connect generator---
     P->generateFullConnectivity();
