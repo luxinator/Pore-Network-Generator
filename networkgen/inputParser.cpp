@@ -46,12 +46,6 @@ NetworkSpecs *readSpecsFile(const char *filename){
     
     std::fstream file;
     
-    // Insanly bad... need to check against workingdir and do checks... no time, no need!
-    if( strcmp(filename, "NetworkSpecs.in")){
-        std::cerr << "No Network Specification File"    << std::endl;
-        std::cout << "Assuming Standard File location" << std::endl;
-    }
-    
     std::cout << "Opening File: " << filename << std::endl;
     file.open(filename, std::ios::in);
     if(!file){

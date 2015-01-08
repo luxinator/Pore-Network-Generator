@@ -30,6 +30,10 @@ PoreNetwork::PoreNetwork(NetworkSpecs *ns){
 PoreNetwork::PoreNetwork(const char *networkSpecsFile){
 
     this->ns = readSpecsFile(networkSpecsFile);
+    if(!ns)
+        return;
+        
+    
     this->nrOfActivePBs = ns->Ni*ns->Nj*ns->Nk;
 }
 
@@ -434,6 +438,7 @@ void writeConnectivity(const char * filename, PoreNetwork *pn){
     std::ofstream file;
     if(!filename){
         std::cerr << "No filename specified! " << std::endl;
+        return;
     }
     
     std::cout << "Opening File: " << filename << std::endl;
@@ -458,6 +463,7 @@ void writeLocation(const char * filename, PoreNetwork *P){
     std::ofstream file;
     if( filename == nullptr){
         std::cerr << "No filename specified! " << std::endl;
+        return;
     }
     
     std::cout << "Opening File: " << filename << std::endl;

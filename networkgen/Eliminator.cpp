@@ -189,7 +189,7 @@ size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
  */
 
 /*
- * Recursive Depth-first Search
+ * Recursive Depth-first Search on FullConnected ThroatList
  * Places a flag in the flagged_pb array, when check is found!
  */
 
@@ -204,10 +204,9 @@ void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag,
     
     for(size_t i = start; i < max; i++){
         if(flagged_PB[TL[1][i]] == check){
-            //search for edges from TL[1][j]
-            for(int j = 0; j < TL_Length; j++)
-            {
-                //connection to pb
+            //search edges of TL[1][j]
+            for(size_t j = 0; j < TL_Length; j++)
+            {//connection to pb
                 if(TL[0][j] == TL[1][i]){
                     DFS(j, TL, flagged_PB, TL_Length, flag, check);
                 }
