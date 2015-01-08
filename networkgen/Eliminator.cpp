@@ -45,6 +45,8 @@ void eliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
     size_t deleted = 0;
     size_t pn = 1, i = 0;
     
+    float xChance = ChanceList[0];
+    
     // Go through throatList
     while(P_net->throatList[0][i] != 0){
         
@@ -52,10 +54,25 @@ void eliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
         deflatten_3d(P_net->throatList[0][i], Ni, Nj, Nk, coord);
         
         pn = P_net->throatList[0][i];
+        /*if(pn < Nj*Nk || pn > Ni*Nj*Nk - Nj*Nk){
+            i++;
+            continue;
+        }
+        */
+        // Inlet and outlet pores are skipped
+        if(coord[0] == 0 ){
+            i++;
+            continue;
+        }
+        if(coord[0] ==  Ni -2 ){
+            i++;
+            ChanceList[0] = 1.0f; // X-dir is kept, else may fail
+        }
         
         while (P_net->throatList[0][i] == pn) {
             // check for this pore, all its connections
             deflatten_3d(P_net->throatList[1][i], Ni, Nj, Nk, coord_n);
+            
             
             // We have a connection in the x-dir
             if(d(e) >= ChanceList[0]
@@ -155,6 +172,7 @@ void eliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
     }
     delete [] coord;
     delete [] coord_n;
+    ChanceList[0] = xChance;    
     
     
 }
@@ -194,19 +212,24 @@ size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
  */
 
 void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag, char check){
-    // Flag PB as discoverd
+ 
+    // Check if the pb has been visited
+    if(flagged_PB[TL[0][start]] == flag)
+        return;
+
+    // Flag PB as discoverd and check all adjecent nodes
     flagged_PB[TL[0][start]] = flag;
-    
-    size_t max = returnAdjecentNodes(TL, start, TL_Length);
+
     // from TL[1][start] to TL[1][max] are connected pbs
+    size_t max = returnAdjecentNodes(TL, start, TL_Length);
+    
     
     //For all throats connected to pb do:
-    
     for(size_t i = start; i < max; i++){
         if(flagged_PB[TL[1][i]] == check){
-            //search edges of TL[1][j]
+            //search edges of this node
             for(size_t j = 0; j < TL_Length; j++)
-            {//connection to pb
+            {// do DFS on all edges of this node
                 if(TL[0][j] == TL[1][i]){
                     DFS(j, TL, flagged_PB, TL_Length, flag, check);
                 }
@@ -224,6 +247,8 @@ void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag,
 
 char * searchForIsolatedPB(PoreNetwork *P_net){
     
+    bool verbose = false;
+    
     
     std::cout<< "Starting Search for Isolated PBs and Clusters" << std::endl;
     int Ni = P_net->ns->Ni;
@@ -233,26 +258,50 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
     size_t i;
     for(i = 0; P_net->throatList_full[0][i] != 0; i++){
         ;
-        //std::cout << P_net->throatList[0][i] << '\t' << P_net->throatList[1][i] << std::endl;
     }
     
     size_t lengthTL = i;
     
-    // Allocata a chunk and set it to zero
-    char *flagged_PB = new char[Ni*Nj*Nk];
-    for(i = 0; i < Ni*Nj*Nk; i++){
+    //std::cout<< "TL: " <<lengthTL << std::endl;
+    
+    // Allocata a chunk of mem and set it to zero
+    char *flagged_PB = new char[Ni*Nj*Nk+1];
+    for(i = 0; i <= Ni*Nj*Nk; i++){
         flagged_PB[i] = 0;
     }
     
     //Do a DepthFirst Search on all inlets
-    for(i = 0; P_net->throatList_full[0][i] < Nj*Nk; i++){
-        DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)1, (char)0); // same as with sorting, do not allow guards to be searched
-    }
-    //Do a Depth First Search on all outlets
-    for(i = (Ni*Nj*Nk - Nj*Nk) ; P_net->throatList_full[0][i] < lengthTL ; i++){
-        DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)2, (char)1);
+    for(i = 0; P_net->throatList_full[0][i] <= Nj*Nk; i++){
+        DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)1, (char)0);
+        // same as with sorting, do not allow guards to be searched
     }
     
+    if(verbose)
+        for(size_t i = 1; i <= Ni*Nj*Nk; i ++){
+        std::cout << "PB: " <<i << "\t Flag: " <<(int)flagged_PB[i] << std::endl;
+        }
+    
+    bool brokenNetwork = true;
+    
+    //Do a Depth First Search on all outlets
+
+    for(i = lengthTL - 1 ; P_net->throatList_full[0][i] >= (Ni*Nj*Nk - Nj*Nk); i--){
+        
+        // Check if pb the qualifies
+        if(flagged_PB[ P_net->throatList_full[0][i]] == (char)1){
+            
+            DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)2, (char)1);
+            //std::cout << i << '\t' << P_net->throatList_full[0][i] << '\t'<< (int)flagged_PB[ P_net->throatList_full[0][i]] << std::endl;
+            brokenNetwork = false;
+        }
+    }
+    if (brokenNetwork)
+        std::cout << "!!! --- 2 : Network is Broken no Connection between Inlet and Outlet ---!!!" << std::endl;
+    
+    if(false)
+        for(size_t i = 1; i <= Ni*Nj*Nk; i ++){
+            std::cout << "PB: " <<i << "\t Flag: " <<(int)flagged_PB[i] << std::endl;
+        }
     
     // we now have a flagged list of pb's which are connected to the inlets
     return flagged_PB;

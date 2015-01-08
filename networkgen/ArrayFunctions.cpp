@@ -13,7 +13,9 @@
 
 
 
-
+/*
+ * Bubble sort is slow, but its a stable sort and easy to understand
+ */
 void bubbleSortList(int **list, const size_t l){
     
     std::cout<< "\t Bubble Sorting " << l << " values" << std::endl;
@@ -25,12 +27,8 @@ void bubbleSortList(int **list, const size_t l){
         for(size_t i = 0; i < l - 1; i++){
             if (list[0][i] > list[0][i+1]) {
                 sorted = false;
-                //if (list[1][i] == 0 || list[0][i] == 0
-                //    || list[1][i+1] == 0 || list[0][i+1] == 0) {
-                //    std::cout<<"BS!"<<std::endl;
-                //    std::cout<<i<< std::endl;
-                //}
                 
+                //swap values
                 t1 = list[0][i];
                 t2 = list[1][i];
                 

@@ -43,13 +43,13 @@ public:
  */
     void removeFlaggedThroats(const int Flag = 0);
 
-    void removeFlaggedPBs(char *pb_flag_list, int minFlag);
+    void removeFlaggedPBs(char *pb_flag_list, char minFlag);
 
     void generateLocation();
     
     void generateConnectivity();
     
-    void generateFullConnectivity();
+    size_t generateFullConnectivity();
     
     void generate_naive_array();
     

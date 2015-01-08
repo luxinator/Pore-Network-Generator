@@ -95,24 +95,22 @@ int main(int argc, char *argv[]) {
     // --- Update input Parser to include the changes per forward direction
     float *C = new float[11];
     for(int i = 0; i < 11; i++){
-        C[i] = 0.6000f;
+        C[i] = 0.3000f;
     }
     
     
     eliminateThroats(P, C, 6);
     P->removeFlaggedThroats(-1);
     
-    writeConnectivity(cFile.c_str(),P);
     
-    P->generateFullConnectivity();
+    size_t a = P->generateFullConnectivity();
   
-    
     char * pb_list = searchForIsolatedPB(P);
     
-    P->removeFlaggedPBs(pb_list, 2);
+    P->removeFlaggedPBs(pb_list, (char)2);
     
-    writeConnectivity(cFile.c_str(),P);
-    writeLocation(lFile.c_str(), P);
+    //writeConnectivity(cFile.c_str(),P);
+    //writeLocation(lFile.c_str(), P);
     
     if(writeVTKswitch)
         writeVTK(vtkFile.c_str(), P);
