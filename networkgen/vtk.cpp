@@ -16,7 +16,7 @@
  * Enhance the shit out of this, we want te select what to put in the files
  * Or even better put any and everything in the file!
  */
-void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags, const int precision){
+void writeVTK(const char* filename, PoreNetwork *P_net, float * pb_values, const int precision){
     
     //int PNMax = P_net->ns->Ni*P_net->ns->Nj*P_net->ns->Nk;
     size_t PNMax = P_net->nrOfActivePBs;
@@ -60,7 +60,7 @@ void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags, const i
      * Write throat data
      */
     int i;
-    for(i = 0; i < PNMax * 13; i ++){
+    for(i = 0; ; i ++){
         if (P_net->throatList[0][i] == 0)
             break;
     }
@@ -68,11 +68,8 @@ void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags, const i
     int nrOfThroats = i;
     file << "LINES" << '\t'<< nrOfThroats << '\t'<< nrOfThroats * 3 <<std::endl;
     for(i = 0; i < nrOfThroats; i++){
-        //if (P_net->throatList[0][i] != 0){
             file << 2 << '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
         // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
-       // } else
-       //     break;
     }
     
     /*
@@ -82,8 +79,8 @@ void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags, const i
     file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
     file << "LOOKUP_TABLE default" <<std::endl;
     // Pn Size
-    for(int pn = 1; pn < PNMax + 1; pn++){
-        file << (float)(int)pb_flags[pn] << '\n';
+    for(int pn = 1; pn <= PNMax; pn++){
+        file << pb_values[pn] << '\n';
         //std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
     }
     
@@ -93,10 +90,6 @@ void writeVTK(const char* filename, PoreNetwork *P_net, char * pb_flags, const i
 
 void writeVTK(const char* filename, PoreNetwork *P_net, const int precision){
     
-    
-    int Ni = P_net->ns->Ni;
-    int Nj = P_net->ns->Nj;
-    int Nk = P_net->ns->Nk;
     size_t i = 0;
     
     size_t PNMax = P_net->nrOfActivePBs;
@@ -130,7 +123,7 @@ void writeVTK(const char* filename, PoreNetwork *P_net, const int precision){
     /*
      * Write pb location data
      */
-    for(int pn = 1; pn < (PNMax + 1); pn++){
+    for(int pn = 1; pn <= PNMax; pn++){
         file << P_net->locationList[0][pn]<< '\t';
         file << P_net->locationList[1][pn]<< '\t';
         file << P_net->locationList[2][pn] << '\n';

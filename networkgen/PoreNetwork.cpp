@@ -67,7 +67,7 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     size_t nrConns = i;
     std::cout<< "Cleaning ThroatList ..." << std::endl;
     std::cout<< "  Amount of Connections: \t" << nrConns << std::endl;
-    std::cout<< "  Amount of Flagged pbs:    \t" << flagCounter   << std::endl;
+    std::cout<< "  Amount of Flagged throats:    \t" << flagCounter   << std::endl;
     std::cout<< "  Max throats:          \t" << this->ns->Ni * this->ns->Nj * this->ns->Nk  * 13 << std::endl;
     
     
@@ -78,7 +78,6 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     int **newTL = new int*[2];
     newTL[0] = t;
     newTL[1] = t + newAmountOfConnections;
-    
     
     // Copy all the connections
     size_t j = 0;
@@ -108,9 +107,14 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
 /*
  * Removes all porebodies who have a flag lower then minFlag (REMINDER: minFlags is a CHAR!)
  * Done on the Full MAP!
- * Calls Renumber!
+ * renumbers the Throat counters and the location list
  */
 void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
+    
+    if(!pb_flag_list){
+        std::cerr << "PoreBodies flag list is empty, broken network?" << std::endl;
+        return;
+    }
     
     std::cout<< "Removing Porebodies with a Flag value lower then: " << (int)minFlag << std::endl;;
     
@@ -118,19 +122,6 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     int Nj = ns->Nj;
     int Nk = ns->Nk;
     size_t i = 0;
-    int t = 0;
-
-    /*
-    std::cout << " ----- UnAlterd ------" << std::endl;
-    std::cout << '\n';
-    t = 0;
-    for(i = 0; this->throatList[1][i] != 0; i++){
-        std::cout << this->throatList[0][i] << '\t' << this->throatList[1][i] << std::endl;
-        if(this->throatList[0][i] - t > 1)
-            std::cout << "---- NOT A SEQUANTIAL LIST !!!!" << std::endl;
-        t = this->throatList[0][i];
-    }
-     */
     
     for(i = 0; this->throatList[0][i] != 0; i++){
         //Delete the connection FROM a flagged Pore
@@ -143,26 +134,12 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
             this->throatList[1][i] = -1;
         }
     }
-   
-    /*
-    std::cout << " ----- Delete flagged ------" << std::endl;
-    for(i = 0; this->throatList[1][i] != 0; i++){
-        std::cout << this->throatList[0][i] << '\t' << this->throatList[1][i] << std::endl;
-    }
-     */
     
     // Do the Actually Deleting
     this->removeFlaggedThroats(-1);
     
-    /*
-     std::cout << " ----- Deleted flagged ------" << std::endl;
-    for(i = 0; this->throatList[1][i] != 0; i++){
-        std::cout << this->throatList[0][i] << '\t' << this->throatList[1][i] << std::endl;
-    }
-     */
     
-    
-    //pb_flag_list -> isolated pb's if minFlag
+    //pb_flag_list -> isolated pb's if minFlg
     //build a mask:
     int* mask = new int[Ni*Nj*Nk + 1];
     for(i = i; i < Ni*Nj*Nk; i++){
@@ -170,62 +147,54 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     }
     // Fill the Mask
     int cummulator = 0;
-    for(i = 1; i < Ni*Nj*Nk; i++){
+    for(i = 1; i <= Ni*Nj*Nk; i++){
         if(pb_flag_list[i] < minFlag){
             cummulator++;
         }
         mask[i] = cummulator;
-    //    std::cout << i << '\t' << mask[i] << '\t' << (int)pb_flag_list[i] << std::endl;
+        //std::cout << i << '\t' << mask[i] << '\t' << (int)pb_flag_list[i] << std::endl;
     }
+    
+    std::cout << "Amount PBs deleted: " << Ni*Nj*Nk - cummulator << std::endl;
+    this->nrOfActivePBs = Ni*Nj*Nk - cummulator;
+    
     
     //Use the mask to update the throatLists, the COMPLETE lists.
-    for(i = 0; this->throatList[0][i] != 0; i++){
+    for(i = 0; this->throatList[0][i] != 0; i++)
         this->throatList[0][i] = this->throatList[0][i] - mask[this->throatList[0][i]];
-    }
+    
     for(i = 0; this->throatList[1][i] != 0; i++){
         this->throatList[1][i] = this->throatList[1][i] - mask[this->throatList[1][i]];
+     
     }
-    /*
-    std::cout << '\n';
-    t = 0;
-    for(i = 0; this->throatList[1][i] != 0; i++){
-        std::cout << this->throatList[0][i] << '\t' << this->throatList[1][i] << std::endl;
-        if(this->throatList[0][i] - t > 1)
-            std::cout << "SHIT" << std::endl;
-        t = this->throatList[0][i];
-    }
-    */
-    
-    // Clean the ThroatCounters and locations, delete all that are eleminated that's it, no re-numbering
-    i = 1;
-    for(size_t pn = 1; pn <= Ni*Nj*Nk; pn++){
-        //std::cout << pn << "\t x:"  << (int)pb_flag_list[pn] << '\t' << this->throatList[0][pn] << '\t' << this->throatList[1][pn]<<" \t tc:\t" << this->throatCounter[0][pn]<< '\t' << this->throatCounter[1][pn] << std::endl;
-        if(pb_flag_list[pn] >= minFlag){ //keep the value at pn
-            this->throatCounter[0][i] = this->throatCounter[0][pn];
-            this->throatCounter[1][i] = this->throatCounter[1][pn];
+    // Update the locations
+    size_t newi;
+    for(i = 1; i <= Ni*Nj*Nk; i ++){
+        if(pb_flag_list[i] >= minFlag){ //Pore exists in new system
+            newi = i - mask[i]; // get the new pbnr and update according
+            this->locationList[0][newi] = this->locationList[0][i];
+            this->locationList[1][newi] = this->locationList[1][i];
+            this->locationList[2][newi] = this->locationList[2][i];
             
-            this->locationList[0][i] = this->locationList[0][pn];
-            this->locationList[1][i] = this->locationList[1][pn];
-            this->locationList[2][i] = this->locationList[2][pn];
-            i++;
+            this->throatCounter[0][newi] = this->throatCounter[0][i];
         }
-        
     }
-    // Update the number of active porebodies in the network
-    this->nrOfActivePBs = i;
+    //OverWrite the last part of the locationList with guards:
+        for(i = this->nrOfActivePBs + 1; i < Ni*Nj*Nk; i++){
+            this->locationList[0][i] = -1.0f;
+            this->locationList[1][i] = -1.0f;
+            this->locationList[2][i] = -1.0f;
+        }
     
-    //flag the rest as garbage:
-    // Future Note, change so that the arrays are deleted, we don't need to hog this memory
-    for( i = i + 1; i <= Ni*Nj*Nk; i++){
-        this->throatCounter[0][i] = -1;
-        this->throatCounter[1][i] = -1;
-        this->locationList[0][i]  = -1.0f;
-        this->locationList[1][i]  = -1.0f;
-        this->locationList[2][i]  = -1.0f;
+    
+    int accumulator = 0;
+    
+    for(i = 1; i <= this->nrOfActivePBs; i ++){
+        this->throatCounter[1][i] = accumulator + this->throatCounter[0][i];
+        accumulator= this->throatCounter[1][i];
     }
     
 }
-
 
 
 /*
@@ -389,6 +358,8 @@ void PoreNetwork::generateLocation(){
         locationList[2][pn] = coord[2] * Length;
         
     }
+    
+    
     this->locationList = locationList;
     
 }
@@ -481,7 +452,7 @@ size_t PoreNetwork::generateFullConnectivity(){
 
 
 /*
- * Delete Pore with PoreNumber i, a flag is placed in the throatlist and throatcounter are diminished with 1
+ * Delete Pore with PoreNumber i, a flag is placed in the throatlist, and throatcounter is diminished with 1
  * ThroatCounters[pn][1] is now invalid!
  */
 size_t PoreNetwork::delelteThroat(size_t pn, size_t deleted, int flag){
@@ -544,7 +515,7 @@ void writeLocation(const char * filename, PoreNetwork *P){
     
     // set output type to scientific
     file.setf(std::ios_base::scientific);
-    for(size_t pn = 1; pn <= P->nrOfActivePBs; pn++){
+    for(size_t pn = 1; pn < P->nrOfActivePBs; pn++){
         
         //file << '[' << pn << ']' << '\t';
         file << std::setw(8)<< P->locationList[0][pn]   << ' ';

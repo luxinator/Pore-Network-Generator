@@ -298,15 +298,13 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
             brokenNetwork = false;
         }
     }
-    if (brokenNetwork)
+    if (brokenNetwork){
         std::cout << "!!! --- 2 : Network is Broken no Connection between Inlet and Outlet ---!!!" << std::endl;
-    
-    if(false)
-        for(size_t i = 1; i <= Ni*Nj*Nk; i ++){
-            std::cout << "PB: " <<i << "\t Flag: " <<(int)flagged_PB[i] << std::endl;
-        }
+        return nullptr;
+    }
     
     // we now have a flagged list of pb's which are connected to the inlets AND outlets
+    std::cout << "Done!"<< std::endl;
     return flagged_PB;
 }
 

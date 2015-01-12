@@ -101,22 +101,26 @@ int main(int argc, char *argv[]) {
     }
     
     
+    std::cout << "\n";
     eliminateThroats(P, C, 6);
     P->removeFlaggedThroats(-1);
     
     
+    std::cout << "\n";
     size_t a = P->generateFullConnectivity();
-  
+
+    std::cout << "\n";
     char * pb_list = searchForIsolatedPB(P);
      
     
     P->removeFlaggedPBs(pb_list, (char)2);
     
     writeConnectivity(cFile.c_str(),P);
+    
     writeLocation(lFile.c_str(), P);
     
-    //if(writeVTKswitch)
-    //    writeVTK(vtkFile.c_str(), P);
+    if(writeVTKswitch)
+        writeVTK(vtkFile.c_str(), P);
     
 
 }
