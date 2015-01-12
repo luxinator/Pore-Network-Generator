@@ -53,6 +53,7 @@ public:
     
     void generate_naive_array();
     
+    
     size_t delelteThroat(size_t i, size_t deleted, int flag);
     
     size_t delelteThroat(int i, int deleted, int flag);

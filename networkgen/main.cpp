@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     -cfile [location]: \t Specify the location of the connectiviy.txt output file\n \
     -fcfile [location]:\t Specify the location of the fullconnectivity.txt output file\n \
     -lfile [location]: \t Specify the location of the locations.txt file\n \
-    -vtk [location]:   \t Specify if the vtk file is to be written and where it goes";
+    -vtk [location]:   \t Specify if the vtk file is to be written and where";
     
     std::string nSpecs = "../data/NetworkSpecs.in";
     std::string cFile   = "../data/connectivity.txt";
@@ -42,16 +42,20 @@ int main(int argc, char *argv[]) {
                 return 0;
                 }
             else if(s.compare(0,3, "-ns") == 0){
+                //if(argc % 2 != 0){
+                //    std::cout << "Error Parsing Input:\nNo Location Specified!" << std::endl;
+                //    return -1;
+                //}
                 inputWasParsed = true;
                 nSpecs = std::string(argv[i+1]);
                 i++;
             }
-            else if(s.compare(0,3, "-cfile") == 0){
+            else if(s.compare(0,6, "-cfile") == 0){
                 inputWasParsed = true;
                 cFile = std::string(argv[i+1]);
                 i++;
             }
-            else if(s.compare(0,4, "-fcfile") == 0){
+            else if(s.compare(0,6, "-fcfile") == 0){
                 inputWasParsed = true;
                 fcFile = std::string(argv[i+1]);
                 i++;
@@ -62,7 +66,7 @@ int main(int argc, char *argv[]) {
                 writeVTKswitch = true;
                 i++;
             }
-            else if(s.compare(0,4, "-lfile") == 0){
+            else if(s.compare(0,6, "-lfile") == 0){
                 inputWasParsed = true;
                 lFile = std::string(argv[i+1]);
                 i++;
@@ -74,8 +78,6 @@ int main(int argc, char *argv[]) {
             return 1;
         }
     }
-    
-    
     
     PoreNetwork *P = new PoreNetwork(nSpecs.c_str());
     if(!P->ns){
@@ -106,14 +108,15 @@ int main(int argc, char *argv[]) {
     size_t a = P->generateFullConnectivity();
   
     char * pb_list = searchForIsolatedPB(P);
+     
     
     P->removeFlaggedPBs(pb_list, (char)2);
     
-    //writeConnectivity(cFile.c_str(),P);
-    //writeLocation(lFile.c_str(), P);
+    writeConnectivity(cFile.c_str(),P);
+    writeLocation(lFile.c_str(), P);
     
-    if(writeVTKswitch)
-        writeVTK(vtkFile.c_str(), P);
+    //if(writeVTKswitch)
+    //    writeVTK(vtkFile.c_str(), P);
     
 
 }

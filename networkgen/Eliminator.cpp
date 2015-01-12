@@ -14,7 +14,7 @@
  * C[3] = x - -y; C[4] = x - +y;
  * C[5] = x - -z; C[6] = x - +z;
  * C[7] = y - -z; C[8] = y - +z;
- * C[9] = -y - -z;C[10]= -y - + z;
+ * C[9] = -y - -z;C[10]= -y - +
  *
  * Max coordination number is 6 at the moment (in forward x dir!)
  *
@@ -162,14 +162,14 @@ void eliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
             i++;
         }// while
         
-        P_net->throatCounter[1][pn] -= deleted; //Not really nice, Only the PoreNetwork Class should change the PoreNetwork... 
+        //P_net->throatCounter[1][pn] -= deleted; //Not really nice, Only the PoreNetwork Class should change the PoreNetwork...
     }// while
     
     //Update the outlet throatcounters as well
-    pn++;
-    for ( ; pn <= Ni*Nj*Nk; pn++) {
-        P_net->throatCounter[1][pn] -= deleted;
-    }
+    //pn++;
+    //for ( ; pn <= Ni*Nj*Nk; pn++) {
+     //   P_net->throatCounter[1][pn] -= deleted;
+    //}
     delete [] coord;
     delete [] coord_n;
     ChanceList[0] = xChance;    
@@ -243,7 +243,10 @@ void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag,
  * Search for isolated PoreBodies and return a Flagged Pore Bodies List
  * Search the FULL connectivity map foward and backward, checking
  * if pbs are connected to inlet AND outlet
+ *
+ * Call removeFlaggedPBs when this has been run, the network is invalid!
  */
+
 
 char * searchForIsolatedPB(PoreNetwork *P_net){
     
@@ -303,7 +306,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
             std::cout << "PB: " <<i << "\t Flag: " <<(int)flagged_PB[i] << std::endl;
         }
     
-    // we now have a flagged list of pb's which are connected to the inlets
+    // we now have a flagged list of pb's which are connected to the inlets AND outlets
     return flagged_PB;
 }
 
