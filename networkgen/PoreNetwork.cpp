@@ -257,7 +257,7 @@ void PoreNetwork::generateConnectivity(){
     
     int i = 0;
     double L = 0;
-    float dist = 2.0f;
+    float dist = this->ns->searchDistance;
     
     for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
         deflatten_3d(pn, Ni, Nj, Nk, coord); //coord from pb[pn]
@@ -303,7 +303,7 @@ void PoreNetwork::generateConnectivity(){
                      pow((double)(coord[1] - coord_n[1]), 2.0)+
                      pow((double)(coord[2] - coord_n[2]), 2.0));
             
-            if(L <= sqrt(dist)){
+            if(L <= dist){
                 connection[0][i] = pn; //Pb nr
                 connection[1][i] = pn_n; //connected to pb
                 throatCounters[0][pn] += 1; //amount of forward connections of pb
@@ -324,6 +324,7 @@ void PoreNetwork::generateConnectivity(){
     
     this->throatList = connection;
     this->throatCounter = throatCounters;
+    this->nrOfActivePBs = Ni*Nj*Nk;
     
 }
 
@@ -336,7 +337,7 @@ void PoreNetwork::generateLocation(){
     
     
     
-    float Length = this->ns->Length;
+    float Length = this->ns->pbDist;
     
     //Allocate a large part of memory
     float *temp = new float[3 * Ni*Nj*Nk];

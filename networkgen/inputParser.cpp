@@ -12,7 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
+#include <math.h>
 
 void trim_chars(char * input, int size, char c){
     
@@ -57,6 +57,8 @@ NetworkSpecs *readSpecsFile(const char *filename){
     char buff[255];
     char c = ' ';
     int i = 0;
+
+    std::cout << "Parsing NetworkSpecs: \n\tChanceList:" << std::endl;
     
     while(file.getline(buff, 255)){
         //TRIM THE STRING OF SPACES!!!
@@ -82,10 +84,41 @@ NetworkSpecs *readSpecsFile(const char *filename){
         else if( s.compare(0,2,"nk") == 0) {
             NS->Nk = std::stoi(s.substr(i+1));
         }
-        else if( s.compare(0,6,"length")  == 0) {
-            NS->Length = std::stoi(s.substr(i+1));
+        else if( s.compare(0,6,"pbdist")  == 0) {
+            NS->pbDist = std::stoi(s.substr(i+1));
+        }
+        // -----
+        else if( s.compare(0,1,"c")  == 0) {
+            try{
+                int pos = std::stoi(s.substr(1,i-1));
+                NS->C[pos] = std::stof(s.substr(i+1));
+                std::cout <<"\tC[" << pos << "] " << "= " <<NS->C[pos]<<std::endl;
+            } catch (std::exception &e) {
+                std::cerr << " ---- ERROR in Parsing the Chance List! " << std::endl;
+                return nullptr;
+            }
+        }
+        
+        else if( s.compare(0,14,"searchdistance")  == 0) {
+            NS->searchDistance = sqrt(std::stod(s.substr(i+1)));
+            if(NS->searchDistance >= sqrt(1.0f) && NS->searchDistance < sqrt(2.0f))
+                NS->coordNr = 3;
+            else if(NS->searchDistance >= sqrt(2.0f) && NS->searchDistance < sqrt(3.0f))
+                NS->coordNr = 11;
+            else if(NS->searchDistance == sqrt(3.0))
+                NS->coordNr = 26;
+            else{
+                std::cerr << "ERROR: No Valid Search Distance Found!\nOptions are: \n\t 1.0\n\t 2.0  \n\t 3.0 " << std::endl;
+                    return nullptr;
+                }
         }
     }
+    
+    std::cout << "NetworkSpecs found: \n\tNi, Nj,Nk:\t\t\t\t\t" << NS->Ni << ",\t" << NS->Nj << ",\t" << NS->Nk << std::endl;
+    std::cout << "\tDistance between PoreBodies:\t" << NS->pbDist << '\n';
+    std::cout << "\tMaximum Searching Distance: \t" << NS->searchDistance << '\n';
+    std::cout << "\tCoordination Number:\t\t\t" << NS->coordNr << '\n';
+    
     
     return NS;
 }
