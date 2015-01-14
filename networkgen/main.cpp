@@ -94,26 +94,20 @@ int main(int argc, char *argv[]) {
     P->generateConnectivity();
     P->generateLocation();
     
-    // --- Update input Parser to include the changes per forward direction
-    float *C = new float[11];
-    for(int i = 0; i < 11; i++){
-        C[i] = 1.0000f;
-    }
-    
-    
+
     std::cout << "\n";
-    eliminateThroats(P, C, 6);
+    eliminateThroats(P, 6);
     P->removeFlaggedThroats(-1);
     
     
     std::cout << "\n";
-    size_t a = P->generateFullConnectivity();
+    //P->generateFullConnectivity();
 
     std::cout << "\n";
-    char * pb_list = searchForIsolatedPB(P);
+    //char * pb_list = searchForIsolatedPB(P);
      
     
-    P->removeFlaggedPBs(pb_list, (char)2);
+    //P->removeFlaggedPBs(pb_list, (char)2);
     
     writeConnectivity(cFile.c_str(),P);
     

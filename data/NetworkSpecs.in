@@ -1,0 +1,41 @@
+# The Number of Porebodies in the x,y,z-directions
+Ni = 16
+Nj = 16
+Nk = 16
+
+# The Distance between the lattice points 
+pbDist = 1.0
+
+#The SquareRoot of this Distance is the maximum distance between to connected porebodies
+searchDistance = 2.0
+
+#Chance of a throat to survive
+c0 = 1.000
+c1 = 1.000
+c2 = 1.000
+c3 = 1.000
+c4 = 1.000
+c5 = 1.000
+c6 = 1.000
+c7 = 1.000
+c8 = 1.000
+c9 = 1.000
+c10 = 1.000
+c11 = 1.000
+
+#
+# PB Distance
+#
+# SearchLength 
+#	-> sqrt(1) = CoordNr = 3
+#	-> sqrt(2) = Coordnr = 11
+#	-> sqrt(3) = coordnr = 26 (not implemented!)
+#
+# C[0] = x-dir; C[1] = y-dir; C[2] = z-dir
+# C[3] = x - -y diag;
+# x++ plane
+# C[4] = x - +y diag; C[5] = x - -y; C[6] = x - -z diag
+# C[7] = x - +z diag;
+#
+# Max coordination number is 6 at the moment (in forward x dir!)
+#

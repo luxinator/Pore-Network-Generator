@@ -56,11 +56,9 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     int flagCounter = 0;
     size_t i = 0;
     
-    while(this->throatList[0][i] != 0){
+    for(i = 0; this->throatList[0][i] != 0; i++){
         if((this->throatList[0][i] == Flag || this->throatList[1][i] == Flag))
             flagCounter++;
-
-        i++;
     }
     // gives index of 0 entry, which is also the length of the list
     
@@ -100,7 +98,7 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     this->throatList[0] = newTL[0];
     this->throatList[1] = newTL[1];
 
-    this->nrOfConnections = newAmountOfConnections;
+    this->nrOfConnections = newAmountOfConnections-1;
     
 }
 
@@ -142,7 +140,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     //pb_flag_list -> isolated pb's if minFlg
     //build a mask:
     int* mask = new int[Ni*Nj*Nk + 1];
-    for(i = i; i < Ni*Nj*Nk; i++){
+    for(; i < Ni*Nj*Nk; i++){
         mask[i] = 0;
     }
     // Fill the Mask
@@ -257,7 +255,7 @@ void PoreNetwork::generateConnectivity(){
     
     int i = 0;
     double L = 0;
-    float dist = this->ns->searchDistance;
+    double dist = this->ns->searchDistance;
     
     for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
         deflatten_3d(pn, Ni, Nj, Nk, coord); //coord from pb[pn]
@@ -325,6 +323,8 @@ void PoreNetwork::generateConnectivity(){
     this->throatList = connection;
     this->throatCounter = throatCounters;
     this->nrOfActivePBs = Ni*Nj*Nk;
+    this->nrOfConnections = throatCounters[1][Ni*Nj*Nk];
+    std::cout << this->nrOfConnections << std::endl;
     
 }
 

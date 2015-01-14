@@ -20,10 +20,12 @@
  *
  */
 
-void eliminateThroats(PoreNetwork *P_net, float * ChanceList, int coordNr){
+void eliminateThroats(PoreNetwork *P_net, int coordNr){
     
     
     std::cout<<"Deleting throats" << std::endl;
+
+    float * ChanceList = P_net->ns->C;
     
     if(!P_net){
         std::cerr << "Eliminator Error! \n\t No PoreNetwork Specified!" << std::endl;

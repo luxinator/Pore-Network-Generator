@@ -24,7 +24,7 @@ class PoreNetwork{
     
 public:
     
-    const NetworkSpecs *ns;
+    NetworkSpecs *ns;
     PoreNetwork(NetworkSpecs *ns);
     PoreNetwork(const char * networkSpecsFile);
     
