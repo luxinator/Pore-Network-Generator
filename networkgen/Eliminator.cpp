@@ -277,7 +277,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
     
     //Do a DepthFirst Search on all inlets
     for(i = 0; P_net->throatList_full[0][i] <= Nj*Nk; i++){
-        DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)1, (char)0);
+        DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)1, (char)0);
         // same as with sorting, do not allow guards to be searched
     }
     
@@ -295,7 +295,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
         // Check if pb the qualifies
         if(flagged_PB[ P_net->throatList_full[0][i]] == (char)1){
             
-            DFS(i, P_net->throatList_full, flagged_PB, lengthTL - 1, (char)2, (char)1);
+            DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)2, (char)1);
             //std::cout << i << '\t' << P_net->throatList_full[0][i] << '\t'<< (int)flagged_PB[ P_net->throatList_full[0][i]] << std::endl;
             brokenNetwork = false;
         }

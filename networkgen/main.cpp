@@ -101,13 +101,13 @@ int main(int argc, char *argv[]) {
     
     
     std::cout << "\n";
-    //P->generateFullConnectivity();
+    P->generateFullConnectivity();
 
     std::cout << "\n";
-    //char * pb_list = searchForIsolatedPB(P);
+    char * pb_list = searchForIsolatedPB(P);
      
     
-    //P->removeFlaggedPBs(pb_list, (char)2);
+    P->removeFlaggedPBs(pb_list, (char)2);
     
     writeConnectivity(cFile.c_str(),P);
     
