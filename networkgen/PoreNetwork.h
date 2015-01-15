@@ -60,7 +60,5 @@ public:
     size_t delelteThroat(int i, int deleted, int flag);
 
 };
-void writeConnectivity(const char * filename, PoreNetwork *P_net);
 
-void writeLocation(const char * filename, PoreNetwork *P_net);
 #endif

@@ -6,7 +6,7 @@
 #include "vtk.h"
 #include "inputParser.h"
 #include "Eliminator.h"
-
+#include "writerFunctions.h"
 
 int main(int argc, char *argv[]) {
     
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
     
     if(writeVTKswitch)
         writeVTK(vtkFile.c_str(), P);
-    
+    writeInlet_OutletPbs("test.out", P); 
 
 }
 
