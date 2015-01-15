@@ -2,3 +2,7 @@ Generator
 *.dSYM
 *.o
 .tags
+.cproject
+.project
+
+
