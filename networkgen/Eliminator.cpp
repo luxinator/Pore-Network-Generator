@@ -23,6 +23,7 @@
 void eliminateThroats(PoreNetwork *P_net, int coordNr){
     
     
+    
     std::cout<<"Deleting throats" << std::endl;
 
     float * ChanceList = P_net->ns->C;

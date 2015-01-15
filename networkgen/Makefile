@@ -1,31 +1,19 @@
-srcdir  = .
 
-CC      = c++
-#CFLAGS  = -g -Wuninitialized -std=c++11 -O3 -fomit-frame-pointer -Wall
-CFLAGS  = -g -Wuninitialized -std=c++11 -Wall
-LIBS	=  
-
-GENSOURCES =  ArrayFunctions.cpp\
-Eliminator.cpp\
-PoreNetwork.cpp \
-inputParser.cpp \
-main.cpp \
-vtk.cpp
-
-GENOBJECTS = $(GENSOURCES:.c=.o)
-
-Generator: $(GENOBJECTS)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-	#$(CC) $(LDFLAGS) $(OBJECTS) -o $@
-
-
-.cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
-
+CXX	:= c++
+CXXFLAGS := -g -Wuninitialized -std=c++11 -Wall
+INCLUDES :=					# This would contain any -I options to the
+  								# compiler, if there are any.
+LIBS     := 					# Contains libraries we need to link in.
+OBJECTS  := ArrayFunctions.o Eliminator.o PoreNetwork.o inputParser.o main.o vtk.o
+   
+Generator: $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $@ $(LIBS)
+    
+%.o: %.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	rm  -f $(OBJECTS)
 	rm  -rf *.dSYM
 	rm  -f Generator
-	rm  -f results.dat
-	rm 	-f results.csv
+	rm -f *.o
