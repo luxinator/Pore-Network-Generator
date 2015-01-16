@@ -26,7 +26,13 @@ void writeInlet_OutletPbs(const char * filename, PoreNetwork *pn){
     int *inlets = new int[pn->ns->Ni];
     int *outlets = new int[pn->ns->Ni];
 
+    
     size_t j = 0;
+    for( ; j < pn->ns->Ni; j++){
+        inlets[j] = 0;
+        outlets[j] = 0;
+    }
+
 
     for(size_t i = 0;pn->throatList[0][i] != 0 ; i ++){
         if (pn->locationList[0][pn->throatList[0][i]] == 0.0f){ //Assuming inlets are at x = 0
@@ -35,7 +41,7 @@ void writeInlet_OutletPbs(const char * filename, PoreNetwork *pn){
             j++;
         }
     }
-
+    
     for(size_t i = 0;pn->throatList[0][i] != 0 ; i ++){
         if (pn->locationList[0][pn->throatList[0][i]] == pn->ns->Ni * pn->ns->pbDist){ //Assuming inlets are at x = 0
             outlets[j] = pn->throatList[0][i];
@@ -44,8 +50,13 @@ void writeInlet_OutletPbs(const char * filename, PoreNetwork *pn){
         }
     }
     
-    //file.close();
-    //    }
+    for(size_t i = 0; i < pn->ns->Ni; i ++){
+ 
+    }
+        
+    
+    file.close();
+    
 }
 
 void writeConnectivity(const char * filename, PoreNetwork *pn){

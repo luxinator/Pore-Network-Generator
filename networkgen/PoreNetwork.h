@@ -12,9 +12,9 @@
 
 
 struct NetworkSpecs {
-    int Ni, Nj, Nk;
+    unsigned int Ni, Nj, Nk;
     float C[26];
-    int coordNr;
+    unsigned int coordNr;
     double searchDistance;
     float pbDist;
     

@@ -1,6 +1,6 @@
 
-CXX	:= c++
-CXXFLAGS := -g -Wuninitialized -std=c++11 -Wall 
+CXX	 := g++-4.9
+CXXFLAGS := -g -Wuninitialized -std=c++11 -Wall -Werror -Wno-sign-compare
 CXXDEBUGFLAGS := -Wuninitialized -std=c++11 -Wall -O3 -fomit-frame-pointer
 INCLUDES :=					# This would contain any -I options to the
   							# compiler, if there are any.

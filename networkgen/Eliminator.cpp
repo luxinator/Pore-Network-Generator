@@ -71,7 +71,7 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
             ChanceList[0] = 1.0f; // X-dir is kept, else may fail
         }
         
-        while (P_net->throatList[0][i] == pn) {
+        while (P_net->throatList[0][i] == (int)pn) {
             // check for this pore, all its connections
             deflatten_3d(P_net->throatList[1][i], Ni, Nj, Nk, coord_n);
             
@@ -189,11 +189,7 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
 size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
     
     int pn = throatList[0][i];
-    int pn_n;
-    int pn_1;
     while( throatList[0][i] == pn && i < max){
-        pn_1 = throatList[0][i];
-        pn_n = throatList[1][i];
         i++;
     }
     
@@ -271,7 +267,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
     
     // Allocata a chunk of mem and set it to zero
     char *flagged_PB = new char[Ni*Nj*Nk+1];
-    for(i = 0; i <= Ni*Nj*Nk; i++){
+    for(i = 0; (int)i <= Ni*Nj*Nk; i++){
         flagged_PB[i] = 0;
     }
     
@@ -282,7 +278,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
     }
     
     if(verbose)
-        for(size_t i = 1; i <= Ni*Nj*Nk; i ++){
+        for(int i = 1; i <= Ni*Nj*Nk; i ++){
         std::cout << "PB: " <<i << "\t Flag: " <<(int)flagged_PB[i] << std::endl;
         }
     

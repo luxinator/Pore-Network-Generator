@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
     bool inputWasParsed = false;
     bool writeVTKswitch = false;
     
+    
     // Go through the list ofgiven args
     if (argc > 1) {
         for(int i = 1; i < argc; i++){
@@ -42,10 +43,6 @@ int main(int argc, char *argv[]) {
                 return 0;
                 }
             else if(s.compare(0,3, "-ns") == 0){
-                //if(argc % 2 != 0){
-                //    std::cout << "Error Parsing Input:\nNo Location Specified!" << std::endl;
-                //    return -1;
-                //}
                 inputWasParsed = true;
                 nSpecs = std::string(argv[i+1]);
                 i++;
