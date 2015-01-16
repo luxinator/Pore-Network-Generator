@@ -37,7 +37,7 @@ void writeInlet_OutletPbs(const char * filename, PoreNetwork *pn){
     }
 
     for(size_t i = 0;pn->throatList[0][i] != 0 ; i ++){
-        if (pn->locationList[0][pn->throatList[0][i]] == P->ns->Ni * P->ns->pbDist){ //Assuming inlets are at x = 0
+        if (pn->locationList[0][pn->throatList[0][i]] == pn->ns->Ni * pn->ns->pbDist){ //Assuming inlets are at x = 0
             outlets[j] = pn->throatList[0][i];
             std::cout << inlets[j] << std::endl;
             j++;
