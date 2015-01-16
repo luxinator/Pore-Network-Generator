@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
     
     if(writeVTKswitch)
         writeVTK(vtkFile.c_str(), P);
-    writeInlet_OutletPbs("test.out", P); 
+    //writeInlet_OutletPbs("test.out", P);
 
 }
 
