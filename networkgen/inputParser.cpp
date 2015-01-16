@@ -16,7 +16,7 @@
 
 void trim_chars(char * input, int size, char c){
     
-    int i ,j;
+    int i = 0 ,j = 0;
     
     for (i = 0; i < size && input[i] != '\0'; i++) {
         if (input[i] == c) {

@@ -189,7 +189,10 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         this->throatCounter[1][i] = accumulator + this->throatCounter[0][i];
         accumulator= this->throatCounter[1][i];
     }
-    
+
+
+    delete[] pb_flag_list; // Clean the Freaking Memory!
+    delete[] mask;
 }
 
 
@@ -357,7 +360,7 @@ void PoreNetwork::generateLocation(){
         
     }
     
-    
+    delete[] coord;
     this->locationList = locationList;
     
 }

@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
      
     
     P->removeFlaggedPBs(pb_list, (char)2);
-    
+
     writeConnectivity(cFile.c_str(),P);
     
     writeLocation(lFile.c_str(), P);
