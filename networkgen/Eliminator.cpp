@@ -6,10 +6,12 @@
 //  Copyright (c) 2014 Lucas van Oosterhout. All rights reserved.
 //
 
+
 #include "Eliminator.h"
 #include <random>
 
 /*
+
  * C[0] = x-dir; C[1] = y-dir; C[2] = z-dir
  * C[3] = x - -y; C[4] = x - +y;
  * C[5] = x - -z; C[6] = x - +z;

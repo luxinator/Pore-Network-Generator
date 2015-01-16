@@ -337,7 +337,7 @@ void PoreNetwork::generateLocation(){
     float Length = this->ns->pbDist;
     
     //Allocate a large part of memory
-    float *temp = new float[3 * Ni*Nj*Nk];
+    float *temp = new float[3 * Ni*Nj*Nk + 3];
     // make a pointer to list of 3 pointers to floats
     float **locationList = new float*[3];
     
