@@ -26,7 +26,7 @@ void trim_chars(char * input, int size, char c){
     }
 }
 
-int find_char(char *input, int size, char c){
+int find_char(const char *input, const int size, const char c){
     int i;
     for (i = 0; i < size && input[i] != '\0'; i++)
         if (input[i] == c)
@@ -34,7 +34,7 @@ int find_char(char *input, int size, char c){
     return -1;
 }
 
-void tolowercase(char *input, int size){
+void tolowercase(char *input, const unsigned int size = 0){
     for (int i = 0; i < size; i++) {
         input[i] = tolower(input[i]);
     }
