@@ -76,10 +76,12 @@ void writeConnectivity(const char * filename, PoreNetwork *pn){
         return;
     }
     
-    for(size_t i = 0;pn->throatList[0][i] != 0 ; i ++){
+    size_t i;
+    for(i =  0;pn->throatList[0][i] != 0 ; i ++){
             file << pn->throatList[0][i]<< '\t' << pn->throatList[1][i] << std::endl;
     }
     
+    std::cout<< "# nr of throats written to File: " << i << std::endl;
     file.close();
 }
 
@@ -100,10 +102,10 @@ void writeLocation(const char * filename, PoreNetwork *P){
         return;
     }
     
-    
+    size_t pn;
     // set output type to scientific
     file.setf(std::ios_base::scientific);
-    for(size_t pn = 1; pn <= P->nrOfActivePBs; pn++){
+    for(pn = 1; pn <= P->nrOfActivePBs; pn++){
         
         //file << '[' << pn << ']' << '\t';
         file << std::setw(8)<< P->locationList[0][pn]   << ' ';
@@ -113,6 +115,8 @@ void writeLocation(const char * filename, PoreNetwork *P){
         file << std::setw(8)<< P->throatCounter[1][pn] << '\n';
         //std::cout<< throatCounters[0][pn] << '\t' <<  throatCounters[1][pn] << std::endl;
     }
+    
+    std::cout << "# PB Locations Writen to file: " << pn -1 << std::endl;
     
     file.close();
 }

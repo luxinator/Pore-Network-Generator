@@ -64,7 +64,7 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     std::cout<< "Cleaning ThroatList ..." << std::endl;
     std::cout<< "  Amount of Connections: \t" << nrConns << std::endl;
     std::cout<< "  Amount of Flagged throats:    \t" << flagCounter   << std::endl;
-    std::cout<< "  Max throats:          \t" << this->ns->Ni * this->ns->Nj * this->ns->Nk  * 13 << std::endl;
+    //std::cout<< "  Max throats:          \t" << this->ns->Ni * this->ns->Nj * this->ns->Nk  * 13 << std::endl;
     
     
     // Since resizing an array in C++ is not possible... we need to do a selective copy and delete the old array
@@ -151,7 +151,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         //std::cout << i << '\t' << mask[i] << '\t' << (int)pb_flag_list[i] << std::endl;
     }
     
-    std::cout << "Amount PBs deleted: " << Ni*Nj*Nk - cummulator << std::endl;
+    std::cout << "Amount PBs deleted: " << cummulator << std::endl;
     this->nrOfActivePBs = Ni*Nj*Nk - cummulator;
     
     
