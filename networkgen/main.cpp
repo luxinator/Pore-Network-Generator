@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     -cfile [location]: \t Specify the location of the connectiviy.txt output file\n \
     -fcfile [location]:\t Specify the location of the fullconnectivity.txt output file\n \
     -lfile [location]: \t Specify the location of the locations.txt file\n \
-    -vtk [location]:   \t Specify if the vtk file is to be written and where";
+    -vtk [location]:   \t Specify if the vtk file is to be written and where \n";
     
     std::string nSpecs = "../data/NetworkSpecs.in";
     std::string cFile   = "../data/connectivity.txt";
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
                 cFile = std::string(argv[i+1]);
                 i++;
             }
-            else if(s.compare(0,6, "-fcfile") == 0){
+            else if(s.compare(0,7, "-fcfile") == 0){
                 inputWasParsed = true;
                 fcFile = std::string(argv[i+1]);
                 i++;

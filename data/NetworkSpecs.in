@@ -1,7 +1,7 @@
 # The Number of Porebodies in the x,y,z-directions
-Ni = 6
-Nj = 6
-Nk = 6
+Ni = 10
+Nj = 10
+Nk = 1
 
 # The Distance between the lattice points 
 pbDist = 1.0

@@ -103,7 +103,7 @@ void writeLocation(const char * filename, PoreNetwork *P){
     
     // set output type to scientific
     file.setf(std::ios_base::scientific);
-    for(size_t pn = 1; pn < P->nrOfActivePBs; pn++){
+    for(size_t pn = 1; pn <= P->nrOfActivePBs; pn++){
         
         //file << '[' << pn << ']' << '\t';
         file << std::setw(8)<< P->locationList[0][pn]   << ' ';
