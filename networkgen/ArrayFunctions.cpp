@@ -9,9 +9,6 @@
 #include "ArrayFunctions.h"
 
 
-//kjkjk
-
-
 
 /*
  * Bubble sort is slow, but its a stable sort and easy to understand

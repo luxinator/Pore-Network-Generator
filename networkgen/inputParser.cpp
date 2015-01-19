@@ -85,7 +85,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
             NS->Nk = std::stoi(s.substr(i+1));
         }
         else if( s.compare(0,6,"pbdist")  == 0) {
-            NS->pbDist = std::stoi(s.substr(i+1));
+            NS->pbDist = std::stof(s.substr(i+1));
         }
         // -----
         else if( s.compare(0,1,"c")  == 0) {
