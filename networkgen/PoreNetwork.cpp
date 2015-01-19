@@ -62,8 +62,8 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     
     size_t nrConns = i;
     std::cout<< "Cleaning ThroatList ..." << std::endl;
-    std::cout<< "  Amount of Connections: \t" << nrConns << std::endl;
-    std::cout<< "  Amount of Flagged throats:    \t" << flagCounter   << std::endl;
+    std::cout<< "\tAmount of Connections: \t" << nrConns << std::endl;
+    std::cout<< "\tAmount of Flagged throats:    \t" << flagCounter   << std::endl;
     //std::cout<< "  Max throats:          \t" << this->ns->Ni * this->ns->Nj * this->ns->Nk  * 13 << std::endl;
     
     
@@ -131,7 +131,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         }
     }
     
-    // Do the Actually Deleting
+    // Do the Actually Deletingof the Throats
     this->removeFlaggedThroats(-1);
     
     
@@ -161,8 +161,20 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     
     for(i = 0; this->throatList[1][i] != 0; i++){
         this->throatList[1][i] = this->throatList[1][i] - mask[this->throatList[1][i]];
-     
     }
+    
+    //And if there there are periodic throats, periodic throats have the cool property: throatlist[0][i] > throatlist[1][i]
+    size_t j = 0;
+    for(i = 0; this->throatList[0][i] != 0; i++){
+        if(this->throatList[0][i] > this->throatList[1][i]){
+            std::cout << this->periodicThroats[j] << " -> ";
+            this->periodicThroats[j] = i;
+            std::cout << this->periodicThroats[j] << '\t' << this->throatList[0][i] << " - " << this->throatList[1][i] << std::endl;
+            j++;
+        }
+    }
+    
+    
     // Update the locations
     size_t newi;
     for(i = 1; i <= Ni*Nj*Nk; i ++){
@@ -219,22 +231,18 @@ void PoreNetwork::generateConnectivity(){
     int *coord = new int[3];
     int *coord_n = new int[3];
     
-    // --- Init throatCounters arrays
     
+    // --- Init throatCounters arrays
     //Allocate a Part of Memory
     int *t = new int[2 * Ni*Nj*Nk + 2];
     this->throatCounter = new int*[2];
     //Point the two pointers to their places in the Large Part of memory
     this->throatCounter[0] = t;
     this->throatCounter[1] = t + Ni*Nj*Nk + 1;
-    
-    // Make a local variable
-    int ** throatCounters = this->throatCounter;
-    
-    
+    //Set all places to 0
     for(size_t pn = 1; pn <= Ni*Nj*Nk; pn++){
-        throatCounters[0][pn] = 0;
-        throatCounters[1][pn] = 0;
+        this->throatCounter[0][pn] = 0;
+        this->throatCounter[1][pn] = 0;
     }
     
     
@@ -254,45 +262,50 @@ void PoreNetwork::generateConnectivity(){
     
     std::cout << "number of PBs: "<<Ni*Nj*Nk << std::endl;
     
+    
+    // PeriodicvBoundaries are Places in ThroatList containing Periodic throats
+    if(this->periodicBounndaries){
+        this->periodicThroats = new size_t[Nj*Nk * 2 + 1];
+        for(size_t i = 0; i < Nj*Nk * 2 + 1; i++){
+            this->periodicThroats[i] = 0;
+        }
+    }
+    size_t periodicTrs = 0;
+    
+    
     int i = 0;
     double L = 0;
     double dist = this->ns->searchDistance;
     
-    for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
+    for(int pn = 1; pn <= Ni*Nj*Nk - Nk*Nj; pn++){
         deflatten_3d(pn, Ni, Nj, Nk, coord); //coord from pb[pn]
         
         // boundary inlet only connect in flow dir
         if (coord[0] == 0){
             connection[0][i] = pn; //Pb nr
             connection[1][i] =  array[coord[0] + 1][coord[1]][coord[2]]; //connected to pb
-            throatCounters[0][pn] += 1; //amount of connections of pb
+            this->throatCounter[0][pn] += 1; //amount of connections of pb
             i++;//
-            throatCounters[1][pn] += i;
+            this->throatCounter[1][pn] += i;
             
             continue; // skip the rest, no more connections for this pb
         }
-        // Connect to Boundary Outlet in x-dir and no more
         
+        // Connect to Boundary Outlet in x-dir and no more
         else if (coord[0] == Ni - 2){
             connection[0][i] = pn; //Pb nr
             connection[1][i] =  array[coord[0] + 1][coord[1]][coord[2]]; //connected to pb
-            throatCounters[0][pn] += 1; //amount of connections of pb
+            this->throatCounter[0][pn] += 1; //amount of connections of pb
             i++;
-            throatCounters[1][pn] = i; // outlet has one throat in forward no more, no less!
+            this->throatCounter[1][pn] = i; // outlet has one throat in forward no more, no less!
             
             //continue; // skip the rest, no more connections for this pb
         }//else if
         
+        
+        
         // (pn+ Nj*Nk + (Nj*Nk /2 + 1) -> distance of one x-slice in x-dir
         //  Ni*Nj*Nk - Nj*Nk -> do not go further then second to last layer in x-dir
-        //
-        // This can be optimzed! within the same x-plane you have at best 3 throats per pb
-        // for the next plane you have at best 9 connections.
-        // the lowest pb in the nest x-plane has pn_n = pn + Nj*Nk - Nk - 1
-        // the max pn_n = pn + Nj*Nk +Nk + 1
-        // By using 2 for loops we lose the need to loop over half of the x-plane in front of pn
-        //
-        
         for( int pn_n = pn+1; pn_n < (pn+ Nj*Nk + (Nj*Nk /2 + 1)) &&
             pn_n <= Ni*Nj*Nk - Nj*Nk; pn_n++){
             
@@ -305,26 +318,49 @@ void PoreNetwork::generateConnectivity(){
             if(L <= dist){
                 connection[0][i] = pn; //Pb nr
                 connection[1][i] = pn_n; //connected to pb
-                throatCounters[0][pn] += 1; //amount of forward connections of pb
+                this->throatCounter[0][pn] += 1; //amount of forward connections of pb
                 
                 i++;
                 
             } // if
+            
         } // for
         
+        //Add Periodic connection
+        if(this->periodicBounndaries && coord[1] == Nj - 1){
+            connection[0][i] = pn;
+            connection[1][i] = pn - ((Nk - 1) * Nj);
+            this->throatCounter[0][pn] += 1;
+            
+            this->periodicThroats[periodicTrs] = i;
+            periodicTrs++;
+            i++;
+        }
+        if(this->periodicBounndaries && coord[2] == Nk - 1){
+            connection[0][i] = pn;
+            connection[1][i] = pn - (Nj - 1);
+            this->throatCounter[0][pn] += 1;
+            
+            this->periodicThroats[periodicTrs] = i;
+            periodicTrs++;
+            i++;
+        }
         
-        throatCounters[1][pn] += i; //nr of connection made in total
+        this->throatCounter[1][pn] += i; //nr of connection made in total
         
     }// for
     
+    
+   // for(i = 0; i < Nk*Nj*2; i++){
+   //     std::cout << this->periodicThroats[i] << '\t' << connection[0][periodicThroats[i]] << " - " << connection[1][periodicThroats[i]]<<std::endl;
+    //}
     
     delete[] coord;
     delete[] coord_n;
     
     this->throatList = connection;
-    this->throatCounter = throatCounters;
     this->nrOfActivePBs = Ni*Nj*Nk;
-    this->nrOfConnections = throatCounters[1][Ni*Nj*Nk];
+    this->nrOfConnections = this->throatCounter[1][Ni*Nj*Nk];
     
 }
 
@@ -444,7 +480,7 @@ size_t PoreNetwork::generateFullConnectivity(){
     
     this->throatList_full = connection;
 
-    std::cout << "\t Number of Connections Left: " << maxConnections - 1 << std::endl;
+    //std::cout << "\t Number of Connections Left: " << maxConnections - 1 << std::endl;
 
     
     return maxConnections;
@@ -456,12 +492,12 @@ size_t PoreNetwork::generateFullConnectivity(){
  * Delete Pore with PoreNumber i, a flag is placed in the throatlist, and throatcounter is diminished with 1
  * ThroatCounters[pn][1] is now invalid!
  */
-size_t PoreNetwork::delelteThroat(size_t pn, size_t deleted, int flag){
+size_t PoreNetwork::delelteThroat(size_t i, size_t deleted, int flag){
     
-    this->throatList[1][pn] = flag;
+    this->throatList[1][i] = flag;
     deleted++;
-    this->throatCounter[0][this->throatList[0][pn]] -= 1;
-    this->throatCounter[1][this->throatList[0][pn]] = -1;
+    this->throatCounter[0][this->throatList[0][i]] -= 1;
+    this->throatCounter[1][this->throatList[0][i]] = -1;
     return deleted;
 }
 

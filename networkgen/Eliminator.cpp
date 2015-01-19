@@ -18,7 +18,7 @@
  * C[7] = y - -z; C[8] = y - +z;
  * C[9] = -y - -z;C[10]= -y - +
  *
- * Max coordination number is 6 at the moment (in forward x dir!)
+ * Max coordination number is 12 at the moment (in forward x dir!)
  *
  */
 
@@ -70,7 +70,7 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
         }
         if(coord[0] ==  Ni -2 ){
             i++;
-            ChanceList[0] = 1.0f; // X-dir is kept, else may fail
+            ChanceList[0] = 1.0f; // X-dir is kept, else may fail -> simple and ugly hack
         }
         
         while (P_net->throatList[0][i] == (int)pn) {
@@ -166,17 +166,42 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
             i++;
         }// while
         
+        
         //P_net->throatCounter[1][pn] -= deleted; //Not really nice, Only the PoreNetwork Class should change the PoreNetwork...
     }// while
     
-    //Update the outlet throatcounters as well
-    //pn++;
-    //for ( ; pn <= Ni*Nj*Nk; pn++) {
-     //   P_net->throatCounter[1][pn] -= deleted;
-    //}
+    //Hackish but it works
+    ChanceList[0] = xChance;
+    
+    if(P_net->periodicBounndaries){
+        size_t pn_n;
+        //Periodic throats can be eliminated as well!
+        for(size_t perdiocC = 0; P_net->periodicThroats[perdiocC] != 0; perdiocC++){
+            pn   = P_net->throatList[0][P_net->periodicThroats[perdiocC]];
+            pn_n = P_net->throatList[1][P_net->periodicThroats[perdiocC]];
+            
+            deflatten_3d(pn, Ni, Nj, Nk, coord);
+            deflatten_3d(pn_n, Ni, Nj, Nk, coord_n);
+            
+            
+            // Delete in y-dir
+            if( d(e) >= ChanceList[1] &&
+               coord[1] == coord_n[1] &&
+               coord[2] != coord_n[2]){
+                deleted = P_net->delelteThroat((size_t)P_net->periodicThroats[perdiocC], deleted, -1);
+                //std::cout << P_net->periodicThroats[perdiocC] << '\t' << pn << " - " << pn_n << std::endl;
+                
+            }
+            if(d(e) >= ChanceList[2] &&
+               coord[1] != coord_n[1] &&
+               coord[2] == coord_n[2]){
+                deleted = P_net->delelteThroat((size_t)P_net->periodicThroats[perdiocC], deleted, -1);
+            }
+        } //for periodicThroat
+    } // if periodicBoundaries
+    
     delete [] coord;
     delete [] coord_n;
-    ChanceList[0] = xChance;    
     
     
 }

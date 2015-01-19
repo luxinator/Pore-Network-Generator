@@ -35,6 +35,8 @@ public:
     size_t nrOfConnections;
     size_t nrOfActivePBs;
     float **locationList; // Location of a pb using its nr as index
+    size_t *periodicThroats; // position in the throaList which has a periodic connection
+    bool periodicBounndaries;
   
 
 /*

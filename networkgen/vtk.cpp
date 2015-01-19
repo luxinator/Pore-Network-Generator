@@ -133,10 +133,24 @@ void writeVTK(const char* filename, PoreNetwork *P_net, const int precision){
     /*
      * Write throat data
      */
+    size_t periodicTrsC = 0;
+    if(P_net->periodicBounndaries){
+        for(periodicTrsC = 0; periodicTrsC < P_net->ns->Nk * P_net->ns->Nj * 2 + 1; periodicTrsC++)
+            if(P_net->periodicThroats[periodicTrsC] == 0){
+                //std::cout << "ZERO" << std::endl;
+                break;
+            }
+        }
     
-    file << "LINES" << '\t'<< P_net->nrOfConnections << '\t'<< P_net->nrOfConnections * 3 <<std::endl;
-    for(i = 0; i < P_net->nrOfConnections; i ++){
-        file<< 2<< '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
+    file << "LINES" << '\t'<< P_net->nrOfConnections - periodicTrsC << '\t'<< (P_net->nrOfConnections - periodicTrsC) * 3 <<std::endl;
+    periodicTrsC = 0;
+    for(i = 0; i < P_net->nrOfConnections; i++){
+        if(P_net->periodicBounndaries && i == P_net->periodicThroats[periodicTrsC]){
+            periodicTrsC++;
+            continue;
+        }
+        
+        file<< 2 << '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
         // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
     }
     
