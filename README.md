@@ -1,7 +1,5 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
-
 ### What is this repository for? ###
 
 * This is the repo for the porenetwork generator build by Lucas van Oosterhout and Chaozhong Qin at the University of Utrecht.
