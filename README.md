@@ -4,18 +4,15 @@ This README would normally document whatever steps are necessary to get your app
 
 ### What is this repository for? ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* This is the repo for the porenetwork generator build by Lucas van Oosterhout and Chaozhong Qin at the University of Utrecht.
+* Version 0.2
 
 ### How do I get set up? ###
 
+* The generator is setup by running make in the networkgen directory
 * Summary of set up
 * Configuration
 * Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
 
 ### Contribution guidelines ###
 
