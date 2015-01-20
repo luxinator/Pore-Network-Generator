@@ -1,27 +1,32 @@
 # The Number of Porebodies in the x,y,z-directions
-Ni = 10
-Nj = 10
-Nk = 1
+Ni = 5
+Nj = 3
+Nk = 3
+
+# Periodic Boundaries, 0 = off, all else is on
+periodic = 1
 
 # The Distance between the lattice points 
 pbDist = 2.0
 
-#The SquareRoot of this Distance is the maximum distance between to connected porebodies
-searchDistance = 1.0
+#The Minimal Distance between two porebodies
+#As if this distance was squared and divided by the pbDist (choices are 1.0, 2.0 and 3.0)
+# ! Elemination does not work on searchDistance = 3.0 as of now!
+searchDistance = 2.00
 
 #Chance of a throat to survive
-c0 = 0.500
-c1 = 0.500
-c2 = 0.500
-c3 = 0.500
-c4 = 0.500
-c5 = 0.500
-c6 = 0.500
-c7 = 0.500
-c8 = 0.500
-c9 = 0.500
-c10 = 0.500
-c11 = 0.500
+c0 = 0.7000
+c1 = 0.700
+c2 = 0.700
+c3 = 1.000
+c4 = 1.000
+c5 = 1.000
+c6 = 1.000
+c7 = 1.000
+c8 = 1.000
+c9 = 1.000
+c10 = 1.000
+c11 = 1.000
 
 #c0 = 1.000
 #c1 = 1.000

@@ -87,6 +87,9 @@ NetworkSpecs *readSpecsFile(const char *filename){
         else if( s.compare(0,6,"pbdist")  == 0) {
             NS->pbDist = std::stof(s.substr(i+1));
         }
+        else if( s.compare(0,8, "periodic") == 0){
+            NS->periodicBounndaries = std::stoi(s.substr(i+1)) != 0; // if not zero then true
+        }
         // -----
         else if( s.compare(0,1,"c")  == 0) {
             try{
@@ -118,6 +121,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
     std::cout << "\tDistance between PoreBodies:\t" << NS->pbDist << '\n';
     std::cout << "\tMaximum Searching Distance: \t" << NS->searchDistance << '\n';
     std::cout << "\tCoordination Number:\t\t\t" << NS->coordNr << '\n';
+    std::cout << "\tPeriodic Boundaries:\t\t\t" << NS->periodicBounndaries << std::endl;
     
     
     return NS;

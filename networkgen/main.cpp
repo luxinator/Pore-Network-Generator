@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     
     std::string nSpecs = "../data/NetworkSpecs.in";
     std::string cFile   = "../data/connectivity.txt";
-    std::string fcFile   = "../data/connectivity.txt";
+    std::string fcFile   = "../data/fullconnectivity.txt";
     std::string lFile   = "../data/location.txt";
     
     std::string vtkFile = "../data/data.vtk";
@@ -82,7 +82,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    
     std::cout<< "Generating PoreBodies Nrs" << std::endl;
     P->generate_naive_array();
     
@@ -103,6 +102,8 @@ int main(int argc, char *argv[]) {
     std::cout << "\n";
     char * pb_list = searchForIsolatedPB(P);
      
+    
+    writeConnectivity(fcFile.c_str(),P);
     
     P->removeFlaggedPBs(pb_list, (char)2);
 
