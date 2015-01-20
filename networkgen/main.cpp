@@ -13,14 +13,14 @@ int main(int argc, char *argv[]) {
     std::cout << "\nPore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__<<std::endl;
     std::cout << "Copyright Lucas van Oosterhout. All Rights Reserverd. \n\n" << std::endl;
 
-    std::string helpText = "Command-Line Options: \n \
-    -h:               \t Shows this help text \n \
-    -ns [location]:   \t Specify the location of the NetworkSpecs.in file \n \
+    std::string helpText = "Command-Line Options:\n \
+    -h               \t Shows this help text\n \
+    -ns [location]   \t Specify the location of the NetworkSpecs.in file\n \
                       \t if not given standard location is used [../data/NetworkSpecs.in]\n \
-    -cfile [location]: \t Specify the location of the connectiviy.txt output file\n \
-    -fcfile [location]:\t Specify the location of the fullconnectivity.txt output file\n \
-    -lfile [location]: \t Specify the location of the locations.txt file\n \
-    -vtk [location]:   \t Specify if the vtk file is to be written and where \n";
+    -cfile [location] \t Specify the location of the connectiviy.txt output file\n \
+    -fcfile [location]\t Specify the location of the fullconnectivity.txt output file\n \
+    -lfile [location] \t Specify the location of the locations.txt file\n \
+    -vtk [location]   \t Specify if a vtk file is to be written and where\n";
     
     std::string nSpecs = "../data/NetworkSpecs.in";
     std::string cFile   = "../data/connectivity.txt";
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     bool writeVTKswitch = false;
     
     
-    // Go through the list ofgiven args
+    // Go through the list of given args
     if (argc > 1) {
         for(int i = 1; i < argc; i++){
             std::string s = std::string(argv[i]);
@@ -74,6 +74,8 @@ int main(int argc, char *argv[]) {
             std::cout << "Error Parsing Input, run with -h for help" << std::endl;
             return 1;
         }
+    } else {
+        std::cout << "No Arguments given, assuming default behavior" << std::endl;
     }
     
     PoreNetwork *P = new PoreNetwork(nSpecs.c_str());

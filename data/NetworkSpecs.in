@@ -1,7 +1,7 @@
 # The Number of Porebodies in the x,y,z-directions
-Ni = 5
-Nj = 3
-Nk = 3
+Ni = 50
+Nj = 30
+Nk = 30
 
 # Periodic Boundaries, 0 = off, all else is on
 periodic = 1
