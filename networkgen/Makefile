@@ -1,7 +1,7 @@
 
 CXX	 := g++
-CXXFLAGS := -g -Wuninitialized -std=c++11 -Wall -Werror -Wno-sign-compare
-CXXDEBUGFLAGS := -Wuninitialized -std=c++11 -Wall -O3 -fomit-frame-pointer
+CXXFLAGS := -g -O3 -std=c++0x  -fomit-frame-pointer
+CXXDEBUGFLAGS := -Wuninitialized -std=c++0x -Wall
 INCLUDES :=					# This would contain any -I options to the
   							# compiler, if there are any.
 LIBS     := 				# Contains libraries we need to link in.
