@@ -102,8 +102,8 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
 
 /*
  * Removes all porebodies who have a flag lower then minFlag (REMINDER: minFlags is a CHAR!)
- * Done on the Full MAP!
- * renumbers the Throat counters and the location list
+ * renumbers the Throat counters and the location list as well, only the half map is renumberd!
+ * For a fully connected and renumberd map simply rerun pn->generateFullConnectivity()
  */
 void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     
@@ -163,18 +163,21 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         this->throatList[1][i] = this->throatList[1][i] - mask[this->throatList[1][i]];
     }
     
-    //And if there there are periodic throats, periodic throats have the cool property: throatlist[0][i] > throatlist[1][i]
-    size_t j = 0;
-    for(i = 0; this->throatList[0][i] != 0; i++){
-        if(this->throatList[0][i] > this->throatList[1][i]){
-            std::cout << this->periodicThroats[j] << " -> ";
-            this->periodicThroats[j] = i;
-            std::cout << this->periodicThroats[j] << '\t' << this->throatList[0][i] << " - " << this->throatList[1][i] << std::endl;
-            j++;
+    //And if there there are periodic throats, update them as well. Periodic throats have the cool property: throatlist[0][i] > throatlist[1][i]
+    if(this->ns->periodicBounndaries) {
+        size_t j = 0;
+        for(i = 0; this->throatList[0][i] != 0; i++){
+            if(this->throatList[0][i] > this->throatList[1][i]){
+                //std::cout << this->periodicThroats[j] << " -> ";
+                this->periodicThroats[j] = i;
+                //std::cout << this->periodicThroats[j] << '\t' << this->throatList[0][i] << " - " << this->throatList[1][i] << std::endl;
+                j++;
+            }
         }
+        // The rest is garbage so delete the entry
+        for( ; j < Nj*Nk * 2; j++)
+            this->periodicThroats[j] = 0;
     }
-    
-    
     // Update the locations
     size_t newi;
     for(i = 1; i <= Ni*Nj*Nk; i ++){
@@ -194,12 +197,12 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
             this->locationList[2][i] = -1.0f;
         }
     
-    
+    //Rebuild the accumulator (throatCounter[1][pn])
     int accumulator = 0;
-    
     for(i = 1; i <= this->nrOfActivePBs; i ++){
         this->throatCounter[1][i] = accumulator + this->throatCounter[0][i];
-        accumulator= this->throatCounter[1][i];
+        accumulator = this->throatCounter[1][i];
+        //std::cout << this->throatCounter[0][i] << '\t' << this->throatCounter[1][i] << std::endl;
     }
 
 
@@ -264,7 +267,7 @@ void PoreNetwork::generateConnectivity(){
     
     
     // PeriodicvBoundaries are Places in ThroatList containing Periodic throats
-    if(this->periodicBounndaries){
+    if(this->ns->periodicBounndaries){
         this->periodicThroats = new size_t[Nj*Nk * 2 + 1];
         for(size_t i = 0; i < Nj*Nk * 2 + 1; i++){
             this->periodicThroats[i] = 0;
@@ -327,7 +330,7 @@ void PoreNetwork::generateConnectivity(){
         } // for
         
         //Add Periodic connection
-        if(this->periodicBounndaries && coord[1] == Nj - 1){
+        if(this->ns->periodicBounndaries && coord[1] == Nj - 1){
             connection[0][i] = pn;
             connection[1][i] = pn - ((Nk - 1) * Nj);
             this->throatCounter[0][pn] += 1;
@@ -336,7 +339,7 @@ void PoreNetwork::generateConnectivity(){
             periodicTrs++;
             i++;
         }
-        if(this->periodicBounndaries && coord[2] == Nk - 1){
+        if(this->ns->periodicBounndaries && coord[2] == Nk - 1){
             connection[0][i] = pn;
             connection[1][i] = pn - (Nj - 1);
             this->throatCounter[0][pn] += 1;

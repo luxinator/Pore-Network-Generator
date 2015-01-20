@@ -81,7 +81,6 @@ int main(int argc, char *argv[]) {
         std::cout<< "Cannot Generate PoreNetwork, please check NetworkSpecs.in for errors" <<std::endl;
         return 1;
     }
-    P->periodicBounndaries = true;
     
     std::cout<< "Generating PoreBodies Nrs" << std::endl;
     P->generate_naive_array();

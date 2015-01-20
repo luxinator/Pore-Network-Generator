@@ -173,7 +173,7 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
     //Hackish but it works
     ChanceList[0] = xChance;
     
-    if(P_net->periodicBounndaries){
+    if(P_net->ns->periodicBounndaries){
         size_t pn_n;
         //Periodic throats can be eliminated as well!
         for(size_t perdiocC = 0; P_net->periodicThroats[perdiocC] != 0; perdiocC++){
