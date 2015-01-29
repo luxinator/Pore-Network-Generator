@@ -301,6 +301,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
     //Do a DepthFirst Search on all inlets
     for(i = 0; P_net->throatList_full[0][i] <= Nj*Nk; i++){
         DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)1, (char)0);
+        //std::cout << i << '\t' << P_net->throatList_full[0][i] << '\t'<< (int)flagged_PB[ P_net->throatList_full[0][i]] << std::endl;
         // same as with sorting, do not allow guards to be searched
     }
     

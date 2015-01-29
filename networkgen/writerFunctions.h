@@ -10,4 +10,6 @@ void writeConnectivity(const char * filename, PoreNetwork *P_net);
 
 void writeLocation(const char * filename, PoreNetwork *P_net);
 
+void writeNetworkSpecs(const char * path, PoreNetwork *pn);
+
 #endif
