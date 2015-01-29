@@ -1,2 +1,5 @@
 fullconnectivity.txt
 *.vtk
+testnetwork_1_conn.txt
+testnetwork_1_loc.txt
+testnetwork_1_specs.txt
