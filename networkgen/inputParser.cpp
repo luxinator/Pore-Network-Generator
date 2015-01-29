@@ -115,8 +115,15 @@ NetworkSpecs *readSpecsFile(const char *filename){
                     return nullptr;
                 }
         }
-    }
+        
+        else if( s.compare(0,4, "name") == 0) {
+            NS->name = new char[255];
+            strcpy(NS->name, s.substr(i+1).c_str());
     
+            
+        }
+    }
+    std::cout << "\nname: " << NS->name << std::endl;
     std::cout << "NetworkSpecs found: \n\tNi, Nj,Nk:\t\t\t\t\t" << NS->Ni << ",\t" << NS->Nj << ",\t" << NS->Nk << std::endl;
     std::cout << "\tDistance between PoreBodies:\t" << NS->pbDist << '\n';
     std::cout << "\tMaximum Searching Distance: \t" << NS->searchDistance << '\n';

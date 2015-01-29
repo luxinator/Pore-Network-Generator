@@ -12,6 +12,7 @@
 
 
 struct NetworkSpecs {
+    char* name;
     unsigned int Ni, Nj, Nk;
     float C[26];
     unsigned int coordNr;

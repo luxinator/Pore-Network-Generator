@@ -17,15 +17,15 @@ int main(int argc, char *argv[]) {
     -h               \t Shows this help text\n \
     -ns [location]   \t Specify the location of the NetworkSpecs.in file\n \
                       \t if not given standard location is used [../data/NetworkSpecs.in]\n \
-    -cfile [location] \t Specify the location of the connectiviy.txt output file\n \
-    -fcfile [location]\t Specify the location of the fullconnectivity.txt output file\n \
-    -lfile [location] \t Specify the location of the locations.txt file\n \
+    -cfile [location] \t Specify the location of the connectiviy output file\n \
+    -fcfile [location]\t Specify the location of the fullconnectivity output file\n \
+    -lfile [location] \t Specify the location of the locations file\n \
     -vtk [location]   \t Specify if a vtk file is to be written and where\n";
     
     std::string nSpecs = "../data/NetworkSpecs.in";
-    std::string cFile   = "../data/connectivity.txt";
-    std::string fcFile   = "../data/fullconnectivity.txt";
-    std::string lFile   = "../data/location.txt";
+    std::string cFile   = "../data/";
+    std::string fcFile   = "../data/";
+    std::string lFile   = "../data/";
     
     std::string vtkFile = "../data/data.vtk";
     
@@ -103,9 +103,13 @@ int main(int argc, char *argv[]) {
 
     std::cout << "\n";
     char * pb_list = searchForIsolatedPB(P);
-     
+    if(!pb_list){
+        std::cout << "Network is Broken Aborting" << std::endl;
+        return 1;
+    }
+        
     
-    writeConnectivity(fcFile.c_str(),P);
+//    writeConnectivity(fcFile.c_str(),P);
     
     P->removeFlaggedPBs(pb_list, (char)2);
 
@@ -115,7 +119,8 @@ int main(int argc, char *argv[]) {
     
     if(writeVTKswitch)
         writeVTK(vtkFile.c_str(), P);
-    //writeInlet_OutletPbs("test.out", P);
+    
+    writeNetworkSpecs(cFile.c_str(), P);
 
 }
 

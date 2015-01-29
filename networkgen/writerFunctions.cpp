@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <string>
 
 /*
  * Writes out the throatList until an entry with [0][0] is encounterd
@@ -60,17 +61,18 @@ void writeInlet_OutletPbs(const char * filename, PoreNetwork *pn){
     
 }
 
-void writeConnectivity(const char * filename, PoreNetwork *pn){
+void writeConnectivity(const char * path, PoreNetwork *pn){
     
     
     std::ofstream file;
-    if(!filename){
+    if(!path){
         std::cerr << "No filename specified! " << std::endl;
         return;
     }
+    std::string filename = std::string(path) + pn->ns->name + "_conn.txt";
     
     std::cout << "Opening File: " << filename << std::endl;
-    file.open(filename, std::ios::trunc);
+    file.open(filename.c_str(), std::ios::trunc);
     if(!file){
         std::cerr<< "Error opening file [" << filename << ']' << std::endl;
         return;
@@ -85,18 +87,21 @@ void writeConnectivity(const char * filename, PoreNetwork *pn){
     file.close();
 }
 
-void writeLocation(const char * filename, PoreNetwork *P){
+void writeLocation(const char * path, PoreNetwork *P){
     
     
     
     std::ofstream file;
-    if( filename == nullptr){
+    if( path == nullptr){
         std::cerr << "No filename specified! " << std::endl;
         return;
     }
     
+    std::string filename = std::string(path) + P->ns->name + "_loc.txt";
+    
+    
     std::cout << "Opening File: " << filename << std::endl;
-    file.open(filename, std::ios::trunc);
+    file.open(filename.c_str(), std::ios::trunc);
     if(!file){
         std::cerr<< "Error opening file [" << filename << ']' << std::endl;
         return;
@@ -119,4 +124,36 @@ void writeLocation(const char * filename, PoreNetwork *P){
     std::cout << "# PB Locations Writen to file: " << pn -1 << std::endl;
     
     file.close();
+}
+
+
+void writeNetworkSpecs(const char * path, PoreNetwork *pn){
+    
+    std::ofstream file;
+    if( path == nullptr){
+        std::cerr << "No filename specified! " << std::endl;
+        return;
+    }
+    
+    std::string filename = std::string(path) + pn->ns->name + "_specs.txt";
+    
+    
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename.c_str(), std::ios::trunc);
+    if(!file){
+        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        return;
+    }
+    
+    size_t i = 0;
+    while (pn->locationList[0][i] == 0.0)
+        i++;
+    
+    file << "Number of PoreBodies = " << pn->nrOfActivePBs << '\n';
+    file << "Number of Throats = " << pn->nrOfConnections << '\n';
+    file << "Number of InletPBs = " << i - 1 << '\n';
+    
+    file.close();
+    
+    
 }

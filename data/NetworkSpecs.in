@@ -1,10 +1,12 @@
+Name = TestNetwork_1
+
 # The Number of Porebodies in the x,y,z-directions
-Ni = 50
+Ni = 30
 Nj = 30
-Nk = 30
+Nk = 1
 
 # Periodic Boundaries, 0 = off, all else is on
-periodic = 1
+periodic = 0
 
 # The Distance between the lattice points 
 pbDist = 2.0
@@ -15,18 +17,18 @@ pbDist = 2.0
 searchDistance = 2.00
 
 #Chance of a throat to survive
-c0 = 0.7000
-c1 = 0.700
-c2 = 0.700
-c3 = 1.000
-c4 = 1.000
-c5 = 1.000
-c6 = 1.000
-c7 = 1.000
-c8 = 1.000
-c9 = 1.000
-c10 = 1.000
-c11 = 1.000
+c0 = 0.1000
+c1 = 0.100
+c2 = 0.100
+c3 = .1000
+c4 = 0.1000
+c5 = 0.1000
+c6 = .1000
+c7 = 0.1000
+c8 = 0.1000
+c9 = 0.1000
+c10 = 0.1000
+c11 = 0.1000
 
 #c0 = 1.000
 #c1 = 1.000
