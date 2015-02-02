@@ -88,8 +88,8 @@ void writeConnectivity(const char * path, PoreNetwork *pn){
                 else
                     periodic = 0;
             }
-            file << pn->throatList[0][i]<< '\t' << pn->throatList[1][i] <<'\t' << periodic << std::endl;
-    }
+            file << pn->throatList[0][i]<< '\t' << pn->throatList[1][i] <<'\t' << periodic << '\n';    }
+    std::cout << std::endl;
     
     std::cout<< "# nr of throats written to File: " << i << std::endl;
     file.close();
