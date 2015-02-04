@@ -141,6 +141,7 @@ void writeVTK(const char* filename, PoreNetwork *P_net, const int precision){
                 break;
             }
         }
+    std::cout << P_net->nrOfConnections << std::endl;
     
     file << "LINES" << '\t'<< P_net->nrOfConnections - periodicTrsC << '\t'<< (P_net->nrOfConnections - periodicTrsC) * 3 <<std::endl;
     periodicTrsC = 0;

@@ -50,6 +50,8 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
     size_t pn = 1, i = 0;
     
     float xChance = ChanceList[0];
+    float yChance = ChanceList[1];
+    float zChance = ChanceList[2];
     
     // Go through throatList
     while(P_net->throatList[0][i] != 0){
@@ -64,13 +66,29 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
         }
         */
         // Inlet and outlet pores are skipped
-        if(coord[0] == 0 ){
+        if(P_net->ns->flowDirs[0] && coord[0] == 0 ){
             i++;
             continue;
         }
-        if(coord[0] ==  Ni -2 ){
+        if(P_net->ns->flowDirs[1] && coord[1] == 0 ){
+            i++;
+            continue;
+        }
+        if(P_net->ns->flowDirs[2] && coord[2] == 0 ){
+            i++;
+            continue;
+        }
+        if(P_net->ns->flowDirs[0] && coord[0] ==  Ni -2 ){
             i++;
             ChanceList[0] = 1.0f; // X-dir is kept, else may fail -> simple and ugly hack
+        }
+        if(P_net->ns->flowDirs[1] && coord[1] ==  Nj - 2 ){
+            i++;
+            ChanceList[1] = 1.0f; // Y-dir is kept, else may fail -> simple and ugly hack
+        }
+        if(P_net->ns->flowDirs[2] && coord[2] ==  Nk - 2 ){
+            i++;
+            ChanceList[2] = 1.0f; // Z-dir is kept, else may fail -> simple and ugly hack
         }
         
         while (P_net->throatList[0][i] == (int)pn) {
@@ -172,6 +190,8 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
     
     //Hackish but it works
     ChanceList[0] = xChance;
+    ChanceList[1] = yChance;
+    ChanceList[2] = zChance;
     
     if(P_net->ns->periodicBounndaries){
         size_t pn_n;

@@ -78,6 +78,7 @@ int main(int argc, char *argv[]) {
         std::cout << "No Arguments given, assuming default behavior" << std::endl;
     }
     
+    
     PoreNetwork *P = new PoreNetwork(nSpecs.c_str());
     if(!P->ns){
         std::cout<< "Cannot Generate PoreNetwork, please check NetworkSpecs.in for errors" <<std::endl;
@@ -87,16 +88,21 @@ int main(int argc, char *argv[]) {
     std::cout<< "Generating PoreBodies Nrs" << std::endl;
     P->generate_naive_array();
     
+   
     // --- Generate the Network
     std::cout<< "Generating Network" << std::endl;
     P->generateConnectivity();
     P->generateLocation();
     
-
     std::cout << "\n";
     eliminateThroats(P, 6);
     P->removeFlaggedThroats(-1);
     
+    
+    // --- Flow Direction Dependent code --- \\
+    //      regenarate the connectivity      \\
+    //    so that the flow dir inlet pores are first in the list
+    //      and the outlet pores are last
     
     std::cout << "\n";
     P->generateFullConnectivity();
@@ -106,7 +112,7 @@ int main(int argc, char *argv[]) {
     if(!pb_list){
         std::cout << "Network is Broken Aborting" << std::endl;
         return 1;
-    }
+}
         
     
 //    writeConnectivity(fcFile.c_str(),P);

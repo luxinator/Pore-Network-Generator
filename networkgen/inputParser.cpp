@@ -58,7 +58,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
     char c = ' ';
     int i = 0;
 
-    std::cout << "Parsing NetworkSpecs: \n\tChanceList:" << std::endl;
+    std::cout << "Parsing NetworkSpecs: \n" << std::endl;
     
     while(file.getline(buff, 255)){
         //TRIM THE STRING OF SPACES!!!
@@ -90,12 +90,22 @@ NetworkSpecs *readSpecsFile(const char *filename){
         else if( s.compare(0,8, "periodic") == 0){
             NS->periodicBounndaries = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         }
-        // -----
+        else if( s.compare(0,5, "xflow") == 0){
+            NS->flowDirs[0] = std::stoi(s.substr(i+1)) != 0; // if not zero then true
+        }
+        else if( s.compare(0,5, "yflow") == 0){
+            NS->flowDirs[1] = std::stoi(s.substr(i+1)) != 0; // if not zero then true
+        }
+        else if( s.compare(0,5, "zflow") == 0){
+            NS->flowDirs[2] = std::stoi(s.substr(i+1)) != 0; // if not zero then true
+        } 
+        
+        // ----- ChanceList is kind of a special Case
         else if( s.compare(0,1,"c")  == 0) {
             try{
                 int pos = std::stoi(s.substr(1,i-1));
                 NS->C[pos] = std::stof(s.substr(i+1));
-                std::cout <<"\tC[" << pos << "] " << "= " <<NS->C[pos]<<std::endl;
+                //std::cout <<"\tC[" << pos << "] " << "= " <<NS->C[pos]<<std::endl;
             } catch (std::exception &e) {
                 std::cerr << " ---- ERROR in Parsing the Chance List! " << std::endl;
                 return nullptr;
@@ -128,8 +138,9 @@ NetworkSpecs *readSpecsFile(const char *filename){
     std::cout << "\tDistance between PoreBodies:\t" << NS->pbDist << '\n';
     std::cout << "\tMaximum Searching Distance: \t" << NS->searchDistance << '\n';
     std::cout << "\tCoordination Number:\t\t\t" << NS->coordNr << '\n';
-    std::cout << "\tPeriodic Boundaries:\t\t\t" << NS->periodicBounndaries << std::endl;
-    
-    
+    std::cout << "\tPeriodic Boundaries:\t\t\t" << NS->periodicBounndaries << '\n';
+    std::cout << "\tPossible Flow Dir:\n\t\t\tX-Flow: " << NS->flowDirs[0] << " Y-Flow: " << NS->flowDirs[1] << " Z-Flow: " << NS->flowDirs[2] << '\n';
+
+    std::cout << std::endl;
     return NS;
 }
