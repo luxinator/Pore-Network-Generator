@@ -10,7 +10,6 @@
 #define networkgen_PoreNetwork_h
 #include <cstdlib>
 
-
 struct NetworkSpecs {
     char* name;
     unsigned int Ni, Nj, Nk;
@@ -27,7 +26,7 @@ class PoreNetwork{
     
 private:
     int checkInput();
-    
+    template <typename T> T** paddedList(size_t amount, T **List, size_t nrOfCols ,size_t currentSize);
     
 public:
     
@@ -39,11 +38,13 @@ public:
     int **throatCounter; //number of prore throats per pb nr (1 based!) and number of throats preceding.
     int **throatList; // Connection map from pb nr -> pb nr. Is the half map!
     int **throatList_full; //Full Connection map
+    int *outlets, *inlets; //The Inlets and Outlets list, lists of inlet and outlet pores.
     size_t nrOfConnections;
     size_t nrOfActivePBs;
     float **locationList; // Location of a pb using its nr as index
     size_t *periodicThroats; // position in the throaList which has a periodic connection
-
+    
+    void generateBoundary(int dir);
   
 
 /*

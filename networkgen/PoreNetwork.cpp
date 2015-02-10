@@ -277,10 +277,9 @@ void PoreNetwork::generateConnectivity(){
     }
     
     
-    // --- Extend this to include variable connection amount based upon distance from Pore to neightbours!
     t = new int[2 * 13  *  Ni*Nj*Nk];// 13 connections per pb, we have Ni*Nj*Nk pbs and connection is a pair of 2 ints
     
-    int **connection = new int*[2]; //[0] from [1] to
+    int **connection = new int*[2]; //from [0] to [1]
     connection[0] = t;
     connection[1] = t + (13 * Ni*Nj*Nk);
     
@@ -308,85 +307,15 @@ void PoreNetwork::generateConnectivity(){
     double L = 0;
     double dist = this->ns->searchDistance;
     
-    for(int pn = 1; pn <= Ni*Nj*Nk - Nk*Nj; pn++){
+    for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
         deflatten_3d(pn, Ni, Nj, Nk, coord); //coord from pb[pn]
         
-        // boundary inlet only connect in x-flow dir
-        if (this->ns->flowDirs[0] && coord[0] == 0){
-            
-            connection[0][i] = pn; //Pb nr
-            connection[1][i] =  array[coord[0] + 1][coord[1]][coord[2]]; //connected to pb
-            this->throatCounter[0][pn] = 1; //amount of connections of pb
-            i++;//
-            this->throatCounter[1][pn] += i;
-            
-            continue; // skip the rest, no more connections for this pb
-        }
         
-        // Connect to Boundary Outlet in x-dir
-        else if (this->ns->flowDirs[0] && coord[0] == Ni - 2){
-            
-            connection[0][i] = pn; //Pb nr
-            connection[1][i] =  array[coord[0] + 1][coord[1]][coord[2]]; //connected to pb
-            this->throatCounter[0][pn] += 1; //amount of connections of pb
-            i++;
-            this->throatCounter[1][pn] = i; // outlet has one throat in forward no more, no less!
-            
-            //continue; // skip the rest, no more connections for this pb
-        }
-        
-        if(this->ns->flowDirs[1] && coord[1] == 0){
-            connection[0][i] = pn; //Pb nr
-            connection[1][i] =  array[coord[0]][coord[1] + 1][coord[2]]; //connected to pb
-            this->throatCounter[0][pn] = 1; //amount of connections of pb
-            i++;//
-            this->throatCounter[1][pn] += i;
-            
-            continue; // skip the rest, no more connections for this pb
-
-        }
-        else if(this->ns->flowDirs[1] &&coord[1] == Nj - 2){
-            
-            connection[0][i] = pn; //Pb nr
-            connection[1][i] =  array[coord[0]][coord[1] + 1][coord[2]]; //connected to pb
-            this->throatCounter[0][pn] += 1; //amount of connections of pb
-            i++;//
-            this->throatCounter[1][pn] += i;
-            
-        }
-        
-        if(this->ns->flowDirs[2] && coord[2] == 0){
-            
-            connection[0][i] = pn; //Pb nr
-            connection[1][i] =  array[coord[0]][coord[1]][coord[2] + 1]; //connected to pb
-            this->throatCounter[0][pn] = 1; //amount of connections of pb
-            i++;//
-            this->throatCounter[1][pn] += i;
-            
-            continue; // skip the rest, no more connections for this pb
-            
-        }
-        else if(this->ns->flowDirs[2] && coord[2] == Nk - 2){
-            
-            connection[0][i] = pn; //Pb nr
-            connection[1][i] =  array[coord[0]][coord[1]][coord[2] + 1]; //connected to pb
-            this->throatCounter[0][pn] += 1; //amount of connections of pb
-            i++;//
-            this->throatCounter[1][pn] += i;
-            
-        }
-        
-        // --- Skip the y and z Boundaries if needed, we already skip x-boundary
-        if(this->ns->flowDirs[1] && coord[1] == Nj -1)
-            continue;
-        if(this->ns->flowDirs[2] && coord[2] == Nk -1)
-            continue;
-    
         // ---------- Generates the "inner" pore porebody throats -------- \\
         // (pn+ Nj*Nk + (Nj*Nk /2 + 1) -> distance of one x-slice in x-dir
         //  Ni*Nj*Nk - Nj*Nk -> do not go further then second to last layer in x-dir
         for( int pn_n = pn+1; pn_n < (pn+ Nj*Nk + (Nj*Nk /2 + 1)) &&
-            pn_n <= Ni*Nj*Nk - Nj*Nk; pn_n++){
+            pn_n <= Ni*Nj*Nk; pn_n++){
             
             deflatten_3d(pn_n, Ni, Nj, Nk, coord_n);
             
@@ -395,18 +324,7 @@ void PoreNetwork::generateConnectivity(){
                      pow((double)(coord[2] - coord_n[2]), 2.0));
             
             if(L <= dist){
-                
-                // -- Skip connection to the boundary pbs,they already have a connection
-                if(coord_n[1] == 0 && this->ns->flowDirs[1])
-                    continue;
-                if( coord_n[1] == Nj - 1 && this->ns->flowDirs[1] )
-                    continue;
-                if(coord_n[2] == 0 && this->ns->flowDirs[2])
-                    continue;
-                if( coord_n[2] == Nk - 1 && this->ns->flowDirs[2] )
-                    continue;
-                
-                
+                //std::cout << pn << '\t' << pn_n << std::endl;
                 connection[0][i] = pn; //Pb nr
                 connection[1][i] = pn_n; //connected to pb
                 this->throatCounter[0][pn] += 1; //amount of forward connections of pb
@@ -451,7 +369,7 @@ void PoreNetwork::generateConnectivity(){
     
     this->throatList = connection;
     this->nrOfActivePBs = Ni*Nj*Nk;
-    std::cout << "stuff: "<<i << '\t' << Ni*Nj*Nk << '\t' << this->throatCounter[1][Ni*Nj*Nk] << std::endl;
+    //std::cout << "stuff: "<<i << '\t' << Ni*Nj*Nk << '\t' << this->throatCounter[1][Ni*Nj*Nk] << std::endl;
     this->nrOfConnections = this->throatCounter[1][Ni*Nj*Nk];
     
 }
@@ -482,9 +400,9 @@ void PoreNetwork::generateLocation(){
     for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
         deflatten_3d(pn, Ni, Nj, Nk, coord);
         
-        locationList[0][pn] = coord[0] * Length; // + Length, because boundary pbs are on (0,0,0)
-        locationList[1][pn] = coord[1] * Length;
-        locationList[2][pn] = coord[2] * Length;
+        locationList[0][pn] = coord[0] * Length + Length; // + Length, because boundary pbs are on (0,0,0)
+        locationList[1][pn] = coord[1] * Length + Length;
+        locationList[2][pn] = coord[2] * Length + Length;
         
     }
     
@@ -518,6 +436,89 @@ void PoreNetwork::generate_naive_array(){
     
 }
 
+
+/*
+ * Creates a list padded with [amount] zeroes
+ */
+
+template <typename T> T** PoreNetwork::paddedList(size_t amount, T **List, size_t nrOfCols ,size_t currentSize) {
+    size_t i,j;
+    
+    if(!nrOfCols || !currentSize)
+        return nullptr;
+    
+    
+    T *tList = new T[(currentSize + 2 * amount) * nrOfCols];
+    T **newList = new T*[nrOfCols];
+    
+    for(j = 0; j < nrOfCols; j++)
+        newList[j] = tList + (currentSize + 2 * amount) * j;
+    
+    for(i = 0; i < currentSize + 2 * amount; i++)
+        for(j = 0; j < nrOfCols; j++)
+            newList[j][i] = -1;
+    
+    
+    for(i = amount; i < currentSize + amount ; i++)
+        for(j = 0; j < nrOfCols; j++){
+            newList[j][i] = List[j][i - amount];
+        }
+    return newList;
+    
+}
+
+void PoreNetwork::generateBoundary(int dir){
+    
+    int Ni = this->ns->Ni;
+    int Nj = this->ns->Nj;
+    int Nk = this->ns->Nk;
+    
+    size_t i;
+    
+    if(dir == 0) // gen x inlets + outlets
+    {
+        std::cout  << this->nrOfConnections << " --- --- " << std::endl;
+        int** newTL     = this->paddedList(Nj*Nk, this->throatList, 2, this->nrOfConnections);
+        this->nrOfConnections = this->nrOfConnections + 2 * Nj*Nk;
+        //int** newTC     = this->paddedList(Nj*Nk, this->throatCounter, 2, Ni*Nj*Nk + 1);
+        //float** newLL   = this->paddedList(Nj*Nk, this->locationList, 3, Ni*Nj*Nk + 1);
+        //int coord[3];
+        //int cummulative;
+        
+/*
+        for(i = 0; i < Nj*Nk; i ++){
+            // Set up the connections
+            newTL[0][i] = (int)i + 1;
+            newTL[1][i] = (int)i + Nj*Nk;
+
+            newTC[0][i] = 1;
+            newTC[1][i] = (int)i + 1;
+            
+            deflatten_3d(i, Ni, Nj, Nk, coord);
+            newLL[0][i+1] = coord[0] * this->ns->pbDist;
+            newLL[1][i+1] = coord[1] * this->ns->pbDist;
+            newLL[2][i+1] = coord[2] * this->ns->pbDist;
+            
+        }
+        cummulative = (int) i ; // or? (int)i
+        
+        for ( ; i < this->nrOfConnections + Nj*Nk; i++) {
+            newTL[0][i] += Nj*Nk;
+            newTL[1][i] += Nj*Nk;
+            
+            newTC[1][newTL[0][i]] += cummulative;
+            
+        }
+        for ( ; i < this->nrOfConnections + Nj*Nk * 2; i++){
+            newTL[0][i] = Ni*Nj*Nk + (int)i;
+        }
+        */
+        //Leak the memory for now...
+        this->throatList = newTL;
+        //this->throatCounter = newTC;
+        //this->locationList = newLL;
+    }
+}
 
 /*
  * Returns a sorted list of throats with connect[0][i] is source pb
@@ -582,7 +583,7 @@ size_t PoreNetwork::generateFullConnectivity(){
 
 
 /*
- * Translate the Network, 
+ * Translate the Network,
  *
  */
 

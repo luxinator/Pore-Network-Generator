@@ -96,37 +96,59 @@ int main(int argc, char *argv[]) {
     
     std::cout << "\n";
     eliminateThroats(P, 6);
+    
     P->removeFlaggedThroats(-1);
     
     
     // --- Flow Direction Dependent code --- \\
     //      regenarate the connectivity      \\
-    //    so that the flow dir inlet pores are first in the list
-    //      and the outlet pores are last
+    //     - Add in Inlet and Outlet Pores   \\
+    //     - Restructure the Lists           \\
+    //     - Output to Different Files       \\
     
-    std::cout << "\n";
-    P->generateFullConnectivity();
-
-    std::cout << "\n";
-    char * pb_list = searchForIsolatedPB(P);
-    if(!pb_list){
-        std::cout << "Network is Broken Aborting" << std::endl;
-        return 1;
-}
-        
     
-//    writeConnectivity(fcFile.c_str(),P);
+    //for(size_t dir = 0; dir <= 3; dir++){
+//        if(P->ns->flowDirs[dir]){
+            
+            
+        P->generateBoundary(0);
     
-    P->removeFlaggedPBs(pb_list, (char)2);
-
-    writeConnectivity(cFile.c_str(),P);
     
-    writeLocation(lFile.c_str(), P);
-    
-    if(writeVTKswitch)
         writeVTK(vtkFile.c_str(), P);
+        writeConnectivity(cFile.c_str(), P);
     
-    writeNetworkSpecs(cFile.c_str(), P);
+        writeLocation(lFile.c_str(), P);
+    
+    /*
+            std::cout <<"\n";
+            P->generateFullConnectivity();
+            
+            std::cout << "\n";
+            char * pb_list = searchForIsolatedPB(P);
+            if(!pb_list){
+                std::cout << "Network is Broken Aborting" << std::endl;
+                return 1;
+            }
+            
+            
+            //    writeConnectivity(fcFile.c_str(),P);
+            
+           // P->removeFlaggedPBs(pb_list, (char)2);
+            
+        //    writeConnectivity(cFile.c_str(),P);
+            
+            writeLocation(lFile.c_str(), P);
+            
+            if(writeVTKswitch)
+                writeVTK(vtkFile.c_str(), P);
+            
+            writeNetworkSpecs(cFile.c_str(), P);
+            
+        //}
+     */
+   // }
+    
+
 
 }
 
