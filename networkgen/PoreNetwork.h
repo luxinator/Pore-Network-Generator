@@ -38,9 +38,10 @@ public:
     int **throatCounter; //number of prore throats per pb nr (1 based!) and number of throats preceding.
     int **throatList; // Connection map from pb nr -> pb nr. Is the half map!
     int **throatList_full; //Full Connection map
-    int *outlets, *inlets; //The Inlets and Outlets list, lists of inlet and outlet pores.
     size_t nrOfConnections;
     size_t nrOfActivePBs;
+    size_t nrOfInlets, nrOfOutlets;
+
     float **locationList; // Location of a pb using its nr as index
     size_t *periodicThroats; // position in the throaList which has a periodic connection
     

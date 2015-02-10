@@ -400,9 +400,9 @@ void PoreNetwork::generateLocation(){
     for(int pn = 1; pn <= Ni*Nj*Nk; pn++){
         deflatten_3d(pn, Ni, Nj, Nk, coord);
         
-        locationList[0][pn] = coord[0] * Length + Length; // + Length, because boundary pbs are on (0,0,0)
-        locationList[1][pn] = coord[1] * Length + Length;
-        locationList[2][pn] = coord[2] * Length + Length;
+        locationList[0][pn] = coord[0] * Length; // + Length, because boundary pbs are on (0,0,0)
+        locationList[1][pn] = coord[1] * Length;
+        locationList[2][pn] = coord[2] * Length;
         
     }
     
@@ -473,51 +473,65 @@ void PoreNetwork::generateBoundary(int dir){
     int Nj = this->ns->Nj;
     int Nk = this->ns->Nk;
     
-    size_t i;
+    size_t i,j;
     
     if(dir == 0) // gen x inlets + outlets
     {
-        std::cout  << this->nrOfConnections << " --- --- " << std::endl;
-        int** newTL     = this->paddedList(Nj*Nk, this->throatList, 2, this->nrOfConnections);
-        this->nrOfConnections = this->nrOfConnections + 2 * Nj*Nk;
-        
+        std::cout  << this->nrOfConnections << " --- --- ";
+        int** newTL         = this->paddedList(Nj*Nk, this->throatList, 2, this->nrOfConnections);
+        this->nrOfInlets    = Nj*Nk;
+        this->nrOfOutlets   = Nj*Nk;
         //int** newTC     = this->paddedList(Nj*Nk, this->throatCounter, 2, Ni*Nj*Nk + 1);
-        //float** newLL   = this->paddedList(Nj*Nk, this->locationList, 3, Ni*Nj*Nk + 1);
-        //int coord[3];
-        //int cummulative;
+        float** newLL   = this->paddedList(Nj*Nk, this->locationList, 3, Ni*Nj*Nk + 1);
+        int coord[3];
+        int cummulative;
         
-
+        //Fill Head padding
         for(i = 0; i < Nj*Nk; i ++){
             // Set up the connections
             newTL[0][i] = (int)i + 1;
-            newTL[1][i] = (int)i + Nj*Nk;
+            newTL[1][i] = (int)i + Nj*Nk +1;
 
            // newTC[0][i] = 1;
            // newTC[1][i] = (int)i + 1;
             
-           // deflatten_3d(i, Ni, Nj, Nk, coord);
-           // newLL[0][i+1] = coord[0] * this->ns->pbDist;
-           // newLL[1][i+1] = coord[1] * this->ns->pbDist;
-            //newLL[2][i+1] = coord[2] * this->ns->pbDist;
+            deflatten_3d(i + 1, Ni, Nj, Nk, coord);
+            newLL[0][i+1] = coord[0] * this->ns->pbDist;
+            newLL[1][i+1] = coord[1] * this->ns->pbDist;
+            newLL[2][i+1] = coord[2] * this->ns->pbDist;
             
         }
-        //cummulative = (int) i ; // or? (int)i
         
+        //Change middle if needed
         for ( ; i < this->nrOfConnections + Nj*Nk; i++) {
             newTL[0][i] += Nj*Nk;
             newTL[1][i] += Nj*Nk;
+
+
+            newLL[0][i+1] += this->ns->pbDist;
+            newLL[1][i+1] += this->ns->pbDist;
+            newLL[2][i+1] += this->ns->pbDist;
             
           //  newTC[1][newTL[0][i]] += cummulative;
             
         }
+
+        //Fill tail Padding
+        j = 0;
         for ( ; i < this->nrOfConnections + Nj*Nk * 2; i++){
-            newTL[0][i] = Ni*Nj*Nk + (int)i;
+            newTL[0][i] = Ni*Nj*Nk + j + 1;
+            newTL[1][i] = Ni*Nj*Nk + j + Nj*Nk + 1;
+            j++;
         }
 
         //Leak the memory for now...
         this->throatList = newTL;
+        this->nrOfConnections = this->nrOfConnections + 2 * Nj*Nk;
+        
         //this->throatCounter = newTC;
-        //this->locationList = newLL;
+        this->locationList = newLL;
+
+        std::cout << this->nrOfConnections <<std::endl;
     }
 }
 
