@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
 //        if(P->ns->flowDirs[dir]){
             
             
-        P->generateBoundary(0);
+        P->generateBoundary(1);
     
     
         writeVTK(vtkFile.c_str(), P);

@@ -159,7 +159,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         }
     }
     
-    // Do the Actually Deletingof the Throats
+    // Do the Actually Deleting of the Throats
     this->removeFlaggedThroats(-1);
     
     
@@ -183,7 +183,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     this->nrOfActivePBs = Ni*Nj*Nk - cummulator;
     
     
-    //Use the mask to update the throatLists, the COMPLETE lists.
+    // --- Use the mask to update the throatLists, the COMPLETE lists.
     for(i = 0; this->throatList[0][i] != 0; i++)
         this->throatList[0][i] = this->throatList[0][i] - mask[this->throatList[0][i]];
     
@@ -206,7 +206,8 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         for( ; j < Nj*Nk * 2; j++)
             this->periodicThroats[j] = 0;
     }
-    // Update the locations
+    
+    // --- Update the locations
     size_t newi;
     for(i = 1; i <= Ni*Nj*Nk; i ++){
         if(pb_flag_list[i] >= minFlag){ //Pore exists in new system
@@ -456,7 +457,7 @@ template <typename T> T** PoreNetwork::paddedList(size_t amount, T **List, size_
     
     for(i = 0; i < currentSize + 2 * amount; i++)
         for(j = 0; j < nrOfCols; j++)
-            newList[j][i] = -1;
+            newList[j][i] = (T)-1;
     
     
     for(i = amount; i < currentSize + amount ; i++)
@@ -472,68 +473,187 @@ void PoreNetwork::generateBoundary(int dir){
     int Ni = this->ns->Ni;
     int Nj = this->ns->Nj;
     int Nk = this->ns->Nk;
-    
+    int *coord = new int[3];
+
     size_t i,j;
     
     if(dir == 0) // gen x inlets + outlets
     {
-        std::cout  << this->nrOfConnections << " --- --- ";
         int** newTL         = this->paddedList(Nj*Nk, this->throatList, 2, this->nrOfConnections);
         this->nrOfInlets    = Nj*Nk;
         this->nrOfOutlets   = Nj*Nk;
-        //int** newTC     = this->paddedList(Nj*Nk, this->throatCounter, 2, Ni*Nj*Nk + 1);
+    
         float** newLL   = this->paddedList(Nj*Nk, this->locationList, 3, Ni*Nj*Nk + 1);
-        int coord[3];
-        int cummulative;
+       
+        int** newTC     = this->paddedList(Nj*Nk, this->throatCounter, 2, Ni*Nj*Nk + 1);
         
+        // --------- Changes in the ThroatList ------ //
         //Fill Head padding
         for(i = 0; i < Nj*Nk; i ++){
-            // Set up the connections
             newTL[0][i] = (int)i + 1;
             newTL[1][i] = (int)i + Nj*Nk +1;
 
-           // newTC[0][i] = 1;
-           // newTC[1][i] = (int)i + 1;
-            
-            deflatten_3d(i + 1, Ni, Nj, Nk, coord);
-            newLL[0][i+1] = coord[0] * this->ns->pbDist;
-            newLL[1][i+1] = coord[1] * this->ns->pbDist;
-            newLL[2][i+1] = coord[2] * this->ns->pbDist;
-            
         }
         
         //Change middle if needed
         for ( ; i < this->nrOfConnections + Nj*Nk; i++) {
             newTL[0][i] += Nj*Nk;
             newTL[1][i] += Nj*Nk;
-
-
-            newLL[0][i+1] += this->ns->pbDist;
-            newLL[1][i+1] += this->ns->pbDist;
-            newLL[2][i+1] += this->ns->pbDist;
-            
-          //  newTC[1][newTL[0][i]] += cummulative;
             
         }
 
         //Fill tail Padding
         j = 0;
         for ( ; i < this->nrOfConnections + Nj*Nk * 2; i++){
-            newTL[0][i] = Ni*Nj*Nk + j + 1;
-            newTL[1][i] = Ni*Nj*Nk + j + Nj*Nk + 1;
+            newTL[0][i] = Ni*Nj*Nk + (int)j + 1;
+            newTL[1][i] = Ni*Nj*Nk + (int)j + Nj*Nk + 1;
             j++;
         }
-
-        //Leak the memory for now...
-        this->throatList = newTL;
+        
         this->nrOfConnections = this->nrOfConnections + 2 * Nj*Nk;
         
-        //this->throatCounter = newTC;
-        this->locationList = newLL;
+        // -------- Changes in Location List -------- //
+        
+        // Change head padding
+        for(i = 1; i <= Nj*Nk; i ++){
+            deflatten_3d(i, Ni, Nj, Nk, coord);
+            newLL[0][i] = coord[0] * this->ns->pbDist;
+            newLL[1][i] = coord[1] * this->ns->pbDist;
+            newLL[2][i] = coord[2] * this->ns->pbDist;
+            
+        }
+        // Change Middle 
+        // move one x
+        for(i = Nj*Nk + 1; i <= Ni*Nj*Nk + Nj*Nk; i++){
+            newLL[0][i] += this->ns->pbDist;
+        }
+        // Change Tail
+        for(i = Ni*Nj*Nk + Nj*Nk + 1; i <=  Ni*Nj*Nk + 2 * Nj*Nk; i++){
+            deflatten_3d(i, Ni + 2, Nj, Nk, coord);
+            newLL[0][i] = coord[0] * this->ns->pbDist;
+            newLL[1][i] = coord[1] * this->ns->pbDist;
+            newLL[2][i] = coord[2] * this->ns->pbDist;
+            
+        }
+        
+        this->nrOfActivePBs =  Ni*Nj*Nk + 2 * Nj*Nk;
+        
+        
+        // -------- Changes in Throat Counters -------- //
+        
+        
+        // Chang head padding
+        for(i = 1; i <= Nj*Nk; i ++){
+            
+            newTC[0][i] = 1;
+            
+        }
+        // Change Middle Padding
+        // move one x
+        
+        for(i = Ni*Nj*Nk + 1; i <=  Ni*Nj*Nk + 2 * Nj*Nk; i++){
+            newTC[0][i] += 1;
 
-        std::cout << this->nrOfConnections <<std::endl;
+        }
+        // --- Rebuild the accumulators
+        int accumulator = 0;
+        for(i = 1; i <= this->nrOfActivePBs; i ++){
+            newTC[1][i] = accumulator + newTC[0][i];
+            accumulator = newTC[1][i];
+        }
+        
+        // -- Release the old Data memory
+        delete [] this->throatList;
+        delete [] this->throatCounter;
+        delete [] this->locationList;
+        
+        this->throatList = newTL;
+        this->throatCounter = newTC;
+        this->locationList = newLL;
+        
+        delete[] coord;
+        //std::cout << this->nrOfConnections <<std::endl;
     }
+    else if(dir == 1) // Gen y inlets + outlets
+    {
+        int** newTL          = this->paddedList(Ni*Nk, this->throatList, 2, this->nrOfConnections);
+        this->nrOfInlets    = Ni*Nk;
+        this->nrOfOutlets   = Ni*Nk;
+        float** newLL       = this->paddedList(Ni*Nk, this->locationList, 3, Ni*Nj*Nk + 1);
+        int** newTC         = this->paddedList(Ni*Nk, this->throatCounter, 2, Ni*Nj*Nk + 1);
+        
+        
+        // --------- Changes in the ThroatList ------ //
+        //Fill Head padding
+        for(i = 0; i < Ni*Nk; i ++){
+            newTL[0][i] = (int) i + 1;
+            newTL[1][i] = this->arr[i][0][0] + Ni*Nk;
+        }
+        // Change Middle
+        for ( ; i < this->nrOfConnections + Ni*Nk; i++) {
+            newTL[0][i] += Ni*Nk;
+            newTL[1][i] += Ni*Nk;
+        }
+        // Change Tail
+        j = 0;
+        for ( ; i < this->nrOfConnections + Ni*Nk * 2; i++){
+            newTL[0][i] = this->arr[j][Nj - 1][Nk - 1] + Ni*Nk;
+            newTL[1][i] = Ni*Nj*Nk + (int)j + Ni*Nk + 1;
+            j++;
+        }
+        
+        this->nrOfConnections = this->nrOfConnections + 2 * Nj*Nk;
+        
+        // -------- Changes in Location List -------- //
+        
+        // Change head padding
+
+        for(i = 1; i <= Ni; i ++){
+            if(coord[1] == 0){
+                newLL[0][i] = i * this->ns->pbDist
+                newLL[1][i] = 
+                newLL[2][i] =
+            } else if(coord[1] == Nj - 1){
+                
+            }
+        }
+        // Change Middle Padding
+        // move one y
+        for(i = Nj*Nk + 1; i <= Ni*Nj*Nk + Ni*Nk; i++){
+            newLL[1][i] += this->ns->pbDist;
+        }
+        
+        // Change Tail
+        for(i = Ni*Nj*Nk + Ni*Nk + 1; i <=  Ni*Nj*Nk + 2 * Ni*Nk; i++){
+            deflatten_3d(i, Ni, Nj + 2, Nk, coord);
+            newLL[0][i] = coord[0] * this->ns->pbDist;
+            newLL[1][i] = coord[1] * this->ns->pbDist;
+            newLL[2][i] = coord[2] * this->ns->pbDist;
+            
+        }
+        
+        this->nrOfActivePBs =  Ni*Nj*Nk + 2 * Nj*Nk;
+
+        
+
+        
+        
+        
+        
+        // -- Release the old Data memory
+        delete [] this->throatList;
+//        delete [] this->throatCounter;
+//        delete [] this->locationList;
+        
+        this->throatList = newTL;
+//        this->throatCounter = newTC;
+//        this->locationList = newLL;
+    }
+    delete [] this->arr;
+    this->arr = nullptr;
+    
 }
+
 
 /*
  * Returns a sorted list of throats with connect[0][i] is source pb
