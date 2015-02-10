@@ -480,39 +480,40 @@ void PoreNetwork::generateBoundary(int dir){
         std::cout  << this->nrOfConnections << " --- --- " << std::endl;
         int** newTL     = this->paddedList(Nj*Nk, this->throatList, 2, this->nrOfConnections);
         this->nrOfConnections = this->nrOfConnections + 2 * Nj*Nk;
+        
         //int** newTC     = this->paddedList(Nj*Nk, this->throatCounter, 2, Ni*Nj*Nk + 1);
         //float** newLL   = this->paddedList(Nj*Nk, this->locationList, 3, Ni*Nj*Nk + 1);
         //int coord[3];
         //int cummulative;
         
-/*
+
         for(i = 0; i < Nj*Nk; i ++){
             // Set up the connections
             newTL[0][i] = (int)i + 1;
             newTL[1][i] = (int)i + Nj*Nk;
 
-            newTC[0][i] = 1;
-            newTC[1][i] = (int)i + 1;
+           // newTC[0][i] = 1;
+           // newTC[1][i] = (int)i + 1;
             
-            deflatten_3d(i, Ni, Nj, Nk, coord);
-            newLL[0][i+1] = coord[0] * this->ns->pbDist;
-            newLL[1][i+1] = coord[1] * this->ns->pbDist;
-            newLL[2][i+1] = coord[2] * this->ns->pbDist;
+           // deflatten_3d(i, Ni, Nj, Nk, coord);
+           // newLL[0][i+1] = coord[0] * this->ns->pbDist;
+           // newLL[1][i+1] = coord[1] * this->ns->pbDist;
+            //newLL[2][i+1] = coord[2] * this->ns->pbDist;
             
         }
-        cummulative = (int) i ; // or? (int)i
+        //cummulative = (int) i ; // or? (int)i
         
         for ( ; i < this->nrOfConnections + Nj*Nk; i++) {
             newTL[0][i] += Nj*Nk;
             newTL[1][i] += Nj*Nk;
             
-            newTC[1][newTL[0][i]] += cummulative;
+          //  newTC[1][newTL[0][i]] += cummulative;
             
         }
         for ( ; i < this->nrOfConnections + Nj*Nk * 2; i++){
             newTL[0][i] = Ni*Nj*Nk + (int)i;
         }
-        */
+
         //Leak the memory for now...
         this->throatList = newTL;
         //this->throatCounter = newTC;
