@@ -31,9 +31,6 @@ private:
 public:
     
     NetworkSpecs *ns;
-    PoreNetwork(NetworkSpecs *ns);
-    PoreNetwork(const char * networkSpecsFile);
-    
     int ***arr; //contains the pb number at the lattic coordinates, (Known as a Lookup Table)
     int **throatCounter; //number of prore throats per pb nr (1 based!) and number of throats preceding.
     int **throatList; // Connection map from pb nr -> pb nr. Is the half map!
@@ -45,14 +42,21 @@ public:
     float **locationList; // Location of a pb using its nr as index
     size_t *periodicThroats; // position in the throaList which has a periodic connection
     
-    void generateBoundary(int dir);
-  
-
 /*
  * Cleans out a throatList in a PN, deleting all Flagged Entries
  * Flag should be smaller then 0!
  * It does so by doing a member copy to an new array! Which takes some tim
  */
+    
+    
+    PoreNetwork(NetworkSpecs *ns);
+    
+    PoreNetwork(const char * networkSpecsFile);
+    
+    void generateBoundary(size_t dir);
+    
+    void generatePeriodic(size_t flowDir);
+    
     void removeFlaggedThroats(const int Flag = 0);
 
     void removeFlaggedPBs(char *pb_flag_list, char minFlag);
@@ -64,7 +68,6 @@ public:
     size_t generateFullConnectivity();
     
     void generate_naive_array();
-    
     
     size_t delelteThroat(size_t i, size_t deleted, int flag);
     
