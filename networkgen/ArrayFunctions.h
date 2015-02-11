@@ -13,7 +13,7 @@
 #include <vector>
 
 /*
- * Insert pb nr and returns the lattice coordinates in the coord array
+ * Insert pb nr and returns the lattice coordinates
  */
 inline void deflatten_3d(size_t i, const int Ni, const int Nj, const int Nk, int* coord){
     i -= 1;

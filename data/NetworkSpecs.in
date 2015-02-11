@@ -18,7 +18,7 @@ searchDistance = 2.00
 
 # Possible Flow Directions
 xFlow = 1
-yFlow = 0
+yFlow = 1
 zFlow = 0
 
 #Chance of a throat to survive
