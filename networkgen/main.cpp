@@ -12,11 +12,11 @@ int main(int argc, char *argv[]) {
     
     std::cout << "\nPore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__<<std::endl;
     std::cout << "Copyright Lucas van Oosterhout. All Rights Reserverd. \n\n" << std::endl;
-
+    
     std::string helpText = "Command-Line Options:\n \
     -h               \t Shows this help text\n \
     -ns [location]   \t Specify the location of the NetworkSpecs.in file\n \
-                      \t if not given standard location is used [../data/NetworkSpecs.in]\n \
+    \t if not given standard location is used [../data/NetworkSpecs.in]\n \
     -cfile [location] \t Specify the location of the connectiviy output file\n \
     -fcfile [location]\t Specify the location of the fullconnectivity output file\n \
     -lfile [location] \t Specify the location of the locations file\n \
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
             if(s.compare(0,2,"-h") == 0){
                 std::cout<< helpText << std::endl;
                 return 0;
-                }
+            }
             else if(s.compare(0,3, "-ns") == 0){
                 inputWasParsed = true;
                 nSpecs = std::string(argv[i+1]);
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
     std::cout<< "Generating PoreBodies Nrs" << std::endl;
     P->generate_naive_array();
     
-   
+    
     // --- Generate the Network
     std::cout<< "Generating Network" << std::endl;
     P->generateConnectivity();
@@ -107,49 +107,49 @@ int main(int argc, char *argv[]) {
     //     - Output to Different Files       \\
     
     
-    //for(size_t dir = 0; dir <= 3; dir++){
-//        if(P->ns->flowDirs[dir]){
+    for(size_t dir = 0; dir <= 3; dir++){
+        if(P->ns->flowDirs[dir]){
             
+            P->generateBoundary(dir);
             
-        P->generateBoundary(1);
-    
-    
-        writeVTK(vtkFile.c_str(), P);
-        writeConnectivity(cFile.c_str(), P);
-    
-        writeLocation(lFile.c_str(), P);
-    
-    /*
-            std::cout <<"\n";
-            P->generateFullConnectivity();
-            
-            std::cout << "\n";
-            char * pb_list = searchForIsolatedPB(P);
-            if(!pb_list){
-                std::cout << "Network is Broken Aborting" << std::endl;
-                return 1;
-            }
-            
-            
-            //    writeConnectivity(fcFile.c_str(),P);
-            
-           // P->removeFlaggedPBs(pb_list, (char)2);
-            
-        //    writeConnectivity(cFile.c_str(),P);
+            writeVTK(vtkFile.c_str(), P);
+            writeConnectivity(cFile.c_str(), P);
             
             writeLocation(lFile.c_str(), P);
-            
-            if(writeVTKswitch)
-                writeVTK(vtkFile.c_str(), P);
-            
-            writeNetworkSpecs(cFile.c_str(), P);
-            
-        //}
-     */
-   // }
+        }
+    }
     
-
-
+    /*
+     std::cout <<"\n";
+     P->generateFullConnectivity();
+     
+     std::cout << "\n";
+     char * pb_list = searchForIsolatedPB(P);
+     if(!pb_list){
+     std::cout << "Network is Broken Aborting" << std::endl;
+     return 1;
+     }
+     
+     
+     //    writeConnectivity(fcFile.c_str(),P);
+     
+     // P->removeFlaggedPBs(pb_list, (char)2);
+     
+     //    writeConnectivity(cFile.c_str(),P);
+     
+     writeLocation(lFile.c_str(), P);
+     
+     if(writeVTKswitch)
+     writeVTK(vtkFile.c_str(), P);
+     
+     writeNetworkSpecs(cFile.c_str(), P);
+     
+     //}
+     */
+    // }
+    
+    
+    
 }
 
 

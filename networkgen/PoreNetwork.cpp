@@ -37,7 +37,7 @@ int PoreNetwork::checkInput(){
         std::cerr << "ERROR: The Z-boundary Condition is turnend on\nBut Nk is smaller then 3: Not Enough PB's for conditions!\n" << std::endl;
         return 1;
     }
-        
+    
     this->nrOfActivePBs = ns->Ni*ns->Nj*ns->Nk;
     
     return 0;
@@ -49,11 +49,11 @@ PoreNetwork::PoreNetwork(NetworkSpecs *ns){
     
     if(checkInput() != 0)
         ns = nullptr;
-
+    
 }
 
 PoreNetwork::PoreNetwork(const char *networkSpecsFile){
-
+    
     this->ns = readSpecsFile(networkSpecsFile);
     if(!ns)
         return;
@@ -116,14 +116,14 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     //put the guards in place
     newTL[0][newAmountOfConnections-1] = 0;
     newTL[1][newAmountOfConnections-1] = 0;
-
+    
     //free the old throatList data
     delete [] this->throatList[0];
     
     // Repopulate the pointers
     this->throatList[0] = newTL[0];
     this->throatList[1] = newTL[1];
-
+    
     this->nrOfConnections = newAmountOfConnections-1;
     
 }
@@ -220,11 +220,11 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         }
     }
     //OverWrite the last part of the locationList with guards:
-        for(i = this->nrOfActivePBs + 1; i < Ni*Nj*Nk; i++){
-            this->locationList[0][i] = -1.0f;
-            this->locationList[1][i] = -1.0f;
-            this->locationList[2][i] = -1.0f;
-        }
+    for(i = this->nrOfActivePBs + 1; i < Ni*Nj*Nk; i++){
+        this->locationList[0][i] = -1.0f;
+        this->locationList[1][i] = -1.0f;
+        this->locationList[2][i] = -1.0f;
+    }
     
     //Rebuild the accumulator (throatCounter[1][pn])
     int accumulator = 0;
@@ -233,8 +233,8 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         accumulator = this->throatCounter[1][i];
         //std::cout << this->throatCounter[0][i] << '\t' << this->throatCounter[1][i] << std::endl;
     }
-
-
+    
+    
     delete[] pb_flag_list; // Clean the Freaking Memory!
     delete[] mask;
 }
@@ -361,8 +361,8 @@ void PoreNetwork::generateConnectivity(){
     }// for
     
     
-   // for(i = 0; i < Nk*Nj*2; i++){
-   //     std::cout << this->periodicThroats[i] << '\t' << connection[0][periodicThroats[i]] << " - " << connection[1][periodicThroats[i]]<<std::endl;
+    // for(i = 0; i < Nk*Nj*2; i++){
+    //     std::cout << this->periodicThroats[i] << '\t' << connection[0][periodicThroats[i]] << " - " << connection[1][periodicThroats[i]]<<std::endl;
     //}
     
     delete[] coord;
@@ -433,7 +433,7 @@ void PoreNetwork::generate_naive_array(){
         }
     }
     this->arr = porebodies;
-
+    
     
 }
 
@@ -474,7 +474,7 @@ void PoreNetwork::generateBoundary(int dir){
     int Nj = this->ns->Nj;
     int Nk = this->ns->Nk;
     int *coord = new int[3];
-
+    
     size_t i,j;
     
     if(dir == 0) // gen x inlets + outlets
@@ -482,9 +482,9 @@ void PoreNetwork::generateBoundary(int dir){
         int** newTL         = this->paddedList(Nj*Nk, this->throatList, 2, this->nrOfConnections);
         this->nrOfInlets    = Nj*Nk;
         this->nrOfOutlets   = Nj*Nk;
-    
+        
         float** newLL   = this->paddedList(Nj*Nk, this->locationList, 3, Ni*Nj*Nk + 1);
-       
+        
         int** newTC     = this->paddedList(Nj*Nk, this->throatCounter, 2, Ni*Nj*Nk + 1);
         
         // --------- Changes in the ThroatList ------ //
@@ -492,7 +492,7 @@ void PoreNetwork::generateBoundary(int dir){
         for(i = 0; i < Nj*Nk; i ++){
             newTL[0][i] = (int)i + 1;
             newTL[1][i] = (int)i + Nj*Nk +1;
-
+            
         }
         
         //Change middle if needed
@@ -501,7 +501,7 @@ void PoreNetwork::generateBoundary(int dir){
             newTL[1][i] += Nj*Nk;
             
         }
-
+        
         //Fill tail Padding
         j = 0;
         for ( ; i < this->nrOfConnections + Nj*Nk * 2; i++){
@@ -522,7 +522,7 @@ void PoreNetwork::generateBoundary(int dir){
             newLL[2][i] = coord[2] * this->ns->pbDist;
             
         }
-        // Change Middle 
+        // Change Middle
         // move one x
         for(i = Nj*Nk + 1; i <= Ni*Nj*Nk + Nj*Nk; i++){
             newLL[0][i] += this->ns->pbDist;
@@ -553,7 +553,7 @@ void PoreNetwork::generateBoundary(int dir){
         
         for(i = Ni*Nj*Nk + 1; i <=  Ni*Nj*Nk + 2 * Nj*Nk; i++){
             newTC[0][i] += 1;
-
+            
         }
         // --- Rebuild the accumulators
         int accumulator = 0;
@@ -616,7 +616,6 @@ void PoreNetwork::generateBoundary(int dir){
         // -------- Changes in Location List -------- //
         
         // Change head padding
-        
         for (i = 1; i <= Ni*Nk; i++) {
             deflatten_3d(i, Ni, 1, Nk, coord);
             newLL[0][i] = coord[0] * this->ns->pbDist;
@@ -636,26 +635,139 @@ void PoreNetwork::generateBoundary(int dir){
             newLL[0][i] = coord[0];
             newLL[1][i] = coord[1] + this->ns->pbDist * (Nj + 1);
             newLL[2][i] = coord[2];
-            
         }
         
-        this->nrOfActivePBs =  Ni*Nj*Nk + 2 * Nj*Nk;
-
+        this->nrOfActivePBs =  Ni*Nj*Nk + 2 * Ni*Nk;
         
-
+        // -------- Changes in Throat Counters -------- //
         
+        
+        // Chang head padding
+        for(i = 1; i <= Nj*Nk; i ++){
+            newTC[0][i] = 1;
+            
+        }
+        // Change Middle Padding
+        // move one x
+        
+        for(i = Ni*Nj*Nk + 1; i <=  Ni*Nj*Nk + 2 * Nj*Nk; i++){
+            newTC[0][i] += 1;
+            
+        }
+        // --- Rebuild the accumulators
+        int accumulator = 0;
+        for(i = 1; i <= this->nrOfActivePBs; i ++){
+            newTC[1][i] = accumulator + newTC[0][i];
+            accumulator = newTC[1][i];
+        }
         
         
         
         // -- Release the old Data memory
         delete [] this->throatList;
-//        delete [] this->throatCounter;
+        delete [] this->throatCounter;
         delete [] this->locationList;
         
-       this->throatList = newTL;
-//        this->throatCounter = newTC;
+        this->throatList = newTL;
+        this->throatCounter = newTC;
         this->locationList = newLL;
     }
+    else if (dir == 2){
+        int** newTL          = this->paddedList(Nj*Ni, this->throatList, 2, this->nrOfConnections);
+        this->nrOfInlets    = Nj*Ni;
+        this->nrOfOutlets   = Nj*Ni;
+        float** newLL       = this->paddedList(Nj*Ni, this->locationList, 3, Ni*Nj*Nk + 1);
+        int** newTC         = this->paddedList(Nj*Ni, this->throatCounter, 2, Ni*Nj*Nk + 1);
+        
+        // --------- Changes in the ThroatList ------ //
+        //Fill Head padding
+        int c = 0;
+        for(i = 0; i < Ni; i++){
+            for (j = 0; j < Nj; j++) {
+                newTL[0][c] = c + 1;
+                newTL[1][c] = this->arr[i][j][0] + Ni*Nj; // old pb nr + its translation
+                c++;
+            }
+        }
+        
+        for ( i = Ni*Nj; i < this->nrOfConnections + Ni * Nj; i++){
+            newTL[0][i] += Ni*Nj;
+            newTL[1][i] += Ni*Nj;
+        }
+        
+        c = Ni*Nj*Nk + Ni*Nj + 1; // Get the Highest PB nr
+        size_t place = this->nrOfConnections + Ni * Nj;
+        for(i = 0; i < Ni; i++){
+            for (j = 0; j < Nj; j++) {
+                newTL[0][place] = this->arr[i][j][Nk - 1] + Ni*Nj; // old pb nr + its translation
+                newTL[1][place] = c;
+                c++; place++;
+            }
+        }
+        
+        this->nrOfConnections = this->nrOfConnections + 2 * Ni*Nk;
+        
+        // -------- Changes in Location List -------- //
+        // Change head padding
+        for (i = 1; i <= Ni*Nj; i++) {
+            deflatten_3d(i, Ni, Nj, 1, coord);
+            newLL[0][i] = coord[0] * this->ns->pbDist;
+            newLL[1][i] = coord[1] * this->ns->pbDist;
+            newLL[2][i] = coord[2] * this->ns->pbDist;
+            
+        }
+        // Change Middle, raise by one pb distance in y
+        // move one y
+        for(i = Ni*Nj + 1; i <= Ni*Nj*Nk + Ni*Nj; i++){
+            newLL[2][i] += this->ns->pbDist;
+        }
+        
+        // Change Tail
+        for(i = Ni*Nj*Nk + Ni*Nj + 1; i <=  Ni*Nj*Nk + 2 * Ni*Nj; i++){
+            deflatten_3d(i, Ni, Nj, 1, coord);
+            newLL[0][i] = coord[0];
+            newLL[1][i] = coord[1];
+            newLL[2][i] = coord[2] + this->ns->pbDist * (Nk + 1);
+        }
+        
+        this->nrOfActivePBs =  Ni*Nj*Nk + 2 * Ni*Nk;
+        
+        // -------- Changes in Throat Counters -------- //
+        
+        
+        // Chang head padding
+        for(i = 1; i <= Nj*Nk; i ++){
+            newTC[0][i] = 1;
+            
+        }
+        // Change Middle Padding
+        // move one x
+        
+        for(i = Ni*Nj*Nk + 1; i <=  Ni*Nj*Nk + 2 * Nj*Nk; i++){
+            newTC[0][i] += 1;
+            
+        }
+        // --- Rebuild the accumulators
+        int accumulator = 0;
+        for(i = 1; i <= this->nrOfActivePBs; i ++){
+            newTC[1][i] = accumulator + newTC[0][i];
+            accumulator = newTC[1][i];
+        }
+        
+        
+        
+        // -- Release the old Data memory
+        delete [] this->throatList;
+        delete [] this->throatCounter;
+        delete [] this->locationList;
+        
+        this->throatList = newTL;
+        this->throatCounter = newTC;
+        this->locationList = newLL;
+        
+        
+    }
+    
     delete [] this->arr;
     this->arr = nullptr;
     
@@ -714,9 +826,9 @@ size_t PoreNetwork::generateFullConnectivity(){
     
     
     this->throatList_full = connection;
-
+    
     //std::cout << "\t Number of Connections Left: " << maxConnections - 1 << std::endl;
-
+    
     
     return maxConnections;
 }
