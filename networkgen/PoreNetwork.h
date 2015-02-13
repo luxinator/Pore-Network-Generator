@@ -27,6 +27,7 @@ class PoreNetwork{
 private:
     int checkInput();
     template <typename T> T** paddedList(size_t amount, T **List, size_t nrOfCols ,size_t currentSize);
+    void cleanPeriodic(size_t flowDir);
     
 public:
     
@@ -40,7 +41,7 @@ public:
     size_t nrOfInlets, nrOfOutlets;
 
     float **locationList; // Location of a pb using its nr as index
-    size_t *periodicThroats; // position in the throaList which has a periodic connection
+    int *periodicThroats; // position in the throaList which has a periodic connection
     
 /*
  * Cleans out a throatList in a PN, deleting all Flagged Entries
@@ -54,8 +55,6 @@ public:
     PoreNetwork(const char * networkSpecsFile);
     
     void generateBoundary(size_t dir);
-    
-    void generatePeriodic(size_t flowDir);
     
     void removeFlaggedThroats(const int Flag = 0);
 

@@ -90,15 +90,13 @@ int main(int argc, char *argv[]) {
     
     
     // --- Generate the Network
-    std::cout<< "Generating Network" << std::endl;
+    std::cout<< "\nGenerating Network" << std::endl;
     P->generateConnectivity();
     P->generateLocation();
     
-    std::cout << "\n";
+    std::cout << "Eliminating Throats ..." << std::endl;
     eliminateThroats(P, 6);
-    
     P->removeFlaggedThroats(-1);
-    
     
     // --- Flow Direction Dependent code --- \\
     //      regenarate the connectivity      \\
@@ -106,16 +104,22 @@ int main(int argc, char *argv[]) {
     //     - Restructure the Lists           \\
     //     - Output to Different Files       \\
     
+    std::cout << std::endl;
+    std::string cFileBound = cFile;
+    std::string lFileBound = lFile;
+    std::string vtkFileBound = vtkFile;
+///    std::string specFileDir = specfile;
     
-    for(size_t dir = 0; dir <= 3; dir++){
+    for(int dir = 0; dir <= 3; dir++){
         if(P->ns->flowDirs[dir]){
+            cFileBound += std::to_string(dir);
             
             P->generateBoundary(dir);
             
-            writeVTK(vtkFile.c_str(), P);
-            writeConnectivity(cFile.c_str(), P);
+            writeVTK(vtkFileBound.c_str(), P);
+            writeConnectivity(cFileBound.c_str(), P);
             
-            writeLocation(lFile.c_str(), P);
+            writeLocation(lFileBound.c_str(), P);
         }
     }
     

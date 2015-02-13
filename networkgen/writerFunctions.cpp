@@ -63,7 +63,6 @@ void writeInlet_OutletPbs(const char * filename, PoreNetwork *pn){
 
 void writeConnectivity(const char * path, PoreNetwork *pn){
     
-    
     std::ofstream file;
     if(!path){
         std::cerr << "No filename specified! " << std::endl;
@@ -81,14 +80,13 @@ void writeConnectivity(const char * path, PoreNetwork *pn){
     size_t i, j;
     int periodic = 0;
     for(i = 0; pn->throatList[0][i] != 0 && i < pn->nrOfConnections ; i ++){
-        if( pn->ns->periodicBounndaries) {
-            for(j = 0; j < pn->ns->Nj * pn->ns->Nk * 2; j++){
-                if( pn->periodicThroats[j] == i)
-                    periodic = 1;
-                else
-                    periodic = 0;
-            }
-        }
+        periodic = 0;
+        
+        for( j = 0; pn->ns->periodicBounndaries && pn->periodicThroats[j] != 0; j ++)
+            if (pn->periodicThroats[j] == i)
+                periodic = 1;
+            
+        
         file << pn->throatList[0][i]<< '\t' << pn->throatList[1][i] <<'\t' << periodic << '\n';
     }
     std::cout << std::endl;

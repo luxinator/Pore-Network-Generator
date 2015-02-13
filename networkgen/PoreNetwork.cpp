@@ -66,7 +66,7 @@ PoreNetwork::PoreNetwork(const char *networkSpecsFile){
 
 /*
  * Go through Throatslist and delete all entries with a throatvalue of Flag
- * Usually done on the half connectivity map!
+ * Usually done on the half connectivity map, no implentation for full is available atm
  */
 void PoreNetwork::removeFlaggedThroats(const int Flag){
     
@@ -202,6 +202,8 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
                 j++;
             }
         }
+        
+        // THIS IS NOT CORRECT!!!!!!
         // The rest is garbage so delete the entry
         for( ; j < Nj*Nk * 2; j++)
             this->periodicThroats[j] = 0;
@@ -277,18 +279,22 @@ void PoreNetwork::generateConnectivity(){
         this->throatCounter[1][pn] = 0;
     }
     
+    // 12 + periodic, we have Ni*Nj*Nk pbs and connection is a pair of 2 ints
+    size_t maxConnections = 12 * Ni*Nj*Nk;
+    if (this->ns->periodicBounndaries) {
+        maxConnections += Ni*Nj + Nj*Nk + Ni*Nk;
+    }
     
-    t = new int[2 * 13  *  Ni*Nj*Nk];// 13 connections per pb, we have Ni*Nj*Nk pbs and connection is a pair of 2 ints
+    t = new int[2 * maxConnections];
     
     int **connection = new int*[2]; //from [0] to [1]
     connection[0] = t;
-    connection[1] = t + (13 * Ni*Nj*Nk);
+    connection[1] = t + maxConnections;
     
-    for(size_t i = 0; i < 13  *  Ni*Nj*Nk; i ++){
+    for(size_t i = 0; i < maxConnections; i ++){
         connection[0][i] = 0;
         connection[1][i] = 0;
     }
-    // Add to this
     this->throatList = connection;
     
     std::cout << "number of PBs: "<<Ni*Nj*Nk << std::endl;
@@ -296,8 +302,8 @@ void PoreNetwork::generateConnectivity(){
     
     // PeriodicBoundaries are Places in ThroatList containing Periodic throats
     if(this->ns->periodicBounndaries){
-        this->periodicThroats = new size_t[Nj*Nk * 2 + 1];
-        for(size_t i = 0; i < Nj*Nk * 2 + 1; i++){
+        this->periodicThroats = new int[Ni*Nj + Nj*Nk + Ni*Nk + 1];
+        for(size_t i = 0; i < Ni*Nj + Nj*Nk + Ni*Nk + 1; i++){
             this->periodicThroats[i] = 0;
         }
     }
@@ -325,7 +331,6 @@ void PoreNetwork::generateConnectivity(){
                      pow((double)(coord[2] - coord_n[2]), 2.0));
             
             if(L <= dist){
-                //std::cout << pn << '\t' << pn_n << std::endl;
                 connection[0][i] = pn; //Pb nr
                 connection[1][i] = pn_n; //connected to pb
                 this->throatCounter[0][pn] += 1; //amount of forward connections of pb
@@ -336,14 +341,38 @@ void PoreNetwork::generateConnectivity(){
             
         } // for
         
+        //--- Add Periodic connection, Inner network has all boundaries as periodic
+        if(this->ns->periodicBounndaries && coord[0] == Ni - 1 && Ni > 1){
+            connection[0][i] = pn;
+            connection[1][i] = this->arr[0][coord[1]][coord[2]];
+            this->throatCounter[0][pn] += 1;
+            
+            this->periodicThroats[periodicTrs] = i;
+            periodicTrs++;
+            i++;
+         }
+        if(this->ns->periodicBounndaries && coord[1] == Nj - 1 && Nj > 1){
+            connection[0][i] = pn;
+            connection[1][i] = this->arr[coord[0]][0][coord[2]];//pn - ((Nk - 1) * Nj);
+            this->throatCounter[0][pn] += 1;
+            
+            this->periodicThroats[periodicTrs] = i;
+            periodicTrs++;
+            i++;
+        }
+        if(this->ns->periodicBounndaries && coord[2] == Nk - 1 && Nk > 1){
+            connection[0][i] = pn;
+            connection[1][i] = this->arr[coord[0]][coord[1]][0];//pn - (Nj - 1);
+            this->throatCounter[0][pn] += 1;
+            
+            this->periodicThroats[periodicTrs] = i;
+            periodicTrs++;
+            i++;
+        }
+        
         this->throatCounter[1][pn] += i; //nr of connection made in total
         
     }// for
-    
-    
-    // for(i = 0; i < Nk*Nj*2; i++){
-    //     std::cout << this->periodicThroats[i] << '\t' << connection[0][periodicThroats[i]] << " - " << connection[1][periodicThroats[i]]<<std::endl;
-    //}
     
     delete[] coord;
     delete[] coord_n;
@@ -450,19 +479,27 @@ template <typename T> T** PoreNetwork::paddedList(size_t amount, T **List, size_
 
 /*
  * Generates the inlet and outlet pores around the inner network.
+ * This is a Long and Ugly Method, but its kind of magical. Every
+ * If statement is slightly different from the others, this is the easiest 
+ * way to do this...
  */
 void PoreNetwork::generateBoundary(size_t dir){
+
+    std::cout << "Generating Inlets and Outlets: " << std::endl;
+    
     
     if (dir > 3) {
         std::cerr << "\nCRITICAL ERROR: COULD NOT GENERATE BOUNDARIES!" << std::endl;
         return;
     }
     
+    // --- First clean the Periodic Throats!!!
+    this->cleanPeriodic(dir);
+    
     int Ni = this->ns->Ni;
     int Nj = this->ns->Nj;
     int Nk = this->ns->Nk;
     int *coord = new int[3];
-    
     
     int** newTL     = nullptr;
     float** newLL   = nullptr;
@@ -488,9 +525,15 @@ void PoreNetwork::generateBoundary(size_t dir){
         }
         
         //Change middle if needed
+        j = 0;
         for ( ; i < this->nrOfConnections + Nj*Nk; i++) {
             newTL[0][i] += Nj*Nk;
             newTL[1][i] += Nj*Nk;
+            // -- Change PeriodicThroats
+            if (newTL[0][i] > newTL[1][i]) {
+                this->periodicThroats[j] = (int)i;
+                j++;
+            }
         }
         
         //Fill tail Padding
@@ -515,6 +558,7 @@ void PoreNetwork::generateBoundary(size_t dir){
         
         // Change Middle
         // move one x
+
         for(i = Nj*Nk + 1; i <= Ni*Nj*Nk + Nj*Nk; i++){
             newLL[0][i] += this->ns->pbDist;
         }
@@ -549,10 +593,19 @@ void PoreNetwork::generateBoundary(size_t dir){
             accumulator = newTC[1][i];
         }
         
+        /*
+        // -- change the periodic List
+        for (i = 0; this->ns->periodicBounndaries && this->periodicThroats[i] != 0; i++) {
+            this->periodicThroats[i] += Nj*Nk;
+            std::cout << this->periodicThroats[i] << '\t' << newTL[0][this->periodicThroats[i]] << '\t' << newTL[1][this->periodicThroats[i]] << std::endl;
+        }
+         */
     }
     else if(dir == 1) // Gen y inlets + outlets
     {
-        this->nrOfInlets    = Ni*Nk;
+        this->nrOfInlets    = Ni*Nk;            if (i != j ) {
+            this->periodicThroats[i] = -1;
+        }
         this->nrOfOutlets   = Ni*Nk;
         
         newTL = this->paddedList(Ni*Nk, this->throatList, 2, this->nrOfConnections);
@@ -574,6 +627,11 @@ void PoreNetwork::generateBoundary(size_t dir){
         for ( i = Ni*Nk; i < this->nrOfConnections + Ni * Nk; i++) {
             newTL[0][i] += Ni*Nk;
             newTL[1][i] += Ni*Nk;
+            // -- Change PeriodicThroats
+            if (newTL[0][i] > newTL[1][i]) {
+                this->periodicThroats[j] = (int)i;
+                j++;
+            }
         }
         
         c = Ni*Nj*Nk + Ni*Nk + 1; // Get the Highest PB nr
@@ -582,7 +640,6 @@ void PoreNetwork::generateBoundary(size_t dir){
             for (j = 0; j < Nk; j++) {
                 newTL[0][place] = this->arr[i][Nj - 1][j] + Ni*Nk; // old pb nr + its translation
                 newTL[1][place] = c;
-                //std::cout << this->arr[i][Nj - 1][j] << std::endl;
                 c++; place++;
             }
         }
@@ -631,6 +688,11 @@ void PoreNetwork::generateBoundary(size_t dir){
             newTC[1][i] = accumulator + newTC[0][i];
             accumulator = newTC[1][i];
         }
+        
+        // -------- change the periodic List -------- //
+        for (i = 0; this->periodicThroats[i] != 0; i++) {
+            this->periodicThroats[i] += Ni*Nk;
+        }
     }
     else if (dir == 2){
         this->nrOfInlets    = Nj*Ni;
@@ -654,6 +716,11 @@ void PoreNetwork::generateBoundary(size_t dir){
         for ( i = Ni*Nj; i < this->nrOfConnections + Ni * Nj; i++) {
             newTL[0][i] += Ni*Nj;
             newTL[1][i] += Ni*Nj;
+            // -- Change PeriodicThroats
+            if (newTL[0][i] > newTL[1][i]) {
+                this->periodicThroats[j] = (int)i;
+                j++;
+            }
         }
         
         c = Ni*Nj*Nk + Ni*Nj + 1; // Get the Highest PB nr
@@ -708,7 +775,13 @@ void PoreNetwork::generateBoundary(size_t dir){
             newTC[1][i] = accumulator + newTC[0][i];
             accumulator = newTC[1][i];
         }
+        
+        // -- change the periodic List
+        for (i = 0; this->periodicThroats[i] != 0; i++) {
+            this->periodicThroats[i] += Ni*Nj;
+        }
     }
+    
     // -- Release the old Data memory
     delete [] this->throatList;
     delete [] this->throatCounter;
@@ -727,34 +800,45 @@ void PoreNetwork::generateBoundary(size_t dir){
 
 
 /*
- * Generates the Periodic Boundaries for the given directions.
+ * Flags the Periodic throats and deletes them
  */
-void PoreNetwork::generatePeriodic(size_t flowDir){
+void PoreNetwork::cleanPeriodic(size_t flowDir){
     
+    int * coord   = new int[3];
+    int * coord_n = new int[3];
+    int pn, pn_n;
+    int Ni = ns->Ni;
+    int Nj = ns->Nj;
+    int Nk = ns->Nk;
+    bool del =  false;
+    size_t deleted = 0;
     
-    // Run through the list of pbs, check with deflatten if the pb has coord[] == 0 || coord[] = N* and if that is NOT the flow dir
-    // it is a periodic boundary
-    
-    //Add Periodic connection
-    if(this->ns->periodicBounndaries && coord[1] == Nj - 1){
-        connection[0][i] = pn;
-        connection[1][i] = pn - ((Nk - 1) * Nj);
-        this->throatCounter[0][pn] += 1;
+    for (size_t i = 0; this->periodicThroats[i] != 0; i++) {
+        pn = this->throatList[0][this->periodicThroats[i]];
+        pn_n = this->throatList[1][this->periodicThroats[i]];
         
-        this->periodicThroats[periodicTrs] = i;
-        periodicTrs++;
-        i++;
-    }
-    if(this->ns->periodicBounndaries && coord[2] == Nk - 1){
-        connection[0][i] = pn;
-        connection[1][i] = pn - (Nj - 1);
-        this->throatCounter[0][pn] += 1;
+        deflatten_3d(pn, Ni, Nj, Nk, coord);
+        deflatten_3d(pn_n, Ni, Nj, Nk, coord_n);
         
-        this->periodicThroats[periodicTrs] = i;
-        periodicTrs++;
-        i++;
+        if( flowDir == 0 && coord[0] != coord_n[0]){
+            del = true;
+        }else if( flowDir == 1 && coord[1] != coord_n[1]){
+            del = true;
+        }else if( flowDir == 2 && coord[2] != coord_n[2]){
+            del = true;
+        }
+        
+        if(del){
+            deleted = this->delelteThroat((size_t)this->periodicThroats[i], deleted, -1);
+            this->periodicThroats[i] = -1;
+            del = false;
+        }
     }
     
+    this->removeFlaggedThroats(-1);
+    // clean the list
+    for (size_t i = 0; this->periodicThroats[i] != 0; i++)
+            this->periodicThroats[i] = 0;
 }
 
 
@@ -785,10 +869,10 @@ size_t PoreNetwork::generateFullConnectivity(){
     
     //For Details see [generateConnectivity]
     int *t = new int[maxConnections * 2];
-    
     int **connection = new int*[2];
     connection[0] = t;
     connection[1] = t + maxConnections;
+    
     for(i = 0; i < maxConnections; i++){
         connection[0][i] = 0;
         connection[1][i] = 0;
@@ -811,19 +895,9 @@ size_t PoreNetwork::generateFullConnectivity(){
     
     this->throatList_full = connection;
     
-    //std::cout << "\t Number of Connections Left: " << maxConnections - 1 << std::endl;
-    
-    
     return maxConnections;
 }
 
-
-
-
-/*
- * Translate the Network,
- *
- */
 
 /*
  * Delete Pore with PoreNumber i, a flag is placed in the throatlist, and throatcounter is diminished with 1
