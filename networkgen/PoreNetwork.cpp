@@ -933,6 +933,87 @@ void PoreNetwork::generateBoundary(size_t dir){
     
 }
 
+void PoreNetwork::generateBoundary(size_t dir, int a){
+
+
+
+    std::cout << "boundary Generator V 2.0" << std::endl;
+    // --- First clean the Periodic Throats!!!
+    this->cleanPeriodic(dir);
+
+
+    int Ni = this->ns->Ni;
+    int Nj = this->ns->Nj;
+    int Nk = this->ns->Nk;
+    int *coord = new int[3];
+    
+    int** newTL     = nullptr;
+    float** newLL   = nullptr;
+    int** newTC     = nullptr;
+    
+    switch (dir) {
+            case 0:
+                this->nrOfInlets    = Nj*Nk;
+                this->nrOfOutlets   = Nj*Nk;
+                break;
+                
+            case 1:
+                this->nrOfInlets    = Ni*Nk;
+                this->nrOfOutlets   = Ni*Nk;
+                break;
+                
+            case 2:
+                this->nrOfInlets    = Ni*Nj;
+                this->nrOfOutlets   = Ni*Nj;
+                break;
+        }
+
+    int nrOfInlets = this->nrOfInlets;
+    int nrOfOutlets = this->nrOfOutlets;
+
+    if( nrOfOutlets != nrOfInlets)
+        return;
+    
+    newTL = this->paddedList(nrOfInlets, this->throatList, 2, this->nrOfConnections);
+    newLL = this->paddedList(nrOfInlets, this->locationList, 3, Ni*Nj*Nk + 1);
+    newTC = this->paddedList(nrOfInlets, this->throatCounter, 2, Ni*Nj*Nk + 1);
+
+    size_t bound_index = 0;
+
+    for( size_t i = 0; i < Ni*Nj*Nk; i ++){
+        if(dir == 0 && newLL[0][i + nrOfInlets] == 0){
+            newTL[0][bound_index] = bound_index + 1;
+            newTL[1][bound_index] = (int) i + this->nr;
+
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+    // Delete "old" memory
+    delete [] this->throatList;
+    delete [] this->throatCounter;
+    delete [] this->locationList;
+    
+    this->throatList = newTL;
+    this->throatCounter = newTC;
+    this->locationList = newLL;
+    
+    delete[] coord;
+    
+    delete [] this->arr;
+    this->arr = nullptr;
+
+}
 
 /*
  * Flags the Periodic throats and deletes them
