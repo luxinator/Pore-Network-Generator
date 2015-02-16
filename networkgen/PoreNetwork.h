@@ -9,9 +9,10 @@
 #ifndef networkgen_PoreNetwork_h
 #define networkgen_PoreNetwork_h
 #include <cstdlib>
+#include <iostream>
 
 struct NetworkSpecs {
-    char* name;
+    std::string name;
     unsigned int Ni, Nj, Nk;
     float C[26];
     unsigned int coordNr;
@@ -43,16 +44,16 @@ public:
     float **locationList; // Location of a pb using its nr as index
     int *periodicThroats; // position in the throaList which has a periodic connection
     
-/*
- * Cleans out a throatList in a PN, deleting all Flagged Entries
- * Flag should be smaller then 0!
- * It does so by doing a member copy to an new array! Which takes some tim
- */
-    
     
     PoreNetwork(NetworkSpecs *ns);
     
     PoreNetwork(const char * networkSpecsFile);
+    
+    PoreNetwork(const PoreNetwork& other, std::string newName);
+    
+    PoreNetwork();
+    
+    virtual ~PoreNetwork();
     
     void generateBoundary(size_t dir);
     

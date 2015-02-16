@@ -128,9 +128,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
         
         else if( s.compare(0,4, "name") == 0) {
             NS->name = new char[255];
-            strcpy(NS->name, s.substr(i+1).c_str());
-    
-            
+            NS->name =s.substr(i+1);            
         }
     }
     std::cout << "\nname: " << NS->name << std::endl;

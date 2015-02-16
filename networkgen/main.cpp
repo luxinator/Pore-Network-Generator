@@ -79,24 +79,24 @@ int main(int argc, char *argv[]) {
     }
     
     
-    PoreNetwork *P = new PoreNetwork(nSpecs.c_str());
-    if(!P->ns){
+    PoreNetwork *innerNetwork = new PoreNetwork(nSpecs.c_str());
+    if(!innerNetwork->ns){
         std::cout<< "Cannot Generate PoreNetwork, please check NetworkSpecs.in for errors" <<std::endl;
         return 1;
     }
     
     std::cout<< "Generating PoreBodies Nrs" << std::endl;
-    P->generate_naive_array();
+    innerNetwork->generate_naive_array();
     
     
     // --- Generate the Network
     std::cout<< "\nGenerating Network" << std::endl;
-    P->generateConnectivity();
-    P->generateLocation();
+    innerNetwork->generateConnectivity();
+    innerNetwork->generateLocation();
     
     std::cout << "Eliminating Throats ..." << std::endl;
-    eliminateThroats(P, 6);
-    P->removeFlaggedThroats(-1);
+    eliminateThroats(innerNetwork, 6);
+    innerNetwork->removeFlaggedThroats(-1);
     
     // --- Flow Direction Dependent code --- \\
     //      regenarate the connectivity      \\
@@ -110,16 +110,20 @@ int main(int argc, char *argv[]) {
     std::string vtkFileBound = vtkFile;
 ///    std::string specFileDir = specfile;
     
-    for(int dir = 0; dir <= 3; dir++){
-        if(P->ns->flowDirs[dir]){
+    for(int dir = 1; dir <= 3; dir++){
+        if(innerNetwork->ns->flowDirs[dir]){
+            PoreNetwork P_Bound = PoreNetwork(*innerNetwork, innerNetwork->ns->name + std::to_string(dir));
+            
             cFileBound += std::to_string(dir);
+            lFileBound += std::to_string(dir);
+            vtkFileBound += std::to_string(dir);
             
-            P->generateBoundary(dir);
+            P_Bound.generateBoundary(dir);
             
-            writeVTK(vtkFileBound.c_str(), P);
-            writeConnectivity(cFileBound.c_str(), P);
+            writeVTK(vtkFileBound.c_str(), &P_Bound);
+            writeConnectivity(cFileBound.c_str(), &P_Bound);
             
-            writeLocation(lFileBound.c_str(), P);
+            writeLocation(lFileBound.c_str(), &P_Bound);
         }
     }
     

@@ -6,7 +6,6 @@
 //  Copyright (c) 2014 Lucas van Oosterhout. All rights reserved.
 //
 
-#include <iostream>
 #include <math.h>
 #include "PoreNetwork.h"
 #include "inputParser.h"
@@ -63,6 +62,137 @@ PoreNetwork::PoreNetwork(const char *networkSpecsFile){
     
 }
 
+/*
+ * Empty Constructor, all pointers of the arrays and lists are empty
+ */
+
+PoreNetwork::PoreNetwork(){
+}
+
+PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
+    
+    this->ns = new NetworkSpecs(*other.ns);
+    this->ns->name = newName;
+    
+    std::cout << "Copying PoreNetwork: " << other.ns->name << " To: " << this->ns->name << std::endl;
+    
+    int Ni = ns->Ni;
+    int Nj = ns->Nj;
+    int Nk = ns->Nk;
+    
+    for(size_t i = 0; i < 26; i ++)
+        this->ns->C[i] = other.ns->C[i];
+    this->ns->searchDistance = other.ns->searchDistance;
+    this->ns->pbDist         = other.ns->pbDist;
+    this->ns->periodicBounndaries = other.ns->periodicBounndaries;
+    for(size_t i = 0; i < 3; i++)
+        this->ns->flowDirs[i] = other.ns->flowDirs[i];
+    
+    
+    
+    this->arr = new int**[this->ns->Ni];
+    
+    for(size_t i = 0; i < this->ns->Ni; i++){
+        this->arr[i] = new int*[this->ns->Nj];
+        for(size_t j = 0; j < this->ns->Nj; j++){
+            this->arr[i][j] = new int[this->ns->Nk];
+            for(size_t k = 0; k < this->ns->Nk; k++){
+                this->arr[i][j][k] = other.arr[i][j][k];
+            }
+        }
+    }
+    
+    //Allocate a large part of memory
+    float *temp = new float[3 * Ni*Nj*Nk + 3];
+    // make a pointer to list of 3 pointers to floats
+    this->locationList = new float*[3];
+    
+    // Point at exactly the right places in the Large Part of memory.
+    this->locationList[0] = temp;
+    this->locationList[1] = temp + (Ni*Nj*Nk);
+    this->locationList[2] = temp + 2*(Ni*Nj*Nk);
+    
+    for(size_t pn = 1; pn <= Ni*Nj*Nk; pn++){
+        this->locationList[0][pn] = other.locationList[0][pn];
+        this->locationList[1][pn] = other.locationList[1][pn];
+        this->locationList[2][pn] = other.locationList[2][pn];
+    }
+    
+    // -- throatList
+    size_t i = 0;
+    int maxConnections = 0;
+    for ( i = 0; other.throatList[0][i] != 0; i++)
+        maxConnections++;
+    maxConnections++;
+    
+    int *t = new int[maxConnections * 2];
+    this->throatList = new int*[2];
+    this->throatList[0] = t;
+    this->throatList[1] = t + maxConnections;
+    
+    for ( i = 0; other.throatList[0][i] != 0; i++) {
+        this->throatList[0][i] = other.throatList[0][i];
+        this->throatList[1][i] = other.throatList[1][i];
+    }
+    this->throatList[0][i++] = 0;
+    this->throatList[1][i++] = 0;
+    
+    
+    // -- throatCounters
+    for (i = 1; other.throatCounter[0][i] != 0; i++) {
+        ;
+    }
+    i++;
+    
+    t = new int[2 * i];
+    this->throatCounter = new int*[2];
+    //Point the two pointers to their places in the Large Part of memory
+    this->throatCounter[0] = t;
+    this->throatCounter[1] = t + i + 1;
+    //Set all places to 0
+    for(size_t pn = 1; pn <= i; pn++){
+        this->throatCounter[0][pn] = other.throatCounter[0][pn];
+        this->throatCounter[1][pn] = other.throatCounter[1][pn];
+    }
+    
+    // -- periodicThroats
+    this->periodicThroats = new int[Ni*Nj + Nj*Nk + Nk*Ni];
+    for (i = 0; i < Ni*Nj + Nj*Nk + Nk*Ni; i ++)
+        this->periodicThroats[i] = other.periodicThroats[i];
+    
+    std::cout << "Done Copying" << std::endl;
+    
+}
+
+
+PoreNetwork::~PoreNetwork(){
+    
+    if (arr) {
+        for (size_t i; i < this->ns->Ni; i++)
+            for (size_t j; j < this->ns->Nj; j++) {
+                delete [] arr[i][j];
+            }
+        delete [] arr;
+        arr = nullptr;
+    }
+    if (throatCounter) {
+        delete [] throatCounter[0];
+        throatCounter[0] = nullptr;
+        delete [] throatCounter;
+        throatCounter = nullptr;
+    }
+    if (throatList) {
+        delete [] throatList[0];
+        delete [] throatList;
+        throatCounter = nullptr;
+    }
+    if (locationList) {
+        delete [] locationList[0];
+        locationList[0] = nullptr;
+        delete [] locationList;
+        locationList = nullptr;
+    }
+}
 
 /*
  * Go through Throatslist and delete all entries with a throatvalue of Flag
@@ -197,7 +327,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         for(i = 0; this->throatList[0][i] != 0; i++){
             if(this->throatList[0][i] > this->throatList[1][i]){
                 //std::cout << this->periodicThroats[j] << " -> ";
-                this->periodicThroats[j] = i;
+                this->periodicThroats[j] = (int)i;
                 //std::cout << this->periodicThroats[j] << '\t' << this->throatList[0][i] << " - " << this->throatList[1][i] <<  std::endl;
                 j++;
             }
@@ -427,7 +557,7 @@ void PoreNetwork::generate_naive_array(){
     int Nj = ns->Nj;
     int Nk = ns->Nk;
     
-    int i,j,k;
+    size_t i,j,k;
     //  Allocate 3D Array, Yess Pointer->Pointer->Pointer->int ...
     // continous block needs some work, I do not understand it probably
     int ***porebodies = new int**[Ni];
@@ -437,7 +567,7 @@ void PoreNetwork::generate_naive_array(){
         for(j = 0; j < Nj; j++){
             porebodies[i][j] = new int[Nk];
             for(k = 0; k < Nk; k++){
-                porebodies[i][j][k] = i * Nj * Nk + j * Nk + k + 1;
+                porebodies[i][j][k] = (int)i * Nj * Nk + (int)j * Nk + (int)k + 1;
             }
         }
     }
@@ -482,6 +612,9 @@ template <typename T> T** PoreNetwork::paddedList(size_t amount, T **List, size_
  * This is a Long and Ugly Method, but its kind of magical. Every
  * If statement is slightly different from the others, this is the easiest 
  * way to do this...
+ *
+ *
+ *  !!!! This Code needs some revision! but not  now...
  */
 void PoreNetwork::generateBoundary(size_t dir){
 
@@ -504,7 +637,6 @@ void PoreNetwork::generateBoundary(size_t dir){
     int** newTL     = nullptr;
     float** newLL   = nullptr;
     int** newTC     = nullptr;
-
     
     size_t i,j;
     
@@ -603,9 +735,7 @@ void PoreNetwork::generateBoundary(size_t dir){
     }
     else if(dir == 1) // Gen y inlets + outlets
     {
-        this->nrOfInlets    = Ni*Nk;            if (i != j ) {
-            this->periodicThroats[i] = -1;
-        }
+        this->nrOfInlets    = Ni*Nk;
         this->nrOfOutlets   = Ni*Nk;
         
         newTL = this->paddedList(Ni*Nk, this->throatList, 2, this->nrOfConnections);
@@ -618,12 +748,11 @@ void PoreNetwork::generateBoundary(size_t dir){
         for(i = 0; i < Ni; i++){
             for (j = 0; j < Nk; j++) {
                 newTL[0][c] = c + 1;
-                newTL[1][c] = this->arr[i][0][j] + Ni*Nk; // old pb nr + its translation
-                //std::cout << this->arr[i][0][j] << std::endl;
+                newTL[1][c] = this->arr[i][0][j] + Ni*Nk;
                 c++;
             }
         }
-        
+        j = 0;
         for ( i = Ni*Nk; i < this->nrOfConnections + Ni * Nk; i++) {
             newTL[0][i] += Ni*Nk;
             newTL[1][i] += Ni*Nk;
@@ -713,6 +842,7 @@ void PoreNetwork::generateBoundary(size_t dir){
             }
         }
         
+        j = 0;
         for ( i = Ni*Nj; i < this->nrOfConnections + Ni * Nj; i++) {
             newTL[0][i] += Ni*Nj;
             newTL[1][i] += Ni*Nj;
