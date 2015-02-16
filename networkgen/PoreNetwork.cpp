@@ -142,7 +142,6 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
     for (i = 1; other.throatCounter[0][i] != 0; i++) {
         ;
     }
-    i++;
     
     t = new int[2 * i];
     this->throatCounter = new int*[2];
