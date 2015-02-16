@@ -143,21 +143,25 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
         ;
     }
     
-    t = new int[2 * i];
+    t = new int[2 * i + 2];
     this->throatCounter = new int*[2];
-    //Point the two pointers to their places in the Large Part of memory
+    
     this->throatCounter[0] = t;
     this->throatCounter[1] = t + i + 1;
-    //Set all places to 0
-    for(size_t pn = 1; pn <= i; pn++){
+    
+    for(size_t pn = 1; other.throatCounter[0][i] != 0; pn++){
         this->throatCounter[0][pn] = other.throatCounter[0][pn];
         this->throatCounter[1][pn] = other.throatCounter[1][pn];
     }
+    this->throatCounter[0][i] = 0;
+    this->throatCounter[1][i] = 0;
     
     // -- periodicThroats
     this->periodicThroats = new int[Ni*Nj + Nj*Nk + Nk*Ni];
     for (i = 0; i < Ni*Nj + Nj*Nk + Nk*Ni; i ++)
         this->periodicThroats[i] = other.periodicThroats[i];
+
+    // -- Add active PBS and Active PTs!
     
     std::cout << "Done Copying" << std::endl;
     
