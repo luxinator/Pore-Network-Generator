@@ -134,8 +134,8 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
         this->throatList[0][i] = other.throatList[0][i];
         this->throatList[1][i] = other.throatList[1][i];
     }
-    this->throatList[0][i++] = 0;
-    this->throatList[1][i++] = 0;
+    this->throatList[0][i] = 0;
+    this->throatList[1][i] = 0;
     
     
     // -- throatCounters
