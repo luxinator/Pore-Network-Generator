@@ -110,20 +110,21 @@ int main(int argc, char *argv[]) {
     std::string vtkFileBound = vtkFile;
 ///    std::string specFileDir = specfile;
     
-    for(int dir = 1; dir <= 3; dir++){
+    for(int dir = 0; dir <= 2; dir++){
         if(innerNetwork->ns->flowDirs[dir]){
-            PoreNetwork P_Bound = PoreNetwork(*innerNetwork, innerNetwork->ns->name + std::to_string(dir));
+            PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, innerNetwork->ns->name + "__" +std::to_string(dir));
             
             cFileBound += std::to_string(dir);
             lFileBound += std::to_string(dir);
             vtkFileBound += std::to_string(dir);
             
-            P_Bound.generateBoundary(dir);
+            P_Bound->generateBoundary(dir);
             
-            writeVTK(vtkFileBound.c_str(), &P_Bound);
-            writeConnectivity(cFileBound.c_str(), &P_Bound);
+            writeVTK(vtkFileBound.c_str(), P_Bound);
+            writeConnectivity(cFileBound.c_str(), P_Bound);
             
-            writeLocation(lFileBound.c_str(), &P_Bound);
+            writeLocation(lFileBound.c_str(), P_Bound);
+            delete P_Bound;
         }
     }
     

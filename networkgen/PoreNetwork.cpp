@@ -192,6 +192,8 @@ PoreNetwork::~PoreNetwork(){
         delete [] locationList;
         locationList = nullptr;
     }
+    if(periodicThroats)
+        delete[] periodicThroats;
 }
 
 /*
