@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     std::string fcFile   = "../data/";
     std::string lFile   = "../data/";
     
-    std::string vtkFile = "../data/data.vtk";
+    std::string vtkFile = "../data/";
     
     bool inputWasParsed = false;
     bool writeVTKswitch = false;
@@ -105,28 +105,44 @@ int main(int argc, char *argv[]) {
     //     - Output to Different Files       \\
     
     std::cout << std::endl;
-    std::string cFileBound = cFile;
-    std::string lFileBound = lFile;
-    std::string vtkFileBound = vtkFile;
+    std::string prefix;
 ///    std::string specFileDir = specfile;
+    
     
     for(int dir = 0; dir <= 2; dir++){
         if(innerNetwork->ns->flowDirs[dir]){
-            PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, innerNetwork->ns->name + "__" +std::to_string(dir));
             
-            cFileBound += std::to_string(dir);
-            lFileBound += std::to_string(dir);
-            vtkFileBound += std::to_string(dir);
+            switch (dir) {
+                case 0:
+                    prefix = "x_";
+                    break;
+                    
+                case 1:
+                    prefix = "y_";
+                    break;
+                    
+                case 2:
+                    prefix = "z_";
+                    break;
+            }
+            
+            PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, prefix + innerNetwork->ns->name);
             
             P_Bound->generateBoundary(dir);
             
-            writeVTK(vtkFileBound.c_str(), P_Bound);
-            writeConnectivity(cFileBound.c_str(), P_Bound);
+            writeVTK(vtkFile.c_str(), P_Bound);
+            writeConnectivity(cFile.c_str(), P_Bound);
             
-            writeLocation(lFileBound.c_str(), P_Bound);
+            writeLocation(lFile.c_str(), P_Bound);
             delete P_Bound;
         }
     }
+    
+    writeVTK(vtkFile.c_str(), innerNetwork);
+    writeConnectivity(cFile.c_str(), innerNetwork);
+    
+    writeLocation(lFile.c_str(), innerNetwork);
+    
     
     /*
      std::cout <<"\n";

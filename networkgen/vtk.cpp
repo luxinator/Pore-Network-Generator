@@ -88,16 +88,18 @@ void writeVTK(const char* filename, PoreNetwork *P_net, float * pb_values, const
     
 }
 
-void writeVTK(const char* filename, PoreNetwork *P_net, const int precision){
+void writeVTK(const char* path, PoreNetwork *P_net, const int precision){
     
     size_t i = 0;
     
     size_t PNMax = P_net->nrOfActivePBs;
     
     std::ofstream file;
-    if( filename == nullptr){
+    if( path == nullptr){
         std::cerr << "Invalid filename specified! " << std::endl;
     }
+    
+    std::string filename = std::string(path) + P_net->ns->name + ".vtk";
     
     std::cout << "Opening File: " << filename << std::endl;
     file.open(filename, std::ios::trunc);
