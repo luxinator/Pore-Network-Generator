@@ -971,6 +971,9 @@ void PoreNetwork::cleanPeriodic(size_t flowDir){
     // clean the list
     for (size_t i = 0; this->periodicThroats[i] != 0; i++)
             this->periodicThroats[i] = 0;
+    
+    delete [] coord;
+    delete [] coord_n;
 }
 
 
