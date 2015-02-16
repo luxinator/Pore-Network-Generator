@@ -945,11 +945,16 @@ void PoreNetwork::cleanPeriodic(size_t flowDir){
     int Ni = ns->Ni;
     int Nj = ns->Nj;
     int Nk = ns->Nk;
+    int maxPeriod = Ni*Nj + Nj*Nk + Nk*Ni;
+
     bool del =  false;
     size_t deleted = 0;
     
-    for (size_t i = 0; this->periodicThroats[i] != 0; i++) {
-        pn = this->throatList[0][this->periodicThroats[i]];
+
+
+    for (size_t i = 0; i < maxPeriod && this->periodicThroats[i] != 0; i++) {
+//	std::cout << "____" << i << "---" this->periodicThroats[i] << std::endl;
+	pn = this->throatList[0][this->periodicThroats[i]];
         pn_n = this->throatList[1][this->periodicThroats[i]];
         
         deflatten_3d(pn, Ni, Nj, Nk, coord);
@@ -972,7 +977,7 @@ void PoreNetwork::cleanPeriodic(size_t flowDir){
     
     this->removeFlaggedThroats(-1);
     // clean the list
-    for (size_t i = 0; this->periodicThroats[i] != 0; i++)
+    for (size_t i = 0; i < maxPeriod && this->periodicThroats[i] != 0; i++)
             this->periodicThroats[i] = 0;
     
     delete [] coord;

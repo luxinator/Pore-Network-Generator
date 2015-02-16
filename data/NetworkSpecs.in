@@ -1,9 +1,9 @@
 Name = TestNetwork1
 
 # The Number of Porebodies in the x,y,z-directions
-Ni = 10
-Nj = 10
-Nk = 10
+Ni = 30
+Nj = 30
+Nk = 30
 
 # Periodic Boundaries, 0 = off, all else is on
 periodic = 1
