@@ -108,7 +108,16 @@ int main(int argc, char *argv[]) {
     std::string prefix;
 ///    std::string specFileDir = specfile;
     
+    innerNetwork->generateFullConnectivity();
     
+    char * pb_list = searchForIsolatedPB(innerNetwork);
+    if(!pb_list){
+        std::cout << "Network is Broken Aborting" << std::endl;
+        return 1;
+    }
+    innerNetwork->removeFlaggedPBs(pb_list, (char)2);
+    
+    bool searched = false;
     for(int dir = 0; dir <= 2; dir++){
         if(innerNetwork->ns->flowDirs[dir]){
             
@@ -158,7 +167,6 @@ int main(int argc, char *argv[]) {
      
      //    writeConnectivity(fcFile.c_str(),P);
      
-     // P->removeFlaggedPBs(pb_list, (char)2);
      
      //    writeConnectivity(cFile.c_str(),P);
      

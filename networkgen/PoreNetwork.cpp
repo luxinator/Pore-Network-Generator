@@ -171,8 +171,8 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
 PoreNetwork::~PoreNetwork(){
     
     if (arr) {
-        for (size_t i; i < this->ns->Ni; i++)
-            for (size_t j; j < this->ns->Nj; j++) {
+        for (size_t i = 0; i < this->ns->Ni; i++)
+            for (size_t j = 0; j < this->ns->Nj; j++) {
                 delete [] arr[i][j];
             }
         delete [] arr;
