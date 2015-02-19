@@ -117,7 +117,6 @@ int main(int argc, char *argv[]) {
     }
     innerNetwork->removeFlaggedPBs(pb_list, (char)2);
     
-    bool searched = false;
     for(int dir = 0; dir <= 2; dir++){
         if(innerNetwork->ns->flowDirs[dir]){
             
@@ -137,13 +136,13 @@ int main(int argc, char *argv[]) {
             
             PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, prefix + innerNetwork->ns->name);
             
-            P_Bound->generateBoundary(dir);
+            P_Bound->generateBoundary(dir, 1);
             
             writeVTK(vtkFile.c_str(), P_Bound);
             writeConnectivity(cFile.c_str(), P_Bound);
             
             writeLocation(lFile.c_str(), P_Bound);
-            delete P_Bound;
+            //delete P_Bound;
         }
     }
     

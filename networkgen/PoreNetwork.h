@@ -27,7 +27,7 @@ class PoreNetwork{
     
 private:
     int checkInput();
-    template <typename T> T** paddedList(size_t amount, T **List, size_t nrOfCols ,size_t currentSize);
+    template <typename T> T** paddedList(size_t amount, T **List, size_t nrOfCols ,size_t currentSize, bool headPadding);
     void cleanPeriodic(size_t flowDir);
     
 public:
@@ -56,6 +56,8 @@ public:
     virtual ~PoreNetwork();
     
     void generateBoundary(size_t dir);
+    
+    void generateBoundary(size_t dir, int a);
     
     void removeFlaggedThroats(const int Flag = 0);
 
