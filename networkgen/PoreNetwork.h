@@ -57,8 +57,6 @@ public:
     
     void generateBoundary(size_t dir);
     
-    void generateBoundary(size_t dir, int a);
-    
     void removeFlaggedThroats(const int Flag = 0);
 
     void removeFlaggedPBs(char *pb_flag_list, char minFlag);

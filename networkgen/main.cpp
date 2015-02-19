@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
             
             PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, prefix + innerNetwork->ns->name);
             
-            P_Bound->generateBoundary(dir, 1);
+            P_Bound->generateBoundary(dir);
             
             writeVTK(vtkFile.c_str(), P_Bound);
             writeConnectivity(cFile.c_str(), P_Bound);
