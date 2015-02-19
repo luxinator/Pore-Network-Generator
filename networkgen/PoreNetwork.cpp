@@ -120,38 +120,28 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
     
     // -- throatList
     size_t i = 0;
-    int maxConnections = 0;
-    for ( i = 0; other.throatList[0][i] != 0; i++)
-        maxConnections++;
-    maxConnections++;
-    
-    int *t = new int[maxConnections * 2];
+
+    int *t = new int[other.nrOfConnections * 2];
     this->throatList = new int*[2];
     this->throatList[0] = t;
-    this->throatList[1] = t + maxConnections;
+    this->throatList[1] = t + other.nrOfConnections;
     
     for ( i = 0; other.throatList[0][i] != 0; i++) {
         this->throatList[0][i] = other.throatList[0][i];
         this->throatList[1][i] = other.throatList[1][i];
     }
-    this->throatList[0][i] = 0;
-    this->throatList[1][i] = 0;
-    this->nrOfConnections = i;
+    //this->nrOfConnections = i;
     
     
     // -- throatCounters
-    for (i = 1; other.throatCounter[0][i] != 0; i++) {
-        ;
-    }
-    
-    t = new int[2 * i + 2];
+    t = new int[2 * other.nrOfActivePBs + 2];
     this->throatCounter = new int*[2];
     
     this->throatCounter[0] = t;
-    this->throatCounter[1] = t + i + 1; // + 1 for the 0 guard
+    this->throatCounter[1] = t + other.nrOfActivePBs + 1; // + 1 for the 0 guard
     
     size_t pn;
-    for(pn = 1; pn <= i; pn++){
+    for(pn = 1; pn <= other.nrOfActivePBs; pn++){
         this->throatCounter[0][pn] = other.throatCounter[0][pn];
         this->throatCounter[1][pn] = other.throatCounter[1][pn];
     }
@@ -219,7 +209,7 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     int flagCounter = 0;
     size_t i = 0;
     
-    for(i = 0; this->throatList[0][i] != 0; i++){
+    for(i = 0; i < this->nrOfConnections; i++){
         if((this->throatList[0][i] == Flag || this->throatList[1][i] == Flag))
             flagCounter++;
     }
@@ -342,7 +332,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         
         // THIS IS NOT CORRECT!!!!!!
         // The rest is garbage so delete the entry
-        for( ; j < Nj*Nk * 2; j++)
+        for( ; j < Ni*Nj + Nj*Nk + Ni*Nk; j++)
             this->periodicThroats[j] = 0;
     }
     
