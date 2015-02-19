@@ -1040,11 +1040,11 @@ void PoreNetwork::generateBoundary(size_t dir, int a){
             
             // Loc_List
             if (dir == 0){
-                deflatten_3d(i, Ni + 2, Nj, Nk, coord);
+                deflatten_3d(bound_index + transform_P, Ni + 2, Nj, Nk, coord);
             } else if (dir == 1){
-                deflatten_3d(i, Ni, Nj + 2, Nk, coord);
+                deflatten_3d(bound_index + transform_P, Ni, Nj + 2, Nk, coord);
             } else if (dir == 2) {
-                deflatten_3d(i, Ni, Nj, Nk + 2, coord);
+                deflatten_3d(bound_index + transform_P, Ni, Nj, Nk + 2, coord);
             }
             
             newLL[0][bound_index + transform_P] = coord[0] * this->ns->pbDist;
@@ -1060,21 +1060,21 @@ void PoreNetwork::generateBoundary(size_t dir, int a){
     
     // --- Change middle part
     size_t j = 0;
-    for(size_t i = nrOfInlets; i < this->nrOfActivePBs + nrOfInlets; i++){
-        // --Translate a PbDistance
-        newLL[dir][i + 1] += this->ns->pbDist;
-        
+    for (size_t i = nrOfInlets; i < this->nrOfConnections + nrOfInlets; i++) {
         // -- update the ThroatList middlePart
         newTL[0][i] += nrOfInlets;
         newTL[1][i] += nrOfInlets;
         // -- register PeriodicThroats
+        
         if (newTL[0][i] > newTL[1][i]) {
             this->periodicThroats[j] = (int)i;
             j++;
         }
-        
-        // Copy the old TC's
-        newTC[0][i] = this->throatCounter[0][i - nrOfInlets];
+    }
+    
+    for(size_t i = nrOfInlets; i < this->nrOfActivePBs + nrOfInlets; i++){
+        // --Translate a PbDistance
+        newLL[dir][i + 1] += this->ns->pbDist;
     }
     
     // --- Rebuild the accumulators
@@ -1102,8 +1102,6 @@ void PoreNetwork::generateBoundary(size_t dir, int a){
     // Update nrOfActivePBs
     this->nrOfActivePBs += nrOfInlets + nrOfOutlets;
     this->nrOfConnections += nrOfInlets + nrOfOutlets;
-    // Update nrOfActiveThroats!
-    
     
 }
 
