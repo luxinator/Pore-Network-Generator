@@ -679,8 +679,6 @@ void PoreNetwork::generateBoundary(size_t dir){
         }
     }
     
-    std::cout << "BI: " << bound_index<< " NrInlets: " << nrOfInlets << std::endl;
-    
     // --- Outlets
     float lastPbLocs = 0.0f;
     if ( dir == 0 ) {
@@ -696,22 +694,22 @@ void PoreNetwork::generateBoundary(size_t dir){
         if( this->locationList[dir][i] == lastPbLocs )
             nrOfOutlets++;
     
-    std::cout << "nrOfOutlets: " << nrOfOutlets << std::endl;
+    int **tempTL = newTL;
+    int **tempTC = newTC;
+    float**tempLL = newLL;
     
-    //CLEAN THE OLD LISTS!!!!!
-    
-    delete [] this->throatList;
-    delete [] this->throatCounter;
-    delete [] this->locationList;
-    
-    this->throatList = newTL;
-    this->throatCounter = newTC;
-    this->locationList = newLL;
-    
-    
+    //Since the padded list is a deep copy of the given list
     newTL = this->paddedList(nrOfOutlets, newTL,    2, this->nrOfConnections + nrOfInlets, false);
     newLL = this->paddedList(nrOfOutlets, newLL,    3, Ni*Nj*Nk + 1 + nrOfInlets,          false);
     newTC = this->paddedList(nrOfOutlets, newTC,    2, Ni*Nj*Nk + 1 + nrOfInlets,          false);
+    
+    // we need to delete the old lists
+    delete [] tempLL;
+    delete [] tempTC;
+    delete [] tempTL;
+    tempLL = nullptr;
+    tempTC = nullptr;
+    tempTL = nullptr;
     
     size_t transform_TL = nrOfInlets + nrOfConnections - 1;
     size_t transform_P = nrOfInlets + nrOfActivePBs;
