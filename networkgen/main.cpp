@@ -98,12 +98,6 @@ int main(int argc, char *argv[]) {
     eliminateThroats(innerNetwork, 6);
     innerNetwork->removeFlaggedThroats(-1);
     
-    // --- Flow Direction Dependent code --- \\
-    //      regenarate the connectivity      \\
-    //     - Add in Inlet and Outlet Pores   \\
-    //     - Restructure the Lists           \\
-    //     - Output to Different Files       \\
-    
     std::cout << std::endl;
     std::string prefix;
 ///    std::string specFileDir = specfile;
@@ -116,6 +110,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     innerNetwork->removeFlaggedPBs(pb_list, (char)2);
+    
+    // --- Flow Direction Dependent code --- \\
+    //      regenarate the connectivity      \\
+    //     - Add in Inlet and Outlet Pores   \\
+    //     - Restructure the Lists           \\
+    //     - Output to Different Files       
     
     for(int dir = 0; dir <= 2; dir++){
         if(innerNetwork->ns->flowDirs[dir]){

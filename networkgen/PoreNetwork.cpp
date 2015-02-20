@@ -330,7 +330,6 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
             }
         }
         
-        // THIS IS NOT CORRECT!!!!!!
         // The rest is garbage so delete the entry
         for( ; j < Ni*Nj + Nj*Nk + Ni*Nk; j++)
             this->periodicThroats[j] = 0;
@@ -700,6 +699,16 @@ void PoreNetwork::generateBoundary(size_t dir){
     std::cout << "nrOfOutlets: " << nrOfOutlets << std::endl;
     
     //CLEAN THE OLD LISTS!!!!!
+    
+    delete [] this->throatList;
+    delete [] this->throatCounter;
+    delete [] this->locationList;
+    
+    this->throatList = newTL;
+    this->throatCounter = newTC;
+    this->locationList = newLL;
+    
+    
     newTL = this->paddedList(nrOfOutlets, newTL,    2, this->nrOfConnections + nrOfInlets, false);
     newLL = this->paddedList(nrOfOutlets, newLL,    3, Ni*Nj*Nk + 1 + nrOfInlets,          false);
     newTC = this->paddedList(nrOfOutlets, newTC,    2, Ni*Nj*Nk + 1 + nrOfInlets,          false);
@@ -836,23 +845,12 @@ void PoreNetwork::cleanPeriodic(size_t flowDir){
  */
 size_t PoreNetwork::generateFullConnectivity(){
     
-    int Ni = ns->Ni;
-    int Nj = ns->Nj;
-    int Nk = ns->Nk;
-    
-    
     int **halfConnectivity = this->throatList;
     
     std::cout << "Generating Full Connectivity" << std::endl;
     size_t i = 0;
-    size_t halfLength = 0;
-    //maximum number of connections is:
-    for(i = 0; i < Ni*Nj*Nk * 13; i++){
-        if(halfConnectivity[0][i] == 0){
-            halfLength = i;
-            break;
-        }
-    }
+    size_t halfLength = this->nrOfConnections;
+    
     size_t maxConnections = halfLength  * 2 + 1; // Full connectivity is twice the size of half connectivity, and we need one extra place for the [0][0] guards
     
     //For Details see [generateConnectivity]
