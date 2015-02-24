@@ -739,12 +739,23 @@ void PoreNetwork::generateBoundary(size_t dir){
             newTL[1][bound_index + transform_TL] = (int) (bound_index + transform_P); // highest pbnr + ouletIndex = index of outlet
             
             // Loc_List
-            deflatten_3d(i, Ni, Nj, Nk, coord);
+                deflatten_3d(i, Ni, Nj, Nk, coord);
+            if ( dir == 0 ) {
+                newLL[0][bound_index + transform_P] = (coord[0] + 2) * this->ns->pbDist;
+                newLL[1][bound_index + transform_P] = coord[1] * this->ns->pbDist;
+                newLL[2][bound_index + transform_P] = coord[2] * this->ns->pbDist;
+            } else if (dir == 1) {
+                newLL[0][bound_index + transform_P] = coord[0] * this->ns->pbDist;
+                newLL[1][bound_index + transform_P] = (coord[1] + 2) * this->ns->pbDist;
+                newLL[2][bound_index + transform_P] = coord[2] * this->ns->pbDist;
+            } else if (dir == 2) {
+                newLL[0][bound_index + transform_P] = coord[0] * this->ns->pbDist;
+                newLL[1][bound_index + transform_P] = coord[1] * this->ns->pbDist;
+                newLL[2][bound_index + transform_P] = (coord[2] + 2) * this->ns->pbDist;
+            }
+            
             coord[dir] += 2;
 
-            newLL[0][bound_index + transform_P] = coord[0] * this->ns->pbDist;
-            newLL[1][bound_index + transform_P] = coord[1] * this->ns->pbDist;
-            newLL[2][bound_index + transform_P] = coord[2] * this->ns->pbDist;
             
             // TC_list
             newTC[0][i + nrOfInlets] += 1;

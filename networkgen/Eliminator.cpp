@@ -261,7 +261,7 @@ void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag,
 
 char * searchForIsolatedPB(PoreNetwork *P_net){
     
-    bool verbose = true;
+    bool verbose = false;
     
     
     std::cout<< "Starting Search for Isolated PBs and Clusters" << std::endl;
@@ -288,32 +288,27 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
         DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)1, (char)0);
     }
     
-    int passes = 0;
     if(verbose)
         for(int i = 1; i <= Ni*Nj*Nk; i ++){
             if (flagged_PB[i] == (char) 0) {
                 std::cout << "PB: " <<i << " on:\t " << P_net->locationList[0][i] << '\t' << P_net->locationList[1][i] << '\t' << P_net->locationList[2][i] << std::endl;
-                passes++;
+            } else {
+                std::cout << "Skipped: " << i << std::endl;
             }
         }
     
-    std::cout << "passes: " << passes << std::endl;
     bool brokenNetwork = true;
     
-    passes = 0;
-    /// BROKEN!!!
     //Do a Depth First Search on all outlets
     for(i = lengthTL - 1 ; P_net->throatList_full[0][i] >= (P_net->nrOfActivePBs - Nj*Nk); i--){
         
         // Check if pb the qualifies
         if(flagged_PB[ P_net->throatList_full[0][i]] == (char)1){
-            passes++;
             DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)2, (char)1);
             brokenNetwork = false;
         } else
             std::cout << "PB: " <<i << " on:\t " << P_net->locationList[0][i] << '\t' << P_net->locationList[1][i] << '\t' << P_net->locationList[2][i] << std::endl;
     }
-        std::cout << "passes: " << passes << std::endl;
     
     if(verbose)
         for(int i = 1; i <= Ni*Nj*Nk; i ++){
