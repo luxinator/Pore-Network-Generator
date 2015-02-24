@@ -301,7 +301,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
     
     //Do a Depth First Search on all outlets
     for(i = lengthTL - 1 ; P_net->throatList_full[0][i] >= (P_net->nrOfActivePBs - Nj*Nk); i--){
-        
+        		
         // Check if pb the qualifies
         if(flagged_PB[ P_net->throatList_full[0][i]] == (char)1){
             DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)2, (char)1);

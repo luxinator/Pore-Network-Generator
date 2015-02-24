@@ -676,12 +676,7 @@ void PoreNetwork::generateBoundary(size_t dir){
             newTL[1][bound_index - 1] = (int) i + (int)nrOfInlets;
             
             // Loc_List, the trick here is that the OLD location of the pb to connect to is the location of the boundPB
-            if (dir == 0)
-                deflatten_3d(i, Ni, Nj, Nk, coord);
-             else if (dir == 1)
-                deflatten_3d(i, Ni, Nj, Nk, coord);
-             else if (dir == 2)
-                deflatten_3d(i, Ni, Nj, Nk, coord);
+                 deflatten_3d(i, Ni, Nj, Nk, coord);
             
             newLL[0][bound_index] = coord[0] * this->ns->pbDist;
             newLL[1][bound_index] = coord[1] * this->ns->pbDist;
@@ -733,28 +728,18 @@ void PoreNetwork::generateBoundary(size_t dir){
     for ( size_t i = 1; i <= this->nrOfActivePBs; i++){
         if( this->locationList[dir][i] == lastPbLocs ){
             
-            //std::cout << "i: " << i << " bound_TL: " << bound_index + transform_TL <<" bound_P: " << bound_index + transform_P  << std::endl;
-            // overflow!!
             newTL[0][bound_index + transform_TL] = (int) i + (int)nrOfInlets; // old pbnr + translation
             newTL[1][bound_index + transform_TL] = (int) (bound_index + transform_P); // highest pbnr + ouletIndex = index of outlet
             
             // Loc_List
-                deflatten_3d(i, Ni, Nj, Nk, coord);
-            if ( dir == 0 ) {
-                newLL[0][bound_index + transform_P] = (coord[0] + 2) * this->ns->pbDist;
-                newLL[1][bound_index + transform_P] = coord[1] * this->ns->pbDist;
-                newLL[2][bound_index + transform_P] = coord[2] * this->ns->pbDist;
-            } else if (dir == 1) {
-                newLL[0][bound_index + transform_P] = coord[0] * this->ns->pbDist;
-                newLL[1][bound_index + transform_P] = (coord[1] + 2) * this->ns->pbDist;
-                newLL[2][bound_index + transform_P] = coord[2] * this->ns->pbDist;
-            } else if (dir == 2) {
-                newLL[0][bound_index + transform_P] = coord[0] * this->ns->pbDist;
-                newLL[1][bound_index + transform_P] = coord[1] * this->ns->pbDist;
-                newLL[2][bound_index + transform_P] = (coord[2] + 2) * this->ns->pbDist;
-            }
-            
+            // Loc_List
+            deflatten_3d(i, Ni, Nj, Nk, coord);
             coord[dir] += 2;
+            
+            newLL[0][bound_index + transform_P] = coord[0] * this->ns->pbDist;
+            newLL[1][bound_index + transform_P] = coord[1] * this->ns->pbDist;
+            newLL[2][bound_index + transform_P] = coord[2] * this->ns->pbDist;
+            
 
             
             // TC_list
