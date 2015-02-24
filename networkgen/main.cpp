@@ -142,7 +142,9 @@ int main(int argc, char *argv[]) {
             writeConnectivity(cFile.c_str(), P_Bound);
             
             writeLocation(lFile.c_str(), P_Bound);
-            //delete P_Bound;
+            writeNetworkSpecs(cFile.c_str(), P_Bound);
+            
+            delete P_Bound;
         }
     }
     
@@ -150,37 +152,10 @@ int main(int argc, char *argv[]) {
     writeConnectivity(cFile.c_str(), innerNetwork);
     
     writeLocation(lFile.c_str(), innerNetwork);
+    writeNetworkSpecs(cFile.c_str(), innerNetwork);
     
     
-    /*
-     std::cout <<"\n";
-     P->generateFullConnectivity();
-     
-     std::cout << "\n";
-     char * pb_list = searchForIsolatedPB(P);
-     if(!pb_list){
-     std::cout << "Network is Broken Aborting" << std::endl;
-     return 1;
-     }
-     
-     
-     //    writeConnectivity(fcFile.c_str(),P);
-     
-     
-     //    writeConnectivity(cFile.c_str(),P);
-     
-     writeLocation(lFile.c_str(), P);
-     
-     if(writeVTKswitch)
-     writeVTK(vtkFile.c_str(), P);
-     
-     writeNetworkSpecs(cFile.c_str(), P);
-     
-     //}
-     */
-    // }
-    
-    
+    delete innerNetwork;
     
 }
 

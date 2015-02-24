@@ -261,7 +261,7 @@ void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag,
 
 char * searchForIsolatedPB(PoreNetwork *P_net){
     
-    bool verbose = false;
+    bool verbose = true;
     
     
     std::cout<< "Starting Search for Isolated PBs and Clusters" << std::endl;
@@ -276,6 +276,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
     
     size_t lengthTL = i;
     
+    
     // Allocata a chunk of mem and set it to zero
     char *flagged_PB = new char[Ni*Nj*Nk+1];
     for(i = 0; (int)i <= Ni*Nj*Nk; i++){
@@ -287,23 +288,39 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
         DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)1, (char)0);
     }
     
+    int passes = 0;
     if(verbose)
         for(int i = 1; i <= Ni*Nj*Nk; i ++){
-        std::cout << "PB: " <<i << "\t Flag: " <<(int)flagged_PB[i] << std::endl;
+            if (flagged_PB[i] == (char) 0) {
+                std::cout << "PB: " <<i << " on:\t " << P_net->locationList[0][i] << '\t' << P_net->locationList[1][i] << '\t' << P_net->locationList[2][i] << std::endl;
+                passes++;
+            }
         }
     
+    std::cout << "passes: " << passes << std::endl;
     bool brokenNetwork = true;
     
+    passes = 0;
+    /// BROKEN!!!
     //Do a Depth First Search on all outlets
-    for(i = lengthTL - 1 ; P_net->throatList_full[0][i] >= (Ni*Nj*Nk - Nj*Nk); i--){
+    for(i = lengthTL - 1 ; P_net->throatList_full[0][i] >= (P_net->nrOfActivePBs - Nj*Nk); i--){
         
         // Check if pb the qualifies
         if(flagged_PB[ P_net->throatList_full[0][i]] == (char)1){
-            
+            passes++;
             DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)2, (char)1);
             brokenNetwork = false;
-        }
+        } else
+            std::cout << "PB: " <<i << " on:\t " << P_net->locationList[0][i] << '\t' << P_net->locationList[1][i] << '\t' << P_net->locationList[2][i] << std::endl;
     }
+        std::cout << "passes: " << passes << std::endl;
+    
+    if(verbose)
+        for(int i = 1; i <= Ni*Nj*Nk; i ++){
+            if (flagged_PB[i] == (char) 1) {
+                std::cout << "PB: " <<i << " on:\t " << P_net->locationList[0][i] << '\t' << P_net->locationList[1][i] << '\t' << P_net->locationList[2][i] << std::endl;
+            }
+        }
     if (brokenNetwork){
         std::cout << "!!! --- 2 : Network is Broken no Connection between Inlet and Outlet ---!!!" << std::endl;
         return nullptr;

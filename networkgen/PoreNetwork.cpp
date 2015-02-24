@@ -273,8 +273,22 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     int Nj = ns->Nj;
     int Nk = ns->Nk;
     size_t i = 0;
-    
+    /*
     for(i = 0; this->throatList[0][i] != 0; i++){
+        //Delete the connection FROM a flagged Pore
+        if (pb_flag_list[this->throatList[0][i]] < minFlag) {
+            this->throatList[0][i] = -1;
+        }
+        //Delete the connection TO a flagged pore
+        if (pb_flag_list[this->throatList[1][i]] < minFlag) {
+            this->throatList[0][i] = -1;
+            this->throatList[1][i] = -1;
+        }
+    }
+     */
+    
+    
+    for(i = 0; i < this->nrOfConnections; i++){
         //Delete the connection FROM a flagged Pore
         if (pb_flag_list[this->throatList[0][i]] < minFlag) {
             this->throatList[0][i] = -1;
@@ -293,7 +307,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     //pb_flag_list -> isolated pb's if minFlg
     //build a mask:
     int* mask = new int[Ni*Nj*Nk + 1];
-    for(; i < Ni*Nj*Nk; i++){
+    for(i = 0; i < Ni*Nj*Nk; i++){
         mask[i] = 0;
     }
     // Fill the Mask
@@ -311,17 +325,17 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     
     
     // --- Use the mask to update the throatLists, the COMPLETE lists.
-    for(i = 0; this->throatList[0][i] != 0; i++)
+    for(i = 0; i < this->nrOfConnections; i++)
         this->throatList[0][i] = this->throatList[0][i] - mask[this->throatList[0][i]];
     
-    for(i = 0; this->throatList[1][i] != 0; i++){
+    for(i = 0; i < this->nrOfConnections; i++){
         this->throatList[1][i] = this->throatList[1][i] - mask[this->throatList[1][i]];
     }
     
     //And if there there are periodic throats, update them as well. Periodic throats have the cool property: throatlist[0][i] > throatlist[1][i]
     if(this->ns->periodicBounndaries) {
         size_t j = 0;
-        for(i = 0; this->throatList[0][i] != 0; i++){
+        for(i = 0; i < this->nrOfConnections; i++){
             if(this->throatList[0][i] > this->throatList[1][i]){
                 //std::cout << this->periodicThroats[j] << " -> ";
                 this->periodicThroats[j] = (int)i;
@@ -363,7 +377,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     }
     
     
-    delete[] pb_flag_list; // Clean the Freaking Memory!
+    delete[] pb_flag_list;
     delete[] mask;
 }
 
@@ -647,7 +661,7 @@ void PoreNetwork::generateBoundary(size_t dir){
     this->nrOfInlets = 0;
     
     for( size_t i = 1; i <= this->nrOfActivePBs; i++)
-        if( this->locationList[dir][i] == this->ns->pbDist )
+        if( this->locationList[dir][i] == 0.0f )
             nrOfInlets++;
     
     newTL = this->paddedList(nrOfInlets, this->throatList,    2, this->nrOfConnections, true);
@@ -783,7 +797,14 @@ void PoreNetwork::generateBoundary(size_t dir){
     // Update nrOfActivePBs
     this->nrOfActivePBs += nrOfInlets + nrOfOutlets;
     this->nrOfConnections += nrOfInlets + nrOfOutlets;
-    
+
+    if ( dir == 0 ) {
+        this->ns->Ni += 2;
+    } else if (dir == 1) {
+        this->ns->Nj += 2;
+    } else if (dir == 2) {
+        this->ns->Nk += 2;
+    }
 }
 
 /*

@@ -160,7 +160,8 @@ void writeNetworkSpecs(const char * path, PoreNetwork *pn){
     
     file << "Number of PoreBodies = " << pn->nrOfActivePBs << '\n';
     file << "Number of Throats = " << pn->nrOfConnections << '\n';
-    file << "Number of InletPBs = " << i - 1 << '\n';
+    file << "Number of InletPBs = " << pn->nrOfInlets << '\n';
+    file << "Number of OutletPBs = " << pn->nrOfOutlets << '\n';
     
     file.close();
     
