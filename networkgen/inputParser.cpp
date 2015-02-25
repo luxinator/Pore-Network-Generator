@@ -220,6 +220,8 @@ void loadPoreBodyLocations(const char *filename, PoreNetwork *P){
         P->throatCounter[0][i] = counter;
         P->throatCounter[1][i] = accu;
         
+        //std::cout << P->locationList[0][i] << '\t'<< P->locationList[1][i] << '\t'<< P->locationList[2][i] << std::endl;
+        
         i++;
     }
     

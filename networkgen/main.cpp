@@ -111,14 +111,6 @@ int main(int argc, char *argv[]) {
         std::string prefix;
         ///    std::string specFileDir = specfile;
         
-        innerNetwork->generateFullConnectivity();
-        
-        char * pb_list = searchForIsolatedPB(innerNetwork);
-        if(!pb_list){
-            std::cout << "Network is Broken Aborting" << std::endl;
-            return 1;
-        }
-        innerNetwork->removeFlaggedPBs(pb_list, (char)2);
         
         // --- Flow Direction Dependent code --- \\
         //      regenarate the connectivity      \\
@@ -146,6 +138,17 @@ int main(int argc, char *argv[]) {
                 PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, prefix + innerNetwork->ns->name);
                 
                 P_Bound->generateBoundary(dir);
+                
+                P_Bound->generateFullConnectivity();
+                
+                char * pb_list = searchForIsolatedPB(P_Bound);
+                if(!pb_list){
+                    std::cout << "Network is Broken Aborting" << std::endl;
+                    return 1;
+                }
+                
+                P_Bound->removeFlaggedPBs(pb_list, (char)2);
+
                 
                 writeVTK(vtkFile.c_str(), P_Bound);
                 writeConnectivity(cFile.c_str(), P_Bound);
@@ -182,6 +185,8 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         inner->removeFlaggedPBs(pb_list, (char)2);
+        
+        
         
         
     }
