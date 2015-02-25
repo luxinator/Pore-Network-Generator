@@ -140,5 +140,130 @@ NetworkSpecs *readSpecsFile(const char *filename){
     std::cout << "\tPossible Flow Dir:\n\t\t\tX-Flow: " << NS->flowDirs[0] << " Y-Flow: " << NS->flowDirs[1] << " Z-Flow: " << NS->flowDirs[2] << '\n';
 
     std::cout << std::endl;
+    
+    file.close();
+    
     return NS;
 }
+
+void loadNrs(const char *filename, PoreNetwork *P){
+    
+    std::fstream file;
+    
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename, std::ios::in);
+    if(!file){
+        std::cerr<< "Error in opening file [" << filename << ']' << std::endl;
+        return;
+    }
+    if(!P){
+        std::cerr << "Error: No PoreNetwork Object Supplied! Check Input Files" << std::endl;
+        return;
+    }
+    
+    const int buffsize = 255;
+    char buff[buffsize];
+    char c = ' ';
+    int i = 0;
+    
+    while(file.getline(buff, buffsize)){
+        //TRIM THE STRING OF SPACES!!!
+        trim_chars(buff, buffsize, c);
+        //Convert to Lower Case
+        tolowercase(buff, buffsize);
+        
+        if(buff[0] == '\n' || buff[0] == '#')
+            continue;
+        
+        i = find_char(buff, buffsize, '=');
+        
+        //use the smart ass string function of C++
+        std::string s = std::string(buff);
+      
+        if ( s.compare(0,18,"numberofporebodies")  == 0) {
+            P->nrOfActivePBs = std::stoi(s.substr(i+1));
+        }
+        else if ( s.compare(0,15,"numberofthroats")  == 0) {
+            P->nrOfConnections = std::stoi(s.substr(i+1));
+        }
+        else if ( s.compare(0,16,"numberofinletpbs")  == 0) {
+            P->nrOfInlets = std::stoi(s.substr(i+1));
+        }
+        else if ( s.compare(0,17,"numberofoutletpbs")  == 0) {
+            P->nrOfOutlets = std::stoi(s.substr(i+1));
+        }
+    }
+    
+    file.close();
+}
+
+void loadPoreBodyLocations(const char *filename, PoreNetwork *P){
+    std::ifstream file;
+    
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename, std::ios::in);
+    if(!file){
+        std::cerr<< "Error in opening file [" << filename << ']' << std::endl;
+        return;
+    }
+   
+    float x, y, z;
+    int counter, accu;
+    int i = 1;
+    
+    while (file >> x >> y >> z >> counter >> accu && i <= P->nrOfActivePBs){
+
+        P->locationList[0][i] = x;
+        P->locationList[1][i] = y;
+        P->locationList[2][i] = z;
+        
+        P->throatCounter[0][i] = counter;
+        P->throatCounter[1][i] = accu;
+        
+        i++;
+    }
+    
+}
+
+void loadThroats(const char *filename, PoreNetwork *P){
+    std::ifstream file;
+    
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename, std::ios::in);
+    if(!file){
+        std::cerr<< "Error in opening file [" << filename << ']' << std::endl;
+        return;
+    }
+    if(!P){
+        std::cerr << "Error: No PoreNetwork Object Supplied! Check Input Files" << std::endl;
+        return;
+    }
+    
+    int from, to, periodic;
+    int i = 0, j = 0;
+    
+    while (file >> to >> from >> periodic && i < P->nrOfConnections){
+
+        
+        if (periodic) {
+            P->periodicThroats[j] = i;
+            j++;
+        }
+        P->throatList[0][i] = to;
+        P->throatList[1][i] = from;
+       // std::cout << i << '\t' << P->throatList[0][i] << '\t' << P->throatList[1][i]<< std::endl;
+        i++;
+        
+    }
+    
+}
+
+
+
+
+
+
+
+
+
+

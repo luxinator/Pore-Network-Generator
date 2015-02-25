@@ -7,6 +7,7 @@
 //
 
 #include <math.h>
+#include <fstream>
 #include "PoreNetwork.h"
 #include "inputParser.h"
 #include "ArrayFunctions.h"
@@ -189,6 +190,44 @@ PoreNetwork::~PoreNetwork(){
     }
     if(periodicThroats)
         delete[] periodicThroats;
+}
+
+
+PoreNetwork::PoreNetwork(const std::string name, const std::string networkSpecs_file){
+    
+    this->ns = readSpecsFile(networkSpecs_file.c_str());
+    
+    int Ni = this->ns->Ni;
+    int Nj = this->ns->Nj;
+    int Nk = this->ns->Nk;
+    
+    loadNrs((name + "_specs.txt").c_str(), this);
+    
+    
+    float *temp = new float[3 * this->nrOfActivePBs + 3];
+    this->locationList = new float*[3];
+    
+    this->locationList[0] = temp;
+    this->locationList[1] = temp + this->nrOfActivePBs;
+    this->locationList[2] = temp + 2*this->nrOfActivePBs;
+    
+    int *t = new int[2 * this->nrOfActivePBs + 2];
+    this->throatCounter = new int*[2];
+    this->throatCounter[0] = t;
+    this->throatCounter[1] = t + this->nrOfActivePBs + 1; // + 1 for the 0 guard
+    
+    loadPoreBodyLocations((name + "_loc.txt").c_str(), this);
+    
+    t = new int[this->nrOfConnections * 2];
+    this->throatList = new int*[2];
+    this->throatList[0] = t;
+    this->throatList[1] = t + this->nrOfConnections;
+    
+    this->periodicThroats = new int[Ni*Nj + Nj*Nk + Nk*Ni];
+    for (size_t i = 0; i < Ni*Nj + Nj*Nk + Nk*Ni; i++)
+        this->periodicThroats[i] = 0;
+    
+    loadThroats((name + "_conn.txt").c_str(), this);
 }
 
 /*
@@ -727,20 +766,15 @@ void PoreNetwork::generateBoundary(size_t dir){
     
     for ( size_t i = 1; i <= this->nrOfActivePBs; i++){
         if( this->locationList[dir][i] == lastPbLocs ){
-            
+            // I is the old pbnr 
             newTL[0][bound_index + transform_TL] = (int) i + (int)nrOfInlets; // old pbnr + translation
             newTL[1][bound_index + transform_TL] = (int) (bound_index + transform_P); // highest pbnr + ouletIndex = index of outlet
             
-            // Loc_List
-            // Loc_List
-            deflatten_3d(i, Ni, Nj, Nk, coord);
-            coord[dir] += 2;
+            newLL[0][bound_index + transform_P] = this->locationList[0][i];
+            newLL[1][bound_index + transform_P] = this->locationList[1][i];
+            newLL[2][bound_index + transform_P] = this->locationList[2][i];
             
-            newLL[0][bound_index + transform_P] = coord[0] * this->ns->pbDist;
-            newLL[1][bound_index + transform_P] = coord[1] * this->ns->pbDist;
-            newLL[2][bound_index + transform_P] = coord[2] * this->ns->pbDist;
-            
-
+            newLL[dir][bound_index + transform_P] += 2 * this->ns->pbDist;
             
             // TC_list
             newTC[0][i + nrOfInlets] += 1;
@@ -748,7 +782,7 @@ void PoreNetwork::generateBoundary(size_t dir){
             bound_index++;
         }
     }
-    
+    	
     // --- Change middle part
     size_t j = 0;
     for (size_t i = nrOfInlets; i < this->nrOfConnections + nrOfInlets; i++) {

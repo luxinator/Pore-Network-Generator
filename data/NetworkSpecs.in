@@ -3,7 +3,7 @@ Name = TestNetwork1
 # The Number of Porebodies in the x,y,z-directions
 Ni = 10
 Nj = 10	
-Nk = 10
+Nk = 1
 
 # Periodic Boundaries, 0 = off, all else is on
 periodic = 1
@@ -19,7 +19,7 @@ searchDistance = 2.00
 # Possible Flow Directions
 xFlow = 1
 yFlow = 1
-zFlow = 1	
+zFlow = 0
 
 #Chance of a throat to survive
 c0 = 	0.4000

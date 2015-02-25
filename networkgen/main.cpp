@@ -29,8 +29,11 @@ int main(int argc, char *argv[]) {
     
     std::string vtkFile = "../data/";
     
+    std::string name = "";
+    
     bool inputWasParsed = false;
     bool writeVTKswitch = false;
+    bool generate = true;
     
     
     // Go through the list of given args
@@ -67,6 +70,12 @@ int main(int argc, char *argv[]) {
                 inputWasParsed = true;
                 lFile = std::string(argv[i+1]);
                 i++;
+            }
+            else if(s.compare(0,6, "-inner") == 0){
+                inputWasParsed = true;
+                generate = false;
+                name = std::string(argv[i+1]);
+                i++;
             } else
                 inputWasParsed = false;
         }
@@ -78,84 +87,104 @@ int main(int argc, char *argv[]) {
         std::cout << "No Arguments given, assuming default behavior" << std::endl;
     }
     
-    
-    PoreNetwork *innerNetwork = new PoreNetwork(nSpecs.c_str());
-    if(!innerNetwork->ns){
-        std::cout<< "Cannot Generate PoreNetwork, please check NetworkSpecs.in for errors" <<std::endl;
-        return 1;
-    }
-    
-    std::cout<< "Generating PoreBodies Nrs" << std::endl;
-    innerNetwork->generate_naive_array();
-    
-    
-    // --- Generate the Network
-    std::cout<< "\nGenerating Network" << std::endl;
-    innerNetwork->generateConnectivity();
-    innerNetwork->generateLocation();
-    
-    std::cout << "Eliminating Throats ..." << std::endl;
-    eliminateThroats(innerNetwork, 6);
-    innerNetwork->removeFlaggedThroats(-1);
-    
-    std::cout << std::endl;
-    std::string prefix;
-///    std::string specFileDir = specfile;
-    
-    innerNetwork->generateFullConnectivity();
-    
-    char * pb_list = searchForIsolatedPB(innerNetwork);
-    if(!pb_list){
-        std::cout << "Network is Broken Aborting" << std::endl;
-        return 1;
-    }
-    innerNetwork->removeFlaggedPBs(pb_list, (char)2);
-    
-    // --- Flow Direction Dependent code --- \\
-    //      regenarate the connectivity      \\
-    //     - Add in Inlet and Outlet Pores   \\
-    //     - Restructure the Lists           \\
-    //     - Output to Different Files       
-    
-    for(int dir = 0; dir <= 2; dir++){
-        if(innerNetwork->ns->flowDirs[dir]){
-            
-            switch (dir) {
-                case 0:
-                    prefix = "x_";
-                    break;
-                    
-                case 1:
-                    prefix = "y_";
-                    break;
-                    
-                case 2:
-                    prefix = "z_";
-                    break;
-            }
-            
-            PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, prefix + innerNetwork->ns->name);
-            
-            P_Bound->generateBoundary(dir);
-            
-            writeVTK(vtkFile.c_str(), P_Bound);
-            writeConnectivity(cFile.c_str(), P_Bound);
-            
-            writeLocation(lFile.c_str(), P_Bound);
-            writeNetworkSpecs(cFile.c_str(), P_Bound);
-            
-            delete P_Bound;
+    if(generate){
+        PoreNetwork *innerNetwork = new PoreNetwork(nSpecs.c_str());
+        if(!innerNetwork->ns){
+            std::cout<< "Cannot Generate PoreNetwork, please check NetworkSpecs.in for errors" <<std::endl;
+            return 1;
         }
+        
+        std::cout<< "Generating PoreBodies Nrs" << std::endl;
+        innerNetwork->generate_naive_array();
+        
+        
+        // --- Generate the Network
+        std::cout<< "\nGenerating Network" << std::endl;
+        innerNetwork->generateConnectivity();
+        innerNetwork->generateLocation();
+        
+        std::cout << "Eliminating Throats ..." << std::endl;
+        eliminateThroats(innerNetwork, 6);
+        innerNetwork->removeFlaggedThroats(-1);
+        
+        std::cout << std::endl;
+        std::string prefix;
+        ///    std::string specFileDir = specfile;
+        
+        innerNetwork->generateFullConnectivity();
+        
+        char * pb_list = searchForIsolatedPB(innerNetwork);
+        if(!pb_list){
+            std::cout << "Network is Broken Aborting" << std::endl;
+            return 1;
+        }
+        innerNetwork->removeFlaggedPBs(pb_list, (char)2);
+        
+        // --- Flow Direction Dependent code --- \\
+        //      regenarate the connectivity      \\
+        //     - Add in Inlet and Outlet Pores   \\
+        //     - Restructure the Lists           \\
+        //     - Output to Different Files
+        
+        for(int dir = 0; dir <= 2; dir++){
+            if(innerNetwork->ns->flowDirs[dir]){
+                
+                switch (dir) {
+                    case 0:
+                        prefix = "x_";
+                        break;
+                        
+                    case 1:
+                        prefix = "y_";
+                        break;
+                        
+                    case 2:
+                        prefix = "z_";
+                        break;
+                }
+                
+                PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, prefix + innerNetwork->ns->name);
+                
+                P_Bound->generateBoundary(dir);
+                
+                writeVTK(vtkFile.c_str(), P_Bound);
+                writeConnectivity(cFile.c_str(), P_Bound);
+                
+                writeLocation(lFile.c_str(), P_Bound);
+                writeNetworkSpecs(cFile.c_str(), P_Bound);
+                
+                delete P_Bound;
+            }
+        }
+        
+        writeVTK(vtkFile.c_str(), innerNetwork);
+        writeConnectivity(cFile.c_str(), innerNetwork);
+        
+        writeLocation(lFile.c_str(), innerNetwork);
+        writeNetworkSpecs(cFile.c_str(), innerNetwork);
+        
+        
+        delete innerNetwork;
     }
     
-    writeVTK(vtkFile.c_str(), innerNetwork);
-    writeConnectivity(cFile.c_str(), innerNetwork);
-    
-    writeLocation(lFile.c_str(), innerNetwork);
-    writeNetworkSpecs(cFile.c_str(), innerNetwork);
-    
-    
-    delete innerNetwork;
+    else{
+        
+        name =  "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/testnetwork1";
+        
+        PoreNetwork * inner = new PoreNetwork(name , "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/NetworkSpecs.in");
+        
+        
+        inner->generateFullConnectivity();
+        
+        char * pb_list = searchForIsolatedPB(inner);
+        if(!pb_list){
+            std::cout << "Network is Broken Aborting" << std::endl;
+            return 1;
+        }
+        inner->removeFlaggedPBs(pb_list, (char)2);
+        
+        
+    }
     
 }
 

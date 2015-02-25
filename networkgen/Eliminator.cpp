@@ -270,11 +270,8 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
     int Nk = P_net->ns->Nk;
     
     size_t i;
-    for(i = 0; P_net->throatList_full[0][i] != 0; i++){
-        ;
-    }
     
-    size_t lengthTL = i;
+    size_t lengthTL = P_net->nrOfConnections * 2;
     
     
     // Allocata a chunk of mem and set it to zero
@@ -306,7 +303,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net){
         if(flagged_PB[ P_net->throatList_full[0][i]] == (char)1){
             DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)2, (char)1);
             brokenNetwork = false;
-        } else
+        } else if(verbose)
             std::cout << "PB: " <<i << " on:\t " << P_net->locationList[0][i] << '\t' << P_net->locationList[1][i] << '\t' << P_net->locationList[2][i] << std::endl;
     }
     
