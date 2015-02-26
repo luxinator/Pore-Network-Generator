@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
         innerNetwork->generate_naive_array();
         
         
-        // --- Generate the Network
+        // --- Generate the innerNetwork
         std::cout<< "\nGenerating Network" << std::endl;
         innerNetwork->generateConnectivity();
         innerNetwork->generateLocation();
@@ -108,34 +108,26 @@ int main(int argc, char *argv[]) {
         innerNetwork->removeFlaggedThroats(-1);
         
         std::cout << std::endl;
-        std::string prefix;
-        ///    std::string specFileDir = specfile;
-        
-        
-        // --- Flow Direction Dependent code --- \\
-        //      regenarate the connectivity      \\
-        //     - Add in Inlet and Outlet Pores   \\
-        //     - Restructure the Lists           \\
-        //     - Output to Different Files
+        std::string suffix;
         
         for(int dir = 0; dir <= 2; dir++){
             if(innerNetwork->ns->flowDirs[dir]){
                 
                 switch (dir) {
                     case 0:
-                        prefix = "x_";
+                        suffix = "x_";
                         break;
                         
                     case 1:
-                        prefix = "y_";
+                        suffix = "y_";
                         break;
                         
                     case 2:
-                        prefix = "z_";
+                        suffix = "z_";
                         break;
                 }
                 
-                PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, prefix + innerNetwork->ns->name);
+                PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, innerNetwork->ns->name + suffix);
                 
                 P_Bound->generateBoundary(dir);
                 
@@ -149,7 +141,6 @@ int main(int argc, char *argv[]) {
                 
                 P_Bound->removeFlaggedPBs(pb_list, (char)2);
 
-                
                 writeVTK(vtkFile.c_str(), P_Bound);
                 writeConnectivity(cFile.c_str(), P_Bound);
                 
@@ -157,6 +148,7 @@ int main(int argc, char *argv[]) {
                 writeNetworkSpecs(cFile.c_str(), P_Bound);
                 
                 delete P_Bound;
+                std::cout << std::endl;
             }
         }
         
