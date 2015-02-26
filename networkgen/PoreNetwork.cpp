@@ -90,18 +90,20 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
         this->ns->flowDirs[i] = other.ns->flowDirs[i];
     
     
-    
-    this->arr = new int**[this->ns->Ni];
-    
-    for(size_t i = 0; i < this->ns->Ni; i++){
-        this->arr[i] = new int*[this->ns->Nj];
-        for(size_t j = 0; j < this->ns->Nj; j++){
-            this->arr[i][j] = new int[this->ns->Nk];
-            for(size_t k = 0; k < this->ns->Nk; k++){
-                this->arr[i][j][k] = other.arr[i][j][k];
+    if(other.arr){
+        this->arr = new int**[this->ns->Ni];
+        
+        for(size_t i = 0; i < this->ns->Ni; i++){
+            this->arr[i] = new int*[this->ns->Nj];
+            for(size_t j = 0; j < this->ns->Nj; j++){
+                this->arr[i][j] = new int[this->ns->Nk];
+                for(size_t k = 0; k < this->ns->Nk; k++){
+                    this->arr[i][j][k] = other.arr[i][j][k];
+                }
             }
         }
-    }
+    } else
+        this->arr = nullptr;
     
     //Allocate a large part of memory
     float *temp = new float[3 * Ni*Nj*Nk + 3];
@@ -148,13 +150,16 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
     }
     
     // -- periodicThroats
-    this->periodicThroats = new int[Ni*Nj + Nj*Nk + Nk*Ni];
-    for (i = 0; i < Ni*Nj + Nj*Nk + Nk*Ni; i ++)
+    this->periodicThroats = new int[other.periodicListLength];
+    for (i = 0; i < other.periodicListLength; i ++){
         this->periodicThroats[i] = other.periodicThroats[i];
+        //std::cout << i << "--" << other.periodicThroats[i]<< std::endl;
+    }
 
     // -- Add active PBS and Active PTs!
     this->nrOfActivePBs = other.nrOfActivePBs;
     this->nrOfConnections = other.nrOfConnections;
+    this->periodicListLength = other.periodicListLength;
     
     std::cout << "Done Copying" << std::endl;
     
@@ -202,8 +207,7 @@ PoreNetwork::PoreNetwork(const std::string name, const std::string networkSpecs_
     int Nk = this->ns->Nk;
     
     loadNrs((name + "_specs.txt").c_str(), this);
-    
-    
+
     float *temp = new float[3 * this->nrOfActivePBs + 3];
     this->locationList = new float*[3];
     
@@ -223,8 +227,10 @@ PoreNetwork::PoreNetwork(const std::string name, const std::string networkSpecs_
     this->throatList[0] = t;
     this->throatList[1] = t + this->nrOfConnections;
     
-    this->periodicThroats = new int[Ni*Nj + Nj*Nk + Nk*Ni];
-    for (size_t i = 0; i < Ni*Nj + Nj*Nk + Nk*Ni; i++)
+    this->periodicListLength = Ni*Nj + Nj*Nk + Nk*Ni;
+    
+    this->periodicThroats = new int[periodicListLength];
+    for (size_t i = 0; i < periodicListLength; i++)
         this->periodicThroats[i] = 0;
     
     loadThroats((name + "_conn.txt").c_str(), this);
@@ -271,14 +277,25 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     
     // Copy all the connections
     size_t j = 0;
+    size_t Pc = 0;
+    
+    for(i = 0; i < this->periodicListLength; i++){
+        this->periodicThroats[i] = 0;
+    }
     
     for(i = 0; i < nrConns; i++){
         if(this->throatList[1][i] != Flag && this->throatList[0][i] != Flag){
             newTL[0][j] = this->throatList[0][i];
             newTL[1][j] = this->throatList[1][i];
+            
+            if(newTL[0][j] > newTL[1][j]){
+                this->periodicThroats[Pc] = (int)j;
+                Pc++;
+            }
             j++;
         }
     }
+    
     //put the guards in place
     newTL[0][newAmountOfConnections-1] = 0;
     newTL[1][newAmountOfConnections-1] = 0;
@@ -309,20 +326,6 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     std::cout<< "Removing Porebodies with a Flag value lower then: " << (int)minFlag << std::endl;;
     
     size_t i = 0;
-    /*
-    for(i = 0; this->throatList[0][i] != 0; i++){
-        //Delete the connection FROM a flagged Pore
-        if (pb_flag_list[this->throatList[0][i]] < minFlag) {
-            this->throatList[0][i] = -1;
-        }
-        //Delete the connection TO a flagged pore
-        if (pb_flag_list[this->throatList[1][i]] < minFlag) {
-            this->throatList[0][i] = -1;
-            this->throatList[1][i] = -1;
-        }
-    }
-     */
-    
     
     for(i = 0; i < this->nrOfConnections; i++){
         //Delete the connection FROM a flagged Pore
@@ -374,24 +377,20 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         size_t j = 0;
         for(i = 0; i < this->nrOfConnections; i++){
             if(this->throatList[0][i] > this->throatList[1][i]){
-                //std::cout << this->periodicThroats[j] << " -> ";
                 this->periodicThroats[j] = (int)i;
                 j++;
             }
         }
         
         // The rest is garbage so delete the entry
-        int Ni = this->ns->Ni;
-        int Nj = this->ns->Nj;
-        int Nk = this->ns->Nk;
-        
-        for( ; j < Ni*Nj + Nj*Nk + Ni*Nk; j++)
+        for( ; j < 	this->periodicListLength; j++)
             this->periodicThroats[j] = 0;
     }
     
     // --- Update the locations
-    size_t newi;
-    for(i = 1; i <= this->nrOfActivePBs; i ++){
+    size_t newi = oldNrOfActivePBs;
+    
+    for(i = 1; i <= oldNrOfActivePBs; i ++){
         if(pb_flag_list[i] >= minFlag){ //Pore exists in new system
             newi = i - mask[i]; // get the new pbnr and update according
             this->locationList[0][newi] = this->locationList[0][i];
@@ -402,7 +401,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         }
     }
     //OverWrite the last part of the locationList with guards:
-    for(i = this->nrOfActivePBs + 1; i < oldNrOfActivePBs; i++){
+    for(i = newi + 1; i < oldNrOfActivePBs; i++){
         this->locationList[0][i] = -1.0f;
         this->locationList[1][i] = -1.0f;
         this->locationList[2][i] = -1.0f;
@@ -482,6 +481,7 @@ void PoreNetwork::generateConnectivity(){
     
     // PeriodicBoundaries are Places in ThroatList containing Periodic throats
     if(this->ns->periodicBounndaries){
+        this->periodicListLength = Ni*Nj + Nj*Nk + Nk*Ni;
         this->periodicThroats = new int[Ni*Nj + Nj*Nk + Ni*Nk + 1];
         for(size_t i = 0; i < Ni*Nj + Nj*Nk + Ni*Nk + 1; i++){
             this->periodicThroats[i] = 0;
@@ -526,8 +526,9 @@ void PoreNetwork::generateConnectivity(){
             connection[0][i] = pn;
             connection[1][i] = this->arr[0][coord[1]][coord[2]];
             this->throatCounter[0][pn] += 1;
-            
             this->periodicThroats[periodicTrs] = i;
+            //std::cout << this->periodicThroats[periodicTrs] << std::endl;
+            
             periodicTrs++;
             i++;
          }
@@ -535,8 +536,9 @@ void PoreNetwork::generateConnectivity(){
             connection[0][i] = pn;
             connection[1][i] = this->arr[coord[0]][0][coord[2]];//pn - ((Nk - 1) * Nj);
             this->throatCounter[0][pn] += 1;
-            
             this->periodicThroats[periodicTrs] = i;
+            //std::cout << this->periodicThroats[periodicTrs] << std::endl;
+            
             periodicTrs++;
             i++;
         }
@@ -544,8 +546,9 @@ void PoreNetwork::generateConnectivity(){
             connection[0][i] = pn;
             connection[1][i] = this->arr[coord[0]][coord[1]][0];//pn - (Nj - 1);
             this->throatCounter[0][pn] += 1;
-            
             this->periodicThroats[periodicTrs] = i;
+           // std::cout << this->periodicThroats[periodicTrs] << std::endl;
+            
             periodicTrs++;
             i++;
         }
@@ -857,8 +860,8 @@ void PoreNetwork::cleanPeriodic(size_t flowDir){
 
 
     for (size_t i = 0; i < maxPeriod && this->periodicThroats[i] != 0; i++) {
-//	std::cout << "____" << i << "---" this->periodicThroats[i] << std::endl;
-	pn = this->throatList[0][this->periodicThroats[i]];
+        //std::cout << "____" << i << "---" << this->periodicThroats[i] << std::endl;
+        pn = this->throatList[0][this->periodicThroats[i]];
         pn_n = this->throatList[1][this->periodicThroats[i]];
         
         deflatten_3d(pn, Ni, Nj, Nk, coord);
@@ -931,7 +934,7 @@ size_t PoreNetwork::generateFullConnectivity(){
     
     this->throatList_full = connection;
     
-    return maxConnections;
+    return maxConnections - 1;
 }
 
 
@@ -941,6 +944,16 @@ size_t PoreNetwork::generateFullConnectivity(){
  */
 size_t PoreNetwork::delelteThroat(size_t i, size_t deleted, int flag){
     
+//
+  /*  if (this->throatList[0][i] > this->throatList[1][i]) {
+        std::cout << "Deleting: "<<  this->throatList[0][i] << '\t' << this->throatList[1][i] << std::endl;
+        for(size_t j = 0; this->periodicThroats[j] != 0; j++){
+            if(j == i){
+                this->periodicThroats[j] = -1;
+            }
+        }
+    }
+   */
     this->throatList[1][i] = flag;
     deleted++;
     this->throatCounter[0][this->throatList[0][i]] -= 1;

@@ -88,7 +88,7 @@ void writeVTK(const char* filename, PoreNetwork *P_net, float * pb_values, const
     
 }
 
-void writeVTK(const char* path, PoreNetwork *P_net, const int precision){
+void writeVTK(const char* path, const PoreNetwork *P_net, const int precision){
     
     size_t i = 0;
     

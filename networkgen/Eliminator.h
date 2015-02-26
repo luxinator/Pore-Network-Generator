@@ -29,6 +29,6 @@
  */
 void eliminateThroats(PoreNetwork *P_net, int coordNr);
 
-char * searchForIsolatedPB(PoreNetwork *P_net);
+char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL);
 
 #endif /* defined(__networkgen__Eliminator__) */

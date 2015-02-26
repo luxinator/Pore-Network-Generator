@@ -13,6 +13,6 @@
 
 void writeVTK(const char* filename, PoreNetwork *P_net, float * pb_flags, const int precision = 0);
 
-void writeVTK(const char* filename, PoreNetwork *P_net, const int precision = 0);
+void writeVTK(const char* filename, const PoreNetwork *P_net, const int precision = 0);
 
 #endif /* defined(__networkgen__vtk__) */

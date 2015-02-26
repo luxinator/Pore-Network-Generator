@@ -1,6 +1,6 @@
 #include <iomanip>
 #include <iostream>
-
+#include <fstream>
 
 #include "ArrayFunctions.h"
 #include "vtk.h"
@@ -139,9 +139,9 @@ int main(int argc, char *argv[]) {
                 
                 P_Bound->generateBoundary(dir);
                 
-                P_Bound->generateFullConnectivity();
+                size_t lengthTL = P_Bound->generateFullConnectivity();
                 
-                char * pb_list = searchForIsolatedPB(P_Bound);
+                char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
                 if(!pb_list){
                     std::cout << "Network is Broken Aborting" << std::endl;
                     return 1;
@@ -176,15 +176,71 @@ int main(int argc, char *argv[]) {
         
         PoreNetwork * inner = new PoreNetwork(name , "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/NetworkSpecs.in");
         
+        std::string nSpecs = "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/";
+        std::string cFile   = "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/";
+        std::string fcFile   = "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/";
+        std::string lFile   = "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/";
         
-        inner->generateFullConnectivity();
+        std::string vtkFile = "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/";
         
-        char * pb_list = searchForIsolatedPB(inner);
-        if(!pb_list){
-            std::cout << "Network is Broken Aborting" << std::endl;
-            return 1;
+
+        
+        std::string prefix;
+        
+        writeVTK(vtkFile.c_str(), inner);
+
+        
+        for(int dir = 0; dir <= 2; dir++){
+            if(inner->ns->flowDirs[dir]){
+                
+                switch (dir) {
+                    case 0:
+                        prefix = "x_";
+                        break;
+                        
+                    case 1:
+                        prefix = "y_";
+                        break;
+                        
+                    case 2:
+                        prefix = "z_";
+                        break;
+                }
+                
+                PoreNetwork *P_Bound = new PoreNetwork(*inner, prefix + inner->ns->name);
+                
+                P_Bound->generateBoundary(dir);
+                
+                size_t lengthTL = P_Bound->generateFullConnectivity();
+                
+                char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
+        
+                {
+                    std::ofstream file;
+                    file.open((vtkFile + "pb_flags.txt"), std::ios::trunc);
+                    
+                    for(size_t i = 1; i <= P_Bound->nrOfActivePBs; i++)
+                        file << (int)pb_list[i] << std::endl;
+                }
+                
+                if(!pb_list){
+                    std::cout << "Network is Broken Aborting" << std::endl;
+                    return 1;
+                }
+                
+                P_Bound->removeFlaggedPBs(pb_list, (char)2);
+                
+                
+                writeVTK(vtkFile.c_str(), P_Bound);
+                writeConnectivity(cFile.c_str(), P_Bound);
+                
+                writeLocation(lFile.c_str(), P_Bound);
+                writeNetworkSpecs(cFile.c_str(), P_Bound);
+                
+                delete P_Bound;
+            }
         }
-        inner->removeFlaggedPBs(pb_list, (char)2);
+
         
         
         

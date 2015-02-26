@@ -169,16 +169,23 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
             deflatten_3d(pn, Ni, Nj, Nk, coord);
             deflatten_3d(pn_n, Ni, Nj, Nk, coord_n);
             
-            
+            // Delete in x-dir
+            if( d(e) >= ChanceList[0] &&
+               coord[0] != coord_n[0] &&
+               coord[2] == coord_n[2]){
+                deleted = P_net->delelteThroat((size_t)P_net->periodicThroats[perdiocC], deleted, -1);
+                //std::cout << P_net->periodicThroats[perdiocC] << '\t' << pn << " - " << pn_n << std::endl;
+                
+            }
             // Delete in y-dir
-            if( d(e) >= ChanceList[1] &&
+            else if( d(e) >= ChanceList[1] &&
                coord[1] == coord_n[1] &&
                coord[2] != coord_n[2]){
                 deleted = P_net->delelteThroat((size_t)P_net->periodicThroats[perdiocC], deleted, -1);
                 //std::cout << P_net->periodicThroats[perdiocC] << '\t' << pn << " - " << pn_n << std::endl;
                 
-            }
-            if(d(e) >= ChanceList[2] &&
+            } // delete in z-dir
+            else if(d(e) >= ChanceList[2] &&
                coord[1] != coord_n[1] &&
                coord[2] == coord_n[2]){
                 deleted = P_net->delelteThroat((size_t)P_net->periodicThroats[perdiocC], deleted, -1);
@@ -259,15 +266,15 @@ void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag,
  */
 
 
-char * searchForIsolatedPB(PoreNetwork *P_net){
+char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
     
     bool verbose = false;
 
-    std::cout<< "Starting Search for Isolated PBs and Clusters" << std::endl;
+    std::cout<< "Starting Search for Isolated PBs and Clusters: \n "<< lengthTL << std::endl;
    
     size_t i;
     
-    size_t lengthTL = P_net->nrOfConnections * 2;
+    //size_t lengthTL = P_net->nrOfConnections * 2;
     
     
     // Allocata a chunk of mem and set it to zero
