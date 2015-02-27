@@ -115,15 +115,15 @@ int main(int argc, char *argv[]) {
                 
                 switch (dir) {
                     case 0:
-                        suffix = "x_";
+                        suffix = "_x";
                         break;
                         
                     case 1:
-                        suffix = "y_";
+                        suffix = "_y";
                         break;
                         
                     case 2:
-                        suffix = "z_";
+                        suffix = "_z";
                         break;
                 }
                 
