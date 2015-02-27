@@ -1,9 +1,9 @@
 Name = TestNetwork1
 
 # The Number of Porebodies in the x,y,z-directions
-Ni = 1
-Nj = 100
-Nk = 100
+Ni = 32
+Nj = 30
+Nk = 30
 
 # Periodic Boundaries, 0 = off, all else is on
 periodic = 0
@@ -17,7 +17,7 @@ pbDist = 1.0
 searchDistance = 2.00
 
 # Possible Flow Directions
-xFlow = 0
+xFlow = 1
 yFlow = 1
 zFlow = 1
 

@@ -686,7 +686,8 @@ void PoreNetwork::generateBoundary(size_t dir){
     
     std::cout << "Genrating Boundaries" << std::endl;
     // --- First clean the Periodic Throats!!!
-    this->cleanPeriodic(dir);
+    if(this->ns->periodicBounndaries)
+        this->cleanPeriodic(dir);
     
     
     int Ni = this->ns->Ni;
