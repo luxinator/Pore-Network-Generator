@@ -113,6 +113,13 @@ int main(int argc, char *argv[]) {
         eliminateThroats(innerNetwork, 6);
         innerNetwork->removeFlaggedThroats(-1);
         
+        writeVTK(vtkFile.c_str(), innerNetwork);
+        writeConnectivity(cFile.c_str(), innerNetwork);
+        
+        writeLocation(lFile.c_str(), innerNetwork);
+        writeNetworkSpecs(cFile.c_str(), innerNetwork);
+        
+
         std::cout << std::endl;
         std::string suffix;
         
@@ -157,14 +164,7 @@ int main(int argc, char *argv[]) {
                 std::cout << std::endl;
             }
         }
-        
-        writeVTK(vtkFile.c_str(), innerNetwork);
-        writeConnectivity(cFile.c_str(), innerNetwork);
-        
-        writeLocation(lFile.c_str(), innerNetwork);
-        writeNetworkSpecs(cFile.c_str(), innerNetwork);
-        
-        
+              
         delete innerNetwork;
     }
     
