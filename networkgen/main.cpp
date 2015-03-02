@@ -28,12 +28,12 @@ int main(int argc, char *argv[]) {
     -lfile [location] \t Specify the location of the locations file\n \
     -vtk [location]   \t Specify if a vtk file is to be written and where\n";
     
-    std::string nSpecs = "../data/NetworkSpecs.in";
-    std::string cFile   = "../data/";
-    std::string fcFile   = "../data/";
-    std::string lFile   = "../data/";
+    std::string nSpecs = "./data/NetworkSpecs.in";
+    std::string cFile   = "./data/";
+    std::string fcFile   = "./data/";
+    std::string lFile   = "./data/";
     
-    std::string vtkFile = "../data/";
+    std::string vtkFile = "./data/";
     
     std::string name = "";
     
