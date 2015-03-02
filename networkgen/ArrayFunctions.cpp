@@ -3,8 +3,11 @@
 //  networkgen
 //
 //  Created by Lucas van Oosterhout on 26-11-14.
-//  Copyright (c) 2014 Lucas van Oosterhout. All rights reserved.
-//
+
+/* This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
 
 #include "ArrayFunctions.h"
 
