@@ -9,6 +9,7 @@ OBJECTS  := ArrayFunctions.o Eliminator.o PoreNetwork.o inputParser.o main.o vtk
    
 Generator: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $@ $(LIBS)
+	cp Generator ../Generator
 
 
 %.o: %.cpp
@@ -17,4 +18,4 @@ Generator: $(OBJECTS)
 clean:
 	rm  -f $(OBJECTS)
 	rm  -rf *.dSYM
-	rm  -f Generator
+	rm  -f Generator ../Generator
