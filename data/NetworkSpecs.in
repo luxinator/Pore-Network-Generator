@@ -1,9 +1,9 @@
 Name = TestNetwork1
 
 # The Number of Porebodies in the x,y,z-directions
-Ni = 32
+Ni = 30
 Nj = 30
-Nk = 30
+Nk = 1
 
 # Periodic Boundaries, 0 = off, all else is on
 periodic = 0
@@ -14,39 +14,39 @@ pbDist = 1.0
 #The Minimal Distance between two porebodies
 #As if this distance was squared and divided by the pbDist (choices are 1.0, 2.0 and 3.0)
 # ! Elemination does not work on searchDistance = 3.0 as of now!
-searchDistance = 2.00
+searchDistance = 1.00
 
 # Possible Flow Directions
 xFlow = 1
 yFlow = 1
-zFlow = 1
+zFlow = 0
 
 #Chance of a throat to survive
-c0 = 	0.4000
-c1 = 	0.4000
-c2 = 	0.4000
-c3 =	0.4000
-c4 = 	0.4000
-c5 = 	0.4000
-c6 =	0.4000
-c7 = 	0.4000
-c8 = 	0.4000
-c9 = 	0.4000
-c10 = 	0.4000
-c11 = 	0.4000
+#c0 = 	0.4000
+#c1 = 	0.4000
+#c2 = 	0.4000
+#c3 =	0.4000
+#c4 = 	0.4000
+#c5 = 	0.4000
+#c6 =	0.4000
+#c7 = 	0.4000
+#c8 = 	0.4000
+#c9 = 	0.4000
+#c10 = 	0.4000
+#c11 = 	0.4000
 
-#c0 = 1.000
-#c1 = 1.000
-#c2 = 1.000
-#c3 = 1.000
-#c4 = 1.000
-#c5 = 1.000
-#c6 = 1.000
-#c7 = 1.000
-#c8 = 1.000
-#c9 = 1.000
-#c10 = 1.000
-#c11 = 1.000
+c0 = 1.000
+c1 = 1.000
+c2 = 1.000
+c3 = 1.000
+c4 = 1.000
+c5 = 1.000
+c6 = 1.000
+c7 = 1.000
+c8 = 1.000
+c9 = 1.000
+c10 = 1.000
+c11 = 1.000
 
 #
 # PB Distance
