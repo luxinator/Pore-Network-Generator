@@ -22,7 +22,7 @@ The `NetworkSpecs.in` file is pretty self-explantory. Comments lines can be adde
 ### Output ###
 * A vtk file is produced for every flow direction, you can open it with *paraview* <http://www.paraview.org>
 * a connectivity file is generated: `networkname_dir_conn.txt`
-* a location file is generated:     `networkname_dir_lox.txt`
+* a location file is generated:     `networkname_dir_loc.txt`
 * a `_specs` file is generated:     `networkname_dir_specs.txt`
 * `_specs` files contains information about the amount of porebodies, throats and number of `inlet` and `outlet` pores
 * `inlet` porebodies are the first pores in the location list, and their connections are also at the head of the connectivity file.
