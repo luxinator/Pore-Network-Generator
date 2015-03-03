@@ -583,6 +583,7 @@ void PoreNetwork::generateConnectivity(){
     this->nrOfActivePBs = Ni*Nj*Nk;
     //std::cout << "stuff: "<<i << '\t' << Ni*Nj*Nk << '\t' << this->throatCounter[1][Ni*Nj*Nk] << std::endl;
     this->nrOfConnections = this->throatCounter[1][Ni*Nj*Nk];
+    this->periodicListLength = periodicTrs;
 
 }
 

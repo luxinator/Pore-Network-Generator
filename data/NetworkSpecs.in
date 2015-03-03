@@ -9,7 +9,7 @@ Nk = 1
 periodic = 0
 
 # The Distance between the lattice points
-pbDist = 1.0
+pbDist = 2.5e-5
 
 #The Minimal Distance between two porebodies
 #As if this distance was squared and divided by the pbDist (choices are 1.0, 2.0 and 3.0)
