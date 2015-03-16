@@ -201,15 +201,18 @@ PoreNetwork::~PoreNetwork(){
 }
 
 
-PoreNetwork::PoreNetwork(const std::string name, const std::string networkSpecs_file){
+PoreNetwork::PoreNetwork(const std::string networkSpecs_file){
 
     this->ns = readSpecsFile(networkSpecs_file.c_str());
+
+    std::string path = networkSpecs_file.substr(0, (networkSpecs_file.length() - 15));
+    std::string name = this->ns->name;
 
     int Ni = this->ns->Ni;
     int Nj = this->ns->Nj;
     int Nk = this->ns->Nk;
 
-    loadNrs((name + "_specs.txt").c_str(), this);
+    loadNrs((path + name + "_specs.txt").c_str(), this);
 
     float *temp = new float[3 * this->nrOfActivePBs + 3];
     this->locationList = new float*[3];
@@ -223,7 +226,7 @@ PoreNetwork::PoreNetwork(const std::string name, const std::string networkSpecs_
     this->throatCounter[0] = t;
     this->throatCounter[1] = t + this->nrOfActivePBs + 1; // + 1 for the 0 guard
 
-    loadPoreBodyLocations((name + "_loc.txt").c_str(), this);
+    loadPoreBodyLocations((path + name + "_loc.txt").c_str(), this);
 
     t = new int[this->nrOfConnections * 2];
     this->throatList = new int*[2];
@@ -236,7 +239,7 @@ PoreNetwork::PoreNetwork(const std::string name, const std::string networkSpecs_
     for (size_t i = 0; i < periodicListLength; i++)
         this->periodicThroats[i] = 0;
 
-    loadThroats((name + "_conn.txt").c_str(), this);
+    loadThroats((path + name + "_conn.txt").c_str(), this);
 }
 
 /*

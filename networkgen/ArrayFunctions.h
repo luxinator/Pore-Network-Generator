@@ -16,7 +16,7 @@
 /*
  * Insert pb nr and returns the lattice coordinates
  */
-inline void deflatten_3d(size_t i, const int Ni, const int Nj, const int Nk, int* coord){
+inline void deflatten_3d(size_t i, const unsigned int Ni, const unsigned int Nj, const unsigned int Nk, int* coord){
     i -= 1;
     coord[0] = (i / (Nj * Nk)) % Ni;
     coord[1] = (i / Nk) % Nj;

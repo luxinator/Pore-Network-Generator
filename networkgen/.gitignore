@@ -3,6 +3,10 @@ Generator
 *.o
 .tags
 tags
-
+.settings
+Default
+.cproject
+.project
+.tags_sorted_by_file
 
 

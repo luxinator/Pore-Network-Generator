@@ -13,6 +13,7 @@
 #include "inputParser.h"
 #include "Eliminator.h"
 #include "writerFunctions.h"
+#include "Combinator.h"
 
 int main(int argc, char *argv[]) {
     
@@ -26,7 +27,9 @@ int main(int argc, char *argv[]) {
     -cfile [location] \t Specify the location of the connectiviy output file\n \
     -fcfile [location]\t Specify the location of the fullconnectivity output file\n \
     -lfile [location] \t Specify the location of the locations file\n \
-    -vtk [location]   \t Specify if a vtk file is to be written and where\n";
+    -vtk [location]   \t Specify if a vtk file is to be written and where\n \
+    -inner [location] \t Load Inner Network from file(s) and Generate with Boundaries\n \
+    -combine [top_network] [bottom_network] \t combines (innner) networks into one network \n";
     
     std::string nSpecs = "./data/NetworkSpecs.in";
     std::string cFile   = "./data/";
@@ -36,12 +39,14 @@ int main(int argc, char *argv[]) {
     std::string vtkFile = "./data/";
  
     std::string name = "";
+    std::string top_network, bot_network = "";
     
     bool inputWasParsed = false;
     bool writeVTKswitch = false;
     bool generate = true;
+    bool combine = false;
     
-    
+
     // Go through the list of given args
     if (argc > 1) {
         for(int i = 1; i < argc; i++){
@@ -82,7 +87,22 @@ int main(int argc, char *argv[]) {
                 generate = false;
                 name = std::string(argv[i+1]);
                 i++;
-            } else
+            }
+            else if(s.compare(0,8, "-combine") == 0 ){
+            	inputWasParsed = true;
+            	generate = false;
+            	combine   = true;
+            	try{
+            		top_network = std::string(argv[i+1]);
+            		bot_network = std::string(argv[i+2]);
+            	}
+            	catch ( ... ){
+            		std::cout << "Error: specify a path to the Networkspec files please!!" << std::endl;
+            		return 1;
+            	}
+            	i += 2;
+            }
+            else
                 inputWasParsed = false;
         }
         if(!inputWasParsed){
@@ -168,81 +188,92 @@ int main(int argc, char *argv[]) {
         delete innerNetwork;
     }
     
-    else{
-        
-        name =  "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/testnetwork1";
-        
-        PoreNetwork * inner = new PoreNetwork(name , "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/NetworkSpecs.in");
-        
-        std::string nSpecs = "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/";
-        std::string cFile   = "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/";
-        std::string fcFile   = "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/";
-        std::string lFile   = "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/";
-        
-        std::string vtkFile = "/Users/lucas/Programming/Xcode/PoreNetworkGen/connectivityGenV2/pore-network/data/valid_error_network/";
-        
+    else if(combine){
+    	std::cout << "Combining Networks " << top_network << " and " << bot_network << std::endl;
 
-        
+    	PoreNetwork *top = new PoreNetwork(top_network);
+    	PoreNetwork *bot = new PoreNetwork(bot_network);
+
+    	Combinator *combi = new Combinator(top, bot);
+
+
+
+    }
+
+    else{
+
+        PoreNetwork *inner = new PoreNetwork(name);
+
+        std::string path = name.substr(0, (name.length() - 15));
+
+        std::string nSpecs  = path + "NetworkSpecs.in";
+        std::string cFile   = path;
+        std::string fcFile  = path;
+        std::string lFile   = path;
+        std::string vtkFile = path;
+
+
+
         std::string prefix;
-        
+
         writeVTK(vtkFile.c_str(), inner);
 
-        
+
         for(int dir = 0; dir <= 2; dir++){
             if(inner->ns->flowDirs[dir]){
-                
+
                 switch (dir) {
                     case 0:
                         prefix = "x_";
                         break;
-                        
+
                     case 1:
                         prefix = "y_";
                         break;
-                        
+
                     case 2:
                         prefix = "z_";
                         break;
                 }
-                
+
                 PoreNetwork *P_Bound = new PoreNetwork(*inner, prefix + inner->ns->name);
-                
+
                 P_Bound->generateBoundary(dir);
-                
+
                 size_t lengthTL = P_Bound->generateFullConnectivity();
-                
+
                 char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
-        
+
                 {
                     std::ofstream file;
                     file.open((vtkFile + "pb_flags.txt"), std::ios::trunc);
-                    
+
                     for(size_t i = 1; i <= P_Bound->nrOfActivePBs; i++)
                         file << (int)pb_list[i] << std::endl;
                 }
-                
+
                 if(!pb_list){
                     std::cout << "Network is Broken Aborting" << std::endl;
                     return 1;
                 }
-                
+
                 P_Bound->removeFlaggedPBs(pb_list, (char)2);
-                
-                
+
+
                 writeVTK(vtkFile.c_str(), P_Bound);
                 writeConnectivity(cFile.c_str(), P_Bound);
-                
+
                 writeLocation(lFile.c_str(), P_Bound);
                 writeNetworkSpecs(cFile.c_str(), P_Bound);
-                
+
                 delete P_Bound;
             }
         }
 
-        
-        
-        
-        
+
+
+
+
     }
     
 }

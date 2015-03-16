@@ -53,9 +53,7 @@ public:
     PoreNetwork(const PoreNetwork& other, std::string newName);
     
     // Loads a PoreNetwork from Files
-    PoreNetwork(const std::string name, const std::string networkSpecs_file);
-    
-    
+    PoreNetwork(const std::string networkSpecs_file);
     
     PoreNetwork();
     
