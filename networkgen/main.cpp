@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     std::string lFile   = "./data/";
     
     std::string vtkFile = "./data/";
-    
+ 
     std::string name = "";
     
     bool inputWasParsed = false;

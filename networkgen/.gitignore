@@ -2,7 +2,7 @@ Generator
 *.dSYM
 *.o
 .tags
-
+tags
 
 
 
