@@ -67,16 +67,32 @@ PoreNetwork::PoreNetwork(const char *networkSpecsFile){
 }
 
 /*
- * Empty Constructor, all pointers of the arrays and lists are empty
+ * Empty Constructor, all pointers of the arrays and lists are 0x0
  */
 
 PoreNetwork::PoreNetwork(){
+
+	// Zero out all the memory, all pointers to 0x0 and all values to 0;
+	this->arr 				= nullptr;
+	this->locationList 		= nullptr;
+	this->nrOfActivePBs 	= 0;
+	this->nrOfConnections 	= 0;
+	this->nrOfInlets 		= 0;
+	this->nrOfOutlets		= 0;
+	this->ns				= nullptr;
+	this->periodicListLength= 0;
+	this->periodicThroats	= nullptr;
+	this->throatCounter		= nullptr;
+	this->throatList		= nullptr;
+	this->throatList_full	= nullptr;
+
 }
 
 PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
 
     this->ns = new NetworkSpecs(*other.ns);
     this->ns->name = newName;
+    this->throatList_full =  nullptr;
 
     std::cout << "Copying PoreNetwork: " << other.ns->name << " To: " << this->ns->name << std::endl;
 
@@ -163,6 +179,9 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
     this->nrOfActivePBs = other.nrOfActivePBs;
     this->nrOfConnections = other.nrOfConnections;
     this->periodicListLength = other.periodicListLength;
+
+    // Guard it against unvaild access!
+    this->throatList_full =  nullptr;
 
     std::cout << "Done Copying" << std::endl;
 

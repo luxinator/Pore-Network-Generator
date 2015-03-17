@@ -17,6 +17,9 @@ Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot){
 	this->Top = top;
 	this->Bot = bot;
 
+	this->SearchDist = 0.0f;
+	this->Separation = 0.0f;
+	this->Survival 	 = 0.0f;
 
 	PoreNetwork *result = new PoreNetwork();
 	float * t = new float[3 * (top->nrOfActivePBs + bot->nrOfActivePBs) + 3];
