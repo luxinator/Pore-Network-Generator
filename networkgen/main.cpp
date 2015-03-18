@@ -133,6 +133,8 @@ int main(int argc, char *argv[]) {
         eliminateThroats(innerNetwork, 6);
         innerNetwork->removeFlaggedThroats(-1);
         
+        // --- Write the Inner network to file, no search for isolated pbs!
+
         writeVTK(vtkFile.c_str(), innerNetwork);
         writeConnectivity(cFile.c_str(), innerNetwork);
         
@@ -195,8 +197,16 @@ int main(int argc, char *argv[]) {
     	PoreNetwork *bot = new PoreNetwork(bot_network);
 
     	Combinator *combi = new Combinator(top, bot);
+    	// Gather this from an options file or from input
+    	combi->setSeparation((float)2.5e-5);
+    	combi->setSearchDist((float)1.5 * 2.5e-5);
+    	combi->setSurvival(0.5f);
+    	combi->Combine(2);
+    	combi->builtConnectionList();
+    	PoreNetwork *Res = combi->getResult();
+    	//writeVTK(vtkFile.c_str(), Res);
 
-
+    	std::cout << "D0ne!" << std::endl;
 
     }
 

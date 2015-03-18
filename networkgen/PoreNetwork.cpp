@@ -48,6 +48,8 @@ int PoreNetwork::checkInput(){
 
 PoreNetwork::PoreNetwork(NetworkSpecs *ns){
 
+    PoreNetwork();
+
     this->ns = ns;
 
     if(checkInput() != 0)
@@ -56,6 +58,8 @@ PoreNetwork::PoreNetwork(NetworkSpecs *ns){
 }
 
 PoreNetwork::PoreNetwork(const char *networkSpecsFile){
+
+    PoreNetwork();
 
     this->ns = readSpecsFile(networkSpecsFile);
     if(!ns)
@@ -89,6 +93,8 @@ PoreNetwork::PoreNetwork(){
 }
 
 PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName){
+
+    PoreNetwork();
 
     this->ns = new NetworkSpecs(*other.ns);
     this->ns->name = newName;
@@ -221,6 +227,9 @@ PoreNetwork::~PoreNetwork(){
 
 
 PoreNetwork::PoreNetwork(const std::string networkSpecs_file){
+
+    PoreNetwork();
+
 
     this->ns = readSpecsFile(networkSpecs_file.c_str());
 

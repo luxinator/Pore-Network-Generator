@@ -40,7 +40,7 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
     int Nj = P_net->ns->Nj;
     int Nk = P_net->ns->Nk;
     
-    //Set up Random Generator in three Directions
+    //Set up Random Generator
     std::random_device r_dev{};
     std::default_random_engine e{r_dev()};
     std::uniform_real_distribution<float> d{0.0f,1.0f};
