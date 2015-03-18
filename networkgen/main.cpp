@@ -196,15 +196,19 @@ int main(int argc, char *argv[]) {
     	PoreNetwork *top = new PoreNetwork(top_network);
     	PoreNetwork *bot = new PoreNetwork(bot_network);
 
-    	Combinator *combi = new Combinator(top, bot);
+    	Combinator *combi = new Combinator(top, bot, "combi");
     	// Gather this from an options file or from input
-    	combi->setSeparation((float)2.5e-5);
-    	combi->setSearchDist((float)1.5 * 2.5e-5);
+    	combi->setSeparation((float)2.5e-4);
+    	combi->setSearchDist((float)2.5001e-4);
     	combi->setSurvival(0.5f);
     	combi->Combine(2);
     	combi->builtConnectionList();
-    	PoreNetwork *Res = combi->getResult();
-    	//writeVTK(vtkFile.c_str(), Res);
+    	PoreNetwork *Res = combi->getResult(); // This is not a completely valid network! NetworkSpecs is mostly empty!
+
+
+
+
+    	writeVTK(vtkFile.c_str(), Res);
 
     	std::cout << "D0ne!" << std::endl;
 

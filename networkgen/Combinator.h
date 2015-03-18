@@ -1,8 +1,6 @@
-/*
- * Combinator.h
- *
- *  Created on: Mar 16, 2015
- *      Author: lucas
+/* This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
  */
 
 #ifndef COMBINATOR_H_
@@ -11,7 +9,6 @@
 #include "PoreNetwork.h"
 #include <vector>
 #include <utility>
-#include <cstddef>
 
 using namespace std;
 
@@ -36,7 +33,7 @@ private:
 
 public:
 	/* Public Constructor */
-	Combinator(PoreNetwork *top, PoreNetwork *bot);
+	Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name);
 	/* Start the Combination Process */
 	void Combine(short side);
 	void builtConnectionList();

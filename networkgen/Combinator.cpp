@@ -1,3 +1,8 @@
+/* This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
 #include "Combinator.h"
 #include <iostream>
 #include <random>
@@ -13,13 +18,13 @@ void Combinator::setSeparation(float separation){ this->Separation = separation;
 
 void Combinator::setSearchDist(float searchDist){ this->SearchDist = searchDist; };
 
-PoreNetwork * Combinator::getResult(){ Result->ns->name = string("combined"); return Result; };
+PoreNetwork * Combinator::getResult(){ return Result; };
 
 /*
  * Combines two inner networks, try to keep it general! could later become important
  * to be able to chooses which sides to stick together
  */
-Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot) {
+Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name) {
     
 	// The generated network, might under certain conditions generate overlapping pores!
 	// NOT my problem!
@@ -37,6 +42,8 @@ Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot) {
 	this->Survival 	 = -1.0f;
 
 	PoreNetwork *result = new PoreNetwork();
+	result->ns = new NetworkSpecs;
+	result->ns->name = name;
 	result->nrOfActivePBs = top->nrOfActivePBs + bot->nrOfActivePBs;
 
 	float * t = new float[3 * result->nrOfActivePBs + 3];
@@ -183,7 +190,7 @@ void Combinator::builtConnectionList(){
 		i++;
 	}
 	// Add the Top and Renumber
-	for(i = 0; i < Result->nrOfConnections; i++){
+	for(i = 0; i < Top->nrOfConnections; i++){
 		Result->throatList[0][i + Bot->nrOfConnections + nrOfInterFaceConns] = Top->throatList[0][i] + Bot->nrOfActivePBs;
 		Result->throatList[1][i + Bot->nrOfConnections + nrOfInterFaceConns] = Top->throatList[1][i] + Bot->nrOfActivePBs;
 	}

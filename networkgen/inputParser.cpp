@@ -35,7 +35,7 @@ int find_char(const char *input, const int size, const char c){
     return -1;
 }
 
-void tolowercase(char *input, const unsigned int size = 0){
+void tolowercase(char *input, const int size = 0){
     for (int i = 0; i < size; i++) {
         input[i] = tolower(input[i]);
     }
