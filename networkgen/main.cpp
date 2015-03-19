@@ -195,29 +195,42 @@ int main(int argc, char *argv[]) {
 
     	PoreNetwork *top = new PoreNetwork(top_network);
     	PoreNetwork *bot = new PoreNetwork(bot_network);
-
+			
     	Combinator *combi = new Combinator(top, bot, "combi");
     	// Gather this from an options file or from input
     	combi->setSeparation((float)2.5e-4);
-    	combi->setSearchDist((float)2.5001e-4);
-    	combi->setSurvival(0.5f);
+    	combi->setSearchDist((float)3.0e-4);
+    	combi->setSurvival(0.01f);
     	combi->Combine(2);
     	combi->builtConnectionList();
     	PoreNetwork *Res = combi->getResult(); // This is not a completely valid network! NetworkSpecs is mostly empty!
-
+		
+	
 		// Generate Boudnaries
 		Res->generateBoundary(2);
+		
 		// Generate Full_conn
-		
+		size_t lengthTL = Res->generateFullConnectivity();
 		// Search for Isolated
-		
-		// Remove flagged porebodies
+		char * pb_list = searchForIsolatedPB(Res,lengthTL);
+		// Remove flagged porebodiesDebug session ended
+		if(!pb_list){
+		std::cout << "Network is Broken Aborting" << std::endl;
+			return 1;
+		}
+                
+		Res->removeFlaggedPBs(pb_list, (char)2);
 
 		// Write network to file(s)
-		writeVTK(vtkFile.c_str(), Res);
+		
+		float *pb = new float[Res->nrOfActivePBs + 1];
+		for(size_t i = 1; i <= Res->nrOfActivePBs; i++)
+			pb[i] = 1.0f;
+		
+		writeVTK(vtkFile.c_str(), Res, pb);
 
     	std::cout << "D0ne!" << std::endl;
-
+		
     }
 
     else{

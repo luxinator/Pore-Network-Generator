@@ -19,7 +19,7 @@ searchDistance = 2.00
 # Possible Flow Directions
 xFlow = 1
 yFlow = 1
-zFlow = 0
+zFlow = 1
 
 #Chance of a throat to survive, every value of c# represents a throat from a porebody.
 #

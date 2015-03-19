@@ -44,6 +44,10 @@ Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name) {
 	PoreNetwork *result = new PoreNetwork();
 	result->ns = new NetworkSpecs;
 	result->ns->name = name;
+	result->ns->pbDist = Bot->ns->pbDist;
+	result->ns->Ni = 0;
+	result->ns->Nj = 0;
+	result->ns->Nk = 0;
 	result->nrOfActivePBs = top->nrOfActivePBs + bot->nrOfActivePBs;
 
 	float * t = new float[3 * result->nrOfActivePBs + 3];
@@ -51,11 +55,10 @@ Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name) {
 	for(std::size_t i = 0; i < result->nrOfActivePBs * 3 + 3; i++)
 		t[i] = 0.0f;
 
-	result->locationList  = new float*[3];
+	result->locationList    = new float*[3];
 	result->locationList[0] = t;
-	result->locationList[1] = t + result->nrOfActivePBs;
-	result->locationList[2] = t + 2 * result->nrOfActivePBs;
-	t = nullptr;
+	result->locationList[1] = t + result->nrOfActivePBs + 1;
+	result->locationList[2] = t + 2 * result->nrOfActivePBs + 2;
 
 	int *temp = new int[2 * result->nrOfActivePBs + 2];
 	for(std::size_t i = 0; i < result->nrOfActivePBs * 2 + 2; i++)
@@ -64,16 +67,7 @@ Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name) {
 	result->throatCounter = new int*[2];
 	result->throatCounter[0] = temp;
 	result->throatCounter[1] = temp + result->nrOfActivePBs + 1;
-	temp = nullptr;
-
-	// This is waaay to small,
-	/*
-	int *temp = new int[2 * (top->nrOfConnections + bot->nrOfConnections) + 2];
-	result->throatList = new int*[2];
-	result->throatList[0] = temp;
-	result->throatList[1] = temp + (top->nrOfConnections + bot->nrOfConnections) + 1;
-	*/
-
+	
 	this->Result = result;
 
 	std::cout << "Combinator Succesfully Created" << std::endl;
@@ -152,15 +146,6 @@ void Combinator::Combine(short side){
 	// We now have a List of Boundary layer connections
 	std::cout << "Nr of Interface Conns: " << Boundary_Layer.size() << std::endl;
 
-
-	// --- add the new connection to the connectivity list?
-
-
-
-//	for (vector<pair<int,int> >::iterator it = Boundary_Layer.begin(); it != Boundary_Layer.end(); it++){
-//		std::cout << it->first << '\t' << it->second << std::endl;
-//	}
-
 }
 
 
@@ -175,7 +160,6 @@ void Combinator::builtConnectionList(){
 	Result->throatList = new int*[2];
 	Result->throatList[0] = temp;
 	Result->throatList[1] = temp + Result->nrOfConnections + 1;
-	temp = nullptr;
 
 	std::size_t i;
 	// Bottom Part just a copy of Bottom
@@ -194,7 +178,8 @@ void Combinator::builtConnectionList(){
 		Result->throatList[0][i + Bot->nrOfConnections + nrOfInterFaceConns] = Top->throatList[0][i] + Bot->nrOfActivePBs;
 		Result->throatList[1][i + Bot->nrOfConnections + nrOfInterFaceConns] = Top->throatList[1][i] + Bot->nrOfActivePBs;
 	}
-
+	
+	// Sort 
 	bubbleSortList(Result->throatList, Result->nrOfConnections);
 
 
