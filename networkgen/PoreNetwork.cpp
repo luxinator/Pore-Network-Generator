@@ -743,8 +743,6 @@ void PoreNetwork::generateBoundary(size_t dir){
     float** newLL   = nullptr;
     int** newTC     = nullptr;
 
-
-
     // --- Inlets
     this->nrOfInlets = 0;
 

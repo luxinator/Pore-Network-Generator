@@ -205,10 +205,16 @@ int main(int argc, char *argv[]) {
     	combi->builtConnectionList();
     	PoreNetwork *Res = combi->getResult(); // This is not a completely valid network! NetworkSpecs is mostly empty!
 
+		// Generate Boudnaries
+		Res->generateBoundary(2);
+		// Generate Full_conn
+		
+		// Search for Isolated
+		
+		// Remove flagged porebodies
 
-
-
-    	writeVTK(vtkFile.c_str(), Res);
+		// Write network to file(s)
+		writeVTK(vtkFile.c_str(), Res);
 
     	std::cout << "D0ne!" << std::endl;
 
