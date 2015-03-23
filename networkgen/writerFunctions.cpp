@@ -10,64 +10,9 @@
 #include <iomanip>
 #include <string>
 
-/*
- * Writes out the throatList until an entry with [0][0] is encounterd
- */
-void writeInlet_OutletPbs(const char * filename, PoreNetwork *pn){
-    
-    
-    std::ofstream file;
-    if(!filename){
-        std::cerr << "No filename specified! " << std::endl;
-        return;
-    }
-    
-    std::cout << "Opening File: " << filename << std::endl;
-    file.open(filename, std::ios::trunc);
-    if(!file){
-        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
-        return;
-    }
-    
-    int *inlets = new int[pn->ns->Ni];
-    int *outlets = new int[pn->ns->Ni];
-
-    
-    size_t j = 0;
-    for( ; j < pn->ns->Ni; j++){
-        inlets[j] = 0;
-        outlets[j] = 0;
-    }
-
-
-    for(size_t i = 0; i < pn->ns->Ni; i ++){
-        if (pn->locationList[0][pn->throatList[0][i]] == 0.0f){ //Assuming inlets are at x = 0
-            inlets[j] = pn->throatList[0][i];
-            std::cout << inlets[j] << std::endl;
-            j++;
-        }
-    }
-    
-    for(size_t i = 0; i < pn->ns->Ni; i ++){
-        if (pn->locationList[0][pn->throatList[0][i]] == pn->ns->Ni * pn->ns->pbDist){ //Assuming inlets are at x = 0
-            outlets[j] = pn->throatList[0][i];
-            std::cout << inlets[j] << std::endl;
-            j++;
-        }
-    }
-    
-    for(size_t i = 0; i < pn->ns->Ni; i ++){
- 
-    }
-    delete[] outlets;
-    delete[] inlets;
-    
-    file.close();
-    
-}
 
 void writeConnectivity(const char * path, PoreNetwork *pn){
-    
+
     std::ofstream file;
     if(!path){
         std::cerr << "No filename specified! " << std::endl;
@@ -102,8 +47,6 @@ void writeConnectivity(const char * path, PoreNetwork *pn){
 }
 
 void writeLocation(const char * path, PoreNetwork *P){
-    
-    
     
     std::ofstream file;
     if( path == nullptr){
@@ -142,7 +85,7 @@ void writeLocation(const char * path, PoreNetwork *P){
 
 
 void writeNetworkSpecs(const char * path, PoreNetwork *pn){
-    
+
     std::ofstream file;
     if( path == nullptr){
         std::cerr << "No filename specified! " << std::endl;
@@ -150,7 +93,6 @@ void writeNetworkSpecs(const char * path, PoreNetwork *pn){
     }
     
     std::string filename = std::string(path) + pn->ns->name + "_specs.txt";
-    
     
     std::cout << "Opening File: " << filename << std::endl;
     file.open(filename.c_str(), std::ios::trunc);
@@ -170,5 +112,49 @@ void writeNetworkSpecs(const char * path, PoreNetwork *pn){
     
     file.close();
     
+}
+
+void writeInterfacePores(const char * path, PoreNetwork *pn, Combinator *C){
+	
+	std::ofstream file;
+    if( path == nullptr){
+        std::cerr << "No filename specified! " << std::endl;
+        return;
+    }
     
+    std::string filename = std::string(path) + pn->ns->name + "_interface.txt";
+    
+    
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename.c_str(), std::ios::trunc);
+    if(!file){
+        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        return;
+    }
+    
+	std::vector<std::pair<int,int>> Boundary_Layer = C->getInterface();
+	
+	for (std::vector<std::pair<int,int>>::iterator it = Boundary_Layer.begin(); it != Boundary_Layer.end(); it++){
+		file << it->first << '\t' << it->second << '\n';
+	}
+	
+	file.close();
+	
+	filename = std::string(path) + pn->ns->name + "_specs.txt";
+    
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename.c_str(), std::ios::app);
+    if(!file){
+        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        return;
+    }
+	
+	file << "-- Combination -- " << '\n';
+	file << "Separation Distance = " << C->getSeparation() << '\n';
+	file << "Search Distance = " << C->getSearchDist() << '\n';
+	file << "Survival = " << C->getSurvival() << '\n';
+	
+	file.close();
+	
+
 }

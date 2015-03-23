@@ -10,7 +10,6 @@
 #include <vector>
 #include <utility>
 
-using namespace std;
 
 class Combinator{
 
@@ -25,7 +24,7 @@ private:
 //	this->Boundary_Layer.push_back(make_pair(2,3));
 //	this->Boundary_Layer[2].first + this->boundary_Layer.second;
 
-	 vector<pair<int,int>> Boundary_Layer;
+	std::vector<std::pair<int,int>> Boundary_Layer;
 
 	 float Survival;
 	 float Separation;
@@ -34,6 +33,7 @@ private:
 public:
 	/* Public Constructor */
 	Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name);
+	
 	/* Start the Combination Process */
 	void Combine(short side);
 	void builtConnectionList();
@@ -42,6 +42,12 @@ public:
 	void setSeparation(float separation);
 	void setSearchDist(float searchDist);
 	PoreNetwork * getResult();
+	
+	const std::vector<std::pair<int,int>>& getInterface() { return Boundary_Layer; };
+	
+	float getSurvival()  { return Survival; };
+	float getSeparation(){ return Separation; };
+	float getSearchDist(){ return SearchDist; };
 
 };
 #endif /* COMBINATOR_H_ */

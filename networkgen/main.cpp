@@ -18,18 +18,18 @@
 int main(int argc, char *argv[]) {
     
     std::cout << "\nPore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__<<std::endl;
-    std::cout << "Copyright Lucas van Oosterhout. All Rights Reserverd. \n\n" << std::endl;
+    std::cout << "Copyright Lucas van Oosterhout. GPLv2 see LICENSE \n\n" << std::endl;
     
-    std::string helpText = "Command-Line Options:\n \
+    std::string helpText = "Options can be combined for different results.\n \
+Command-Line Options:\n \
     -h               \t Shows this help text\n \
-    -ns [location]   \t Specify the location of the NetworkSpecs.in file\n \
-    \t if not given standard location is used [../data/NetworkSpecs.in]\n \
+    -ns [location]   \t Specify the location of the NetworkSpecs.in file if not given standard location is used [../data/NetworkSpecs.in]\n \
     -cfile [location] \t Specify the location of the connectiviy output file\n \
     -fcfile [location]\t Specify the location of the fullconnectivity output file\n \
     -lfile [location] \t Specify the location of the locations file\n \
     -vtk [location]   \t Specify if a vtk file is to be written and where\n \
-    -inner [location] \t Load Inner Network from file(s) and Generate with Boundaries\n \
-    -combine [top_network] [bottom_network] \t combines (innner) networks into one network \n";
+    -inner [location] \t Load Inner Network from file(s) and Generate with Boundaries as specified in the NetworkSpecs.in\n \
+    -combine [top_network] [bottom_network] [Separation Dist] [Search Dist] [Survival] combines (innner) networks into one network with boundaries as specified in bot_network/NetworkSpecs.in \n";
     
     std::string nSpecs = "./data/NetworkSpecs.in";
     std::string cFile   = "./data/";
@@ -45,6 +45,10 @@ int main(int argc, char *argv[]) {
     bool writeVTKswitch = false;
     bool generate = true;
     bool combine = false;
+	
+	float c_sep_dist 	= 0.0f;
+	float c_search_dist = 0.0f;
+	float c_survival 	= 0.0f;
     
 
     // Go through the list of given args
@@ -86,6 +90,7 @@ int main(int argc, char *argv[]) {
                 inputWasParsed = true;
                 generate = false;
                 name = std::string(argv[i+1]);
+		
                 i++;
             }
             else if(s.compare(0,8, "-combine") == 0 ){
@@ -93,13 +98,18 @@ int main(int argc, char *argv[]) {
             	generate = false;
             	combine   = true;
             	try{
-            		top_network = std::string(argv[i+1]);
-            		bot_network = std::string(argv[i+2]);
+            		top_network 	= std::string(argv[i+1]);
+            		bot_network 	= std::string(argv[i+2]);
+					c_sep_dist 		= std::atof(argv[i+3]);
+					c_search_dist 	= std::atof(argv[i+4]);
+					c_survival		= std::atof(argv[i+5]);
             	}
             	catch ( ... ){
-            		std::cout << "Error: specify a path to the Networkspec files please!!" << std::endl;
+            		std::cerr << "Error: Not Enough Parameters, see -h for details" << std::endl;
+					std::cerr << argv[i+3] << std::endl;
             		return 1;
             	}
+				break;
             	i += 2;
             }
             else
@@ -198,9 +208,9 @@ int main(int argc, char *argv[]) {
 			
     	Combinator *combi = new Combinator(top, bot, "combi");
     	// Gather this from an options file or from input
-    	combi->setSeparation((float)2.5e-4);
-    	combi->setSearchDist((float)3.0e-4);
-    	combi->setSurvival(0.01f);
+    	combi->setSeparation(c_sep_dist);
+    	combi->setSearchDist(c_search_dist);
+    	combi->setSurvival(c_survival);
     	combi->Combine(2);
     	combi->builtConnectionList();
     	PoreNetwork *Res = combi->getResult(); // This is not a completely valid network! NetworkSpecs is mostly empty!
@@ -223,13 +233,17 @@ int main(int argc, char *argv[]) {
 
 		// Write network to file(s)
 		
-		float *pb = new float[Res->nrOfActivePBs + 1];
-		for(size_t i = 1; i <= Res->nrOfActivePBs; i++)
+		float *pb = new float[Res->nrOfActivePBs];
+		for(size_t i = 1; i < Res->nrOfActivePBs; i++)
 			pb[i] = 1.0f;
 		
 		writeVTK(vtkFile.c_str(), Res, pb);
-
-    	std::cout << "D0ne!" << std::endl;
+		writeNetworkSpecs(cFile.c_str(), Res);
+		writeInterfacePores(cFile.c_str(), Res, combi);
+		writeConnectivity(cFile.c_str(), Res);
+		writeLocation(cFile.c_str(), Res);
+		
+    	std::cout << "Done!" << std::endl;
 		
     }
 

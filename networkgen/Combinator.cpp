@@ -94,7 +94,9 @@ void Combinator::Combine(short side){
 			std::cerr << "Please set the Survival Chance!" << std::endl;
 			return;
 		}
-
+	std::cout << "Separation Distance: " << Separation << std::endl;
+	std::cout << "Seaching Distance: " << SearchDist << std::endl;
+	std::cout << "Survival: " << Survival << std::endl;
 
 	// ------ Location ------//
 	float translation[] = { 0.0f, 0.0f, 0.0f };
@@ -168,7 +170,7 @@ void Combinator::builtConnectionList(){
 		Result->throatList[1][i] = Bot->throatList[1][i];
 	}
 	// Add the Boundary Layer, already renumberd!
-	for (vector<pair<int,int> >::iterator it = Boundary_Layer.begin(); it != Boundary_Layer.end(); it++){
+	for (std::vector<std::pair<int,int> >::iterator it = Boundary_Layer.begin(); it != Boundary_Layer.end(); it++){
 		Result->throatList[0][i] = it->first;
 		Result->throatList[1][i] = it->second;
 		i++;
