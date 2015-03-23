@@ -35,7 +35,7 @@ int find_char(const char *input, const int size, const char c){
     return -1;
 }
 
-void tolowercase(char *input, const unsigned int size = 0){
+void tolowercase(char *input, const int size = 0){
     for (int i = 0; i < size; i++) {
         input[i] = tolower(input[i]);
     }
@@ -59,7 +59,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
     char c = ' ';
     int i = 0;
 
-    std::cout << "Parsing NetworkSpecs: \n" << std::endl;
+    std::cout << "Parsing NetworkSpecs: " << std::endl;
     
     while(file.getline(buff, 255)){
         //TRIM THE STRING OF SPACES!!!
@@ -128,8 +128,9 @@ NetworkSpecs *readSpecsFile(const char *filename){
         }
         
         else if( s.compare(0,4, "name") == 0) {
-            NS->name = new char[255];
-            NS->name =s.substr(i+1);            
+            //NS->name = new char[255];
+            NS->name = s.substr(i+1);
+
         }
     }
     std::cout << "\nname: " << NS->name << std::endl;

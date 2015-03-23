@@ -21,7 +21,9 @@ void bubbleSortList(int **list, const size_t l){
     std::cout<< "\t Bubble Sorting " << l << " values" << std::endl;
     bool sorted = false;
     int t1, t2; // temp values
+    std::size_t passes = 0;
     while (!sorted){
+    	passes++;
         sorted = true;
     
         for(size_t i = 0; i < l - 1; i++){
@@ -41,6 +43,7 @@ void bubbleSortList(int **list, const size_t l){
             }
         }
     }
+    std::cout << "\t Passes: " << passes << std::endl;
 }
 
 void bubbleSortList(int **list, const int l){

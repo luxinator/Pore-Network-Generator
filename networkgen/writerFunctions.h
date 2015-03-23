@@ -6,13 +6,14 @@
 #define writer_Functions_h
 
 #include "PoreNetwork.h"
-
-void writeInlet_OutletPbs(const char * filename, PoreNetwork *pn);
+#include "Combinator.h"
 
 void writeConnectivity(const char * filename, PoreNetwork *P_net);
 
 void writeLocation(const char * filename, PoreNetwork *P_net);
 
 void writeNetworkSpecs(const char * path, PoreNetwork *pn);
+
+void writeInterfacePores(const char * path, PoreNetwork *pn, Combinator *C);
 
 #endif
