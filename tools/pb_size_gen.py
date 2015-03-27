@@ -9,7 +9,7 @@ __author__ = 'Lucas van Oosterhout'
 import matplotlib.pyplot as plt
 import numpy as np
 
-mu, sigma = np.log(2.0e-4), 0.2
+mu, sigma = np.log(2.0e-4), 0.1
 s = np.random.lognormal(mu, sigma, 100000)
 
 # pretty plot
@@ -17,7 +17,7 @@ s = np.random.lognormal(mu, sigma, 100000)
 count, bins, ignored = plt.hist(s, 100, normed=True, align='mid')
 plt.xlabel('Pore body Size')
 plt.ylabel('Frequency')
-plt.title(r'Pb Size Distribution: $\mu={}$, $\sigma={}$'.format(mu, sigma))
+plt.title(r'Pb Size Distribution: $\mu={}$, $\sigma={}$'.format(np.e**mu, sigma))
 plt.subplots_adjust(left=0.15)
 
 
