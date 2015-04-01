@@ -23,7 +23,7 @@
  *
  */
 
-void eliminateThroats(PoreNetwork *P_net, int coordNr){
+void eliminateThroats(PoreNetwork *P_net){
    
      
     std::cout<<"Deleting throats" << std::endl;
@@ -190,7 +190,7 @@ void eliminateThroats(PoreNetwork *P_net, int coordNr){
 size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
     
     int pn = throatList[0][i];
-    while( throatList[0][i] == pn && i < max){
+    while(throatList[0][i] == pn && i < max){
         i++;
     }
     
@@ -221,8 +221,7 @@ void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag,
 
     // from TL[1][start] to TL[1][max] are connected pbs
     size_t max = returnAdjecentNodes(TL, start, TL_Length);
-
-    
+	    
     //For all throats connected to pb do:
     for(size_t i = start; i < max; i++){
         if(flagged_PB[TL[1][i]] == check){
@@ -310,7 +309,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
         std::cout << "!!! --- 2 : Network is Broken no Connection between Inlet and Outlet ---!!!" << std::endl;
         return nullptr;
     }
-    
+	    
     // we now have a flagged list of pb's which are connected to the inlets AND outlets
     std::cout << "Done!"<< std::endl;
     return flagged_PB;

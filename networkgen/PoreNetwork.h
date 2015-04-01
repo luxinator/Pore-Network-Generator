@@ -20,6 +20,7 @@ struct NetworkSpecs {
     float pbDist;
     bool periodicBounndaries;
     bool flowDirs[3]; // flowDirs[0] -> x-boundaries, flowDirs[1] -> y-boundaries, flowDirts[2] -> z-boundaries
+	bool keepDeadEnd;
 };
 
 class PoreNetwork{
@@ -72,6 +73,8 @@ public:
     size_t generateFullConnectivity();
     
     void generate_naive_array();
+	
+	char* killDeadEndPores();
     
     size_t delelteThroat(size_t i, size_t deleted, int flag);
     

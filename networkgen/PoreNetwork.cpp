@@ -392,23 +392,6 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
 	
     // Do the Actually Deleting of the Throats
     this->removeFlaggedThroats(-1);
-    
-    
-    // Check the Inlet and Outlet porebodies and delete them if needed:
-//    if(this->nrOfInlets > 0){
-//        for( i = 1; i <= nrOfInlets; i++){
-//            if( pb_flag_list[i] < minFlag ){
-//                nrOfInlets--;
-//            }
-//        }
-//    }
-//    if(this->nrOfOutlets > 0){
-//        for (i = nrOfActivePBs - nrOfOutlets + 1; i <= nrOfActivePBs; i++) {
-//            if (pb_flag_list[i] < minFlag){
-//                nrOfOutlets--;
-//            }
-//        }
-//    }
 	
 	std::cout << nrOfInlets << '\t' << nrOfOutlets << std::endl;
 	
@@ -1042,6 +1025,25 @@ size_t PoreNetwork::generateFullConnectivity(){
     return maxConnections - 1;
 }
 
+
+
+char * PoreNetwork::killDeadEndPores(){
+	
+	std::cout << "Killing dead end Pores"<< std::endl;
+	if(!throatList_full)
+ 		generateFullConnectivity();
+	
+	char* mask = new char[nrOfActivePBs];
+	for(size_t i = 0; i < nrOfConnections; i++)
+		mask[i] = 0;
+	
+	for(size_t i = nrOfInlets; i < nrOfConnections - nrOfOutlets; i++){
+		if(mask[throatList_full[0][i]] < (char)2)
+			mask[throatList_full[0][i]]++;
+	}
+	return mask;
+	
+}
 
 /*
  * Delete Pore with PoreNumber i, a flag is placed in the throatlist, and throatcounter is diminished with 1

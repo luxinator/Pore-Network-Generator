@@ -140,7 +140,7 @@ Command-Line Options:\n \
         innerNetwork->generateLocation();
         
         std::cout << "Eliminating Throats ..." << std::endl;
-        eliminateThroats(innerNetwork, 6);
+        eliminateThroats(innerNetwork);
         innerNetwork->removeFlaggedThroats(-1);
         
         // --- Write the Inner network to file, no search for isolated pbs!
@@ -178,14 +178,19 @@ Command-Line Options:\n \
                 
                 size_t lengthTL = P_Bound->generateFullConnectivity();
                 
-                char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
+                if(!P_Bound->ns->keepDeadEnd){
+					char *pb_list = P_Bound->killDeadEndPores();
+					P_Bound->removeFlaggedPBs(pb_list, (char)2);
+				}
+				
+				char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
                 if(!pb_list){
                     std::cout << "Network is Broken Aborting" << std::endl;
                     return 1;
                 }
                 
-                P_Bound->removeFlaggedPBs(pb_list, (char)2);
-
+				P_Bound->removeFlaggedPBs(pb_list, (char)2);
+								
                 writeVTK(vtkFile.c_str(), P_Bound);
                 writeConnectivity(cFile.c_str(), P_Bound);
                 

@@ -28,7 +28,7 @@
  * Max coordination number is 6 at the moment (in forward x dir!)
  *
  */
-void eliminateThroats(PoreNetwork *P_net, int coordNr);
+void eliminateThroats(PoreNetwork *P_net);
 
 char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL);
 
