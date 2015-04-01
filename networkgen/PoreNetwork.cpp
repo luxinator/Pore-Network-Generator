@@ -363,6 +363,9 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
 
     size_t i = 0;
 
+	size_t in = 0;
+	size_t out = 0;
+	
     for(i = 0; i < this->nrOfConnections; i++){
         //Delete the connection FROM a flagged Pore
         if (pb_flag_list[this->throatList[0][i]] < minFlag) {
@@ -374,26 +377,41 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
             this->throatList[1][i] = -1;
         }
     }
-
+	
+	//Check for Inlet of Outlet changes
+	for(i = 0; i < this->nrOfInlets; i++){
+		if(this->throatList[0][i] == -1 )
+			in++;
+	}
+	for(i = nrOfConnections - nrOfOutlets; i < this->nrOfConnections; i++)
+		if(this->throatList[0][i] == -1)
+			out++;
+    
+	//std::cout << nrOfInlets - in << '\t' << nrOfOutlets - out << std::endl;
+	nrOfInlets -= in; nrOfOutlets-= out;
+	
     // Do the Actually Deleting of the Throats
     this->removeFlaggedThroats(-1);
     
     
     // Check the Inlet and Outlet porebodies and delete them if needed:
-    if(this->nrOfInlets > 0){
-        for( i = 1; i < nrOfInlets; i++){
-            if( pb_flag_list[i] < minFlag ){
-                nrOfInlets--;
-            }
-        }
-    }
-    if(this->nrOfOutlets > 0){
-        for (i = nrOfActivePBs - nrOfOutlets + 1; i <= nrOfActivePBs; i++) {
-            if (pb_flag_list[i] < minFlag){
-                nrOfOutlets--;
-            }
-        }
-    }
+//    if(this->nrOfInlets > 0){
+//        for( i = 1; i <= nrOfInlets; i++){
+//            if( pb_flag_list[i] < minFlag ){
+//                nrOfInlets--;
+//            }
+//        }
+//    }
+//    if(this->nrOfOutlets > 0){
+//        for (i = nrOfActivePBs - nrOfOutlets + 1; i <= nrOfActivePBs; i++) {
+//            if (pb_flag_list[i] < minFlag){
+//                nrOfOutlets--;
+//            }
+//        }
+//    }
+	
+	std::cout << nrOfInlets << '\t' << nrOfOutlets << std::endl;
+	
 
     //pb_flag_list -> isolated pb's if minFlg
     //build a mask:
@@ -466,7 +484,6 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         accumulator = this->throatCounter[1][i];
         //std::cout << this->throatCounter[0][i] << '\t' << this->throatCounter[1][i] << std::endl;
     }
-
 
     delete[] pb_flag_list;
     delete[] mask;

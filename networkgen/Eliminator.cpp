@@ -288,8 +288,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
     bool brokenNetwork = true;
     
     //Do a Depth First Search on all outlets
-    //for(i = lengthTL - 1; P_net->throatList_full[0][i] >= (P_net->nrOfActivePBs - P_net->nrOfOutlets); i--){
-    for(i = lengthTL - 1; i > (lengthTL- P_net->nrOfOutlets); i--){
+    for(i = lengthTL - P_net->nrOfOutlets; P_net->throatList_full[1][i] <= P_net->nrOfActivePBs; i++){
         // Check if pb the qualifies
         if(flagged_PB[ P_net->throatList_full[0][i] ] == (char)1){
             DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)2, (char)1);
