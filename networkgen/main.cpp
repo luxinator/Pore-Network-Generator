@@ -112,7 +112,8 @@ Command-Line Options:\n \
 				break;
             	i += 2;
             }
-            else
+			
+			else
                 inputWasParsed = false;
         }
         if(!inputWasParsed){
@@ -152,6 +153,7 @@ Command-Line Options:\n \
         writeNetworkSpecs(cFile.c_str(), innerNetwork);
         
 
+		// --- Generate the Boundaries and Search for Isolated pbds
         std::cout << std::endl;
         std::string suffix;
         
@@ -176,18 +178,18 @@ Command-Line Options:\n \
                 
                 P_Bound->generateBoundary(dir);
                 
-                size_t lengthTL = P_Bound->generateFullConnectivity();
-                
-                if(!P_Bound->ns->keepDeadEnd){
-					char *pb_list = P_Bound->killDeadEndPores();
-					P_Bound->removeFlaggedPBs(pb_list, (char)2);
-				}
 				
-				char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
+				
+				size_t lengthTL = P_Bound->generateFullConnectivity();
+                char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
                 if(!pb_list){
                     std::cout << "Network is Broken Aborting" << std::endl;
                     return 1;
                 }
+				// KilldeadEnd should be able to run after search as well...
+                if(!P_Bound->ns->keepDeadEnd){
+					P_Bound->killDeadEndPores();
+				}
                 
 				P_Bound->removeFlaggedPBs(pb_list, (char)2);
 								
@@ -268,7 +270,7 @@ Command-Line Options:\n \
 
         std::string prefix;
 
-        writeVTK(vtkFile.c_str(), inner);
+        //writeVTK(vtkFile.c_str(), inner);
 
 
         for(int dir = 0; dir <= 2; dir++){
@@ -289,36 +291,31 @@ Command-Line Options:\n \
                 }
 
                 PoreNetwork *P_Bound = new PoreNetwork(*inner, prefix + inner->ns->name);
-
+                
                 P_Bound->generateBoundary(dir);
-
-                size_t lengthTL = P_Bound->generateFullConnectivity();
-
+                
+				size_t lengthTL = P_Bound->generateFullConnectivity();
                 char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
-
-                {
-                    std::ofstream file;
-                    file.open((vtkFile + "pb_flags.txt"), std::ios::trunc);
-
-                    for(size_t i = 1; i <= P_Bound->nrOfActivePBs; i++)
-                        file << (int)pb_list[i] << std::endl;
-                }
-
                 if(!pb_list){
                     std::cout << "Network is Broken Aborting" << std::endl;
                     return 1;
                 }
-
-                P_Bound->removeFlaggedPBs(pb_list, (char)2);
-
-
+				
+				P_Bound->removeFlaggedPBs(pb_list, (char)2);
+								
+				// KilldeadEnd should be able to run after search as well...
+                if(!P_Bound->ns->keepDeadEnd){
+					P_Bound->killDeadEndPores();
+				}
+                
                 writeVTK(vtkFile.c_str(), P_Bound);
                 writeConnectivity(cFile.c_str(), P_Bound);
-
+                
                 writeLocation(lFile.c_str(), P_Bound);
                 writeNetworkSpecs(cFile.c_str(), P_Bound);
-
+                
                 delete P_Bound;
+                std::cout << std::endl;
             }
         }
 

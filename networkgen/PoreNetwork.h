@@ -64,7 +64,7 @@ public:
     
     void removeFlaggedThroats(const int Flag = 0);
 
-    void removeFlaggedPBs(char *pb_flag_list, char minFlag);
+    int removeFlaggedPBs(char *pb_flag_list, char minFlag);
 
     void generateLocation();
     

@@ -150,12 +150,10 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName) : PoreNe
     this->throatList[0] = t;
     this->throatList[1] = t + other.nrOfConnections;
 
-    for ( i = 0; other.throatList[0][i] != 0; i++) {
+    for ( i = 0; i < other.nrOfConnections; i++) {
         this->throatList[0][i] = other.throatList[0][i];
         this->throatList[1][i] = other.throatList[1][i];
     }
-    //this->nrOfConnections = i;
-
 
     // -- throatCounters
     t = new int[2 * other.nrOfActivePBs + 2];
@@ -269,6 +267,7 @@ PoreNetwork::PoreNetwork(const std::string networkSpecs_file) : PoreNetwork(){
     for (size_t i = 0; i < periodicListLength; i++)
         this->periodicThroats[i] = 0;
 
+	t = nullptr;
     loadThroats((path + name + "_conn.txt").c_str(), this);
 }
 
@@ -352,11 +351,11 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
  * renumbers the Throat counters and the location list as well, only the half map is renumberd!
  * For a fully connected and renumberd map simply rerun pn->generateFullConnectivity()
  */
-void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
+int PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
 
     if(!pb_flag_list){
         std::cerr << "PoreBodies flag list is empty, broken network?" << std::endl;
-        return;
+        return -1;
     }
 
     std::cout<< "Removing Porebodies with a Flag value lower then: " << (int)minFlag << std::endl;;
@@ -393,7 +392,7 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
     // Do the Actually Deleting of the Throats
     this->removeFlaggedThroats(-1);
 	
-	std::cout << nrOfInlets << '\t' << nrOfOutlets << std::endl;
+	//std::cout << nrOfInlets << '\t' << nrOfOutlets << std::endl;
 	
 
     //pb_flag_list -> isolated pb's if minFlg
@@ -470,6 +469,8 @@ void PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
 
     delete[] pb_flag_list;
     delete[] mask;
+	
+	return cummulator;
 }
 
 
@@ -999,6 +1000,8 @@ size_t PoreNetwork::generateFullConnectivity(){
     int **connection = new int*[2];
     connection[0] = t;
     connection[1] = t + maxConnections;
+	// Shuts memchecker up
+	t = nullptr;
 
     for(i = 0; i < maxConnections; i++){
         connection[0][i] = 0;
@@ -1016,7 +1019,6 @@ size_t PoreNetwork::generateFullConnectivity(){
         connection[1][i * 2 + 1] = halfConnectivity[0][i];
 
     }
-
     bubbleSortList(connection, maxConnections-1); // Do NOT sort WITH the guards...
 
 
@@ -1026,23 +1028,49 @@ size_t PoreNetwork::generateFullConnectivity(){
 }
 
 
-
+/*
+ * Generate a Coordination number per pb
+ * if it is 2 or less, a pb is a dead end.
+ * except for inlets and outlets
+ */ 
 char * PoreNetwork::killDeadEndPores(){
 	
 	std::cout << "Killing dead end Pores"<< std::endl;
-	if(!throatList_full)
- 		generateFullConnectivity();
+
+	char* mask ;
 	
-	char* mask = new char[nrOfActivePBs];
-	for(size_t i = 0; i < nrOfConnections; i++)
-		mask[i] = 0;
-	
-	for(size_t i = nrOfInlets; i < nrOfConnections - nrOfOutlets; i++){
-		if(mask[throatList_full[0][i]] < (char)2)
-			mask[throatList_full[0][i]]++;
+	bool clean = false;
+	int j = 1;
+	while(!clean){
+		std::cout << "PASS " << j << std::endl;
+		
+		mask = new char[nrOfActivePBs + 1];
+		
+		for(size_t i = 0; i <= nrOfActivePBs; i++)
+			mask[i] = 0;
+		
+		for(size_t i = 1; i <= nrOfInlets; i++)
+			mask[i] = 2;
+			
+		for(size_t i = nrOfActivePBs - nrOfOutlets; i <= nrOfActivePBs; i++)
+			mask[i] = 2;
+		
+		for(size_t i = 0; i < this->nrOfConnections; i++){
+				mask[throatList[0][i]]++;
+				mask[throatList[1][i]]++;
+		}
+		
+		
+	//	for(size_t i = 0; i <= nrOfActivePBs; i++)
+	//		std::cout <<i << '\t' <<  (int)mask[i] << std::endl;
+	//	
+		if(removeFlaggedPBs(mask, (char)2) < 1){
+			clean = true;
+		}
+		j++;
+				
 	}
 	return mask;
-	
 }
 
 /*

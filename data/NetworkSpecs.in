@@ -1,8 +1,8 @@
 Name = Coarse_LowCoord
 # The Number of Porebodies in the x,y,z-directions
-Ni = 60
-Nj = 60
-Nk = 1
+Ni = 30
+Nj = 30
+Nk = 10
 
 # Periodic Boundaries, 0 = off, all else is on
 periodic = 0
@@ -18,10 +18,10 @@ searchDistance = 2.00
 # Possible Flow Directions
 xFlow = 1
 yFlow = 1
-zFlow = 0
+zFlow = 1
 
 # Keep deadend porebodies in the network
-keepDeadEnd = 1
+keepDeadEnd = 0
 
 #Chance of a throat to survive, every value of c# represents a throat from a porebody.
 #

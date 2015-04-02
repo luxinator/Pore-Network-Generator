@@ -100,7 +100,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
         else if( s.compare(0,5, "zflow") == 0){
             NS->flowDirs[2] = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         } 
-        else if( s.compare(0,11, "keepDeadEnd") == 0){
+        else if( s.compare(0,11, "keepdeadend") == 0){
             NS->keepDeadEnd = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         }
         // ----- ChanceList is kind of a special Case

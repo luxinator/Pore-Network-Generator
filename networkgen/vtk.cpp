@@ -81,9 +81,12 @@ void writeVTK(const char* path, PoreNetwork *P_net, float * pb_values, const int
 			file << pb_values[pn] << '\n';
 			//std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
 		}
-	} else 
-		for(size_t pn = 1; pn <= PNMax; pn++)
-			file << 1.0 << '\n';
+	} 
+//	else 
+//		for(size_t pn = 1; pn <= PNMax; pn++)
+//			file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
+//			file << "LOOKUP_TABLE default" << std::endl;
+//			file << 1.0 << '\n';
 	
 	file.close();
 

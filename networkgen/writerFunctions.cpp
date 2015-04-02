@@ -39,10 +39,8 @@ void writeConnectivity(const char * path, PoreNetwork *pn){
         
         file << pn->throatList[0][i]<< '\t' << pn->throatList[1][i] <<'\t' << periodic << '\n';
     }
-    std::cout << std::endl;
-    
     std::cout<< "# nr of throats written to File: " << i << std::endl;
-   
+	std::cout << std::endl;
     file.close();
 }
 
@@ -78,7 +76,7 @@ void writeLocation(const char * path, PoreNetwork *P){
         //std::cout<< throatCounters[0][pn] << '\t' <<  throatCounters[1][pn] << std::endl;
     }
     
-    std::cout << "# PB Locations Writen to file: " << pn -1 << std::endl;
+    std::cout << "# PB Locations Writen to file: " << pn -1 << '\n' << std::endl;
     
     file.close();
 }
