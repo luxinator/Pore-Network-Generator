@@ -186,12 +186,14 @@ Command-Line Options:\n \
                     std::cout << "Network is Broken Aborting" << std::endl;
                     return 1;
                 }
+				P_Bound->removeFlaggedPBs(pb_list, (char)2);
+				
 				// KilldeadEnd should be able to run after search as well...
                 if(!P_Bound->ns->keepDeadEnd){
 					P_Bound->killDeadEndPores();
 				}
                 
-				P_Bound->removeFlaggedPBs(pb_list, (char)2);
+				
 								
                 writeVTK(vtkFile.c_str(), P_Bound);
                 writeConnectivity(cFile.c_str(), P_Bound);
