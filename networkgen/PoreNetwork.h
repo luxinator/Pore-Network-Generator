@@ -13,6 +13,7 @@
 
 struct NetworkSpecs {
     std::string name;
+	std::string pbSizeFile;
     unsigned int Ni, Nj, Nk;
     float C[26];
     unsigned int coordNr;
@@ -34,6 +35,7 @@ private:
 public:
     
     NetworkSpecs *ns;
+	float *pb_sizeList; //pB_SIZES read from file
     int ***arr; //contains the pb number at the lattic coordinates, (Known as a Lookup Table)
     int **throatCounter; //number of prore throats per pb nr (1 based!) and number of throats preceding.
     int **throatList; // Connection map from pb nr -> pb nr. Is the half map!

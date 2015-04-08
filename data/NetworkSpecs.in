@@ -11,10 +11,14 @@ periodic = 0
 # The Distance between the lattice points
 pbDist = 6.0e-5
 
-#The Minimal Distance between two porebodies
+#The Minimal Distance between two connected porebodies
 #As if this distance was squared and divided by the pbDist (choices are 1.0, 2.0 and 3.0)
 # ! Elemination does not work on searchDistance = 3.0 as of now!
 searchDistance = 2.00
+
+#Pb_size file, may be empty
+pbsize = pb_size.txt
+
 
 # Possible Flow Directions
 xFlow = 1

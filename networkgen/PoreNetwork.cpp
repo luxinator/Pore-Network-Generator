@@ -22,8 +22,6 @@
 
 int PoreNetwork::checkInput(){
 
-
-
     if (this->ns->Ni < 3 && this->ns->flowDirs[0]){
         std::cerr << "ERROR: The X-boundary Condition is turnend on\nBut Ni is smaller then 3: Not Enough PB's for conditions!\n" << std::endl;
         return 1;
@@ -76,18 +74,19 @@ PoreNetwork::PoreNetwork(){
 
 	// Zero out all the memory, all pointers to 0x0 and all values to 0;
 	this->arr 				= nullptr;
+	this->pb_sizeList		= nullptr;
 	this->locationList 		= nullptr;
-	this->nrOfActivePBs 	= 0;
-	this->nrOfConnections 	= 0;
-	this->nrOfInlets 		= 0;
-	this->nrOfOutlets		= 0;
 	this->ns				= nullptr;
-	this->periodicListLength= 0;
 	this->periodicThroats	= nullptr;
 	this->throatCounter		= nullptr;
 	this->throatList		= nullptr;
 	this->throatList_full	= nullptr;
-
+	this->nrOfActivePBs 	= 0;
+	this->nrOfConnections 	= 0;
+	this->nrOfInlets 		= 0;
+	this->nrOfOutlets		= 0;
+	this->periodicListLength= 0;
+	
 }
 
 PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName) : PoreNetwork(){
