@@ -1,4 +1,5 @@
-Name = Coarse_LowCoord
+Name = bottom
+
 # The Number of Porebodies in the x,y,z-directions
 Ni = 30
 Nj = 30

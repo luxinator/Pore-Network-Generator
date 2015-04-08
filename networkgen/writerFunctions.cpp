@@ -151,6 +151,7 @@ void writeInterfacePores(const char * path, PoreNetwork *pn, Combinator *C){
 	file << "Separation Distance = " << C->getSeparation() << '\n';
 	file << "Search Distance = " << C->getSearchDist() << '\n';
 	file << "Survival = " << C->getSurvival() << '\n';
+	file << "Number of Interface Throats = "<< Boundary_Layer.size() << '\n';
 	
 	file.close();
 	

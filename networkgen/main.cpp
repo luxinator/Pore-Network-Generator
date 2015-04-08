@@ -239,6 +239,10 @@ Command-Line Options:\n \
 		}
                 
 		Res->removeFlaggedPBs(pb_list, (char)2);
+		
+		if(!top->ns->keepDeadEnd || !bot->ns->keepDeadEnd){
+					Res->killDeadEndPores();
+		}
 
 		// Write network to file(s)
 		

@@ -29,6 +29,7 @@ private:
 	 float Survival;
 	 float Separation;
 	 float SearchDist;
+	 
 
 public:
 	/* Public Constructor */
