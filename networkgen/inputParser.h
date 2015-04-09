@@ -13,10 +13,10 @@
 
 NetworkSpecs *readSpecsFile(const char *filename = "NetworkSpecs.in");
 
-void loadNrs(const char *filename, PoreNetwork *P);
+int loadNrs(const char *filename, PoreNetwork *P);
 
-void loadPoreBodyLocations(const char *filename, PoreNetwork *P);
+int loadPoreBodyLocations(const char *filename, PoreNetwork *P);
 
-void loadThroats(const char *filename, PoreNetwork *P);
+int loadThroats(const char *filename, PoreNetwork *P);
 
 #endif /* defined(__networkgen__inputParser__) */

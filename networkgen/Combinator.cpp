@@ -59,7 +59,17 @@ Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name) {
 	result->locationList[0] = t;
 	result->locationList[1] = t + result->nrOfActivePBs + 1;
 	result->locationList[2] = t + 2 * result->nrOfActivePBs + 2;
-
+	
+	result->pb_sizeList = new float[result->nrOfActivePBs + 1];
+	// Copy over the Pb_sizes
+	for(size_t i = 1 ; i <= bot->nrOfActivePBs; i++)
+		result->pb_sizeList[i] = bot->pb_sizeList[i];
+	
+	for(size_t i = bot->nrOfActivePBs+1; i <= result->nrOfActivePBs; i++)
+		result->pb_sizeList[i] = top->pb_sizeList[i - bot->nrOfActivePBs];
+	
+	result->ns->meanPBsize = bot->ns->meanPBsize;
+	
 	int *temp = new int[2 * result->nrOfActivePBs + 2];
 	for(std::size_t i = 0; i < result->nrOfActivePBs * 2 + 2; i++)
 			temp[i] = 0;
@@ -69,7 +79,6 @@ Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name) {
 	result->throatCounter[1] = temp + result->nrOfActivePBs + 1;
 	
 	this->Result = result;
-
 	std::cout << "Combinator Succesfully Created" << std::endl;
 
 }
@@ -147,7 +156,9 @@ void Combinator::Combine(short side){
 
 	// We now have a List of Boundary layer connections
 	std::cout << "Nr of Interface Conns: " << Boundary_Layer.size() << std::endl;
-
+	
+	//Add the Pb_sizes
+	
 }
 
 

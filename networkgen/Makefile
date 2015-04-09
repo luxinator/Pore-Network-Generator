@@ -1,7 +1,7 @@
 
 CXX	 := clang++
-#CXXFLAGS := -g -O3 -std=c++11 -march=native -fomit-frame-pointer 
-CXXFLAGS := -g -Wuninitialized -std=c++11 -Wall 
+CXXFLAGS := -g -O3 -std=c++11 -march=native -fomit-frame-pointer 
+#CXXFLAGS := -g -Wuninitialized -std=c++11 -Wall 
 INCLUDES :=					# This would contain any -I options to the
   							# compiler, if there are any.
 LIBS     := 				# Contains libraries we need to link in.

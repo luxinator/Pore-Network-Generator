@@ -165,7 +165,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
     return NS;
 }
 
-void loadNrs(const char *filename, PoreNetwork *P){
+int loadNrs(const char *filename, PoreNetwork *P){
     
     std::fstream file;
     
@@ -173,11 +173,11 @@ void loadNrs(const char *filename, PoreNetwork *P){
     file.open(filename, std::ios::in);
     if(!file){
         std::cerr<< "Error in opening file [" << filename << ']' << std::endl;
-        return;
+        return -1;
     }
     if(!P){
         std::cerr << "Error: No PoreNetwork Object Supplied! Check Input Files" << std::endl;
-        return;
+        return -2;
     }
     
     const int buffsize = 255;
@@ -214,16 +214,17 @@ void loadNrs(const char *filename, PoreNetwork *P){
     }
     
     file.close();
+	return 0;
 }
 
-void loadPoreBodyLocations(const char *filename, PoreNetwork *P){
+int loadPoreBodyLocations(const char *filename, PoreNetwork *P){
     std::ifstream file;
     
     std::cout << "Opening File: " << filename << std::endl;
     file.open(filename, std::ios::in);
     if(!file){
         std::cerr<< "Error in opening file [" << filename << ']' << std::endl;
-        return;
+        return -1;
     }
    
     float x, y, z, pbsize;
@@ -244,21 +245,23 @@ void loadPoreBodyLocations(const char *filename, PoreNetwork *P){
         
         i++;
     }
+	
+	return 0;
     
 }
 
-void loadThroats(const char *filename, PoreNetwork *P){
+int loadThroats(const char *filename, PoreNetwork *P){
     std::ifstream file;
     
     std::cout << "Opening File: " << filename << std::endl;
     file.open(filename, std::ios::in);
     if(!file){
         std::cerr<< "Error in opening file [" << filename << ']' << std::endl;
-        return;
+        return -1;
     }
     if(!P){
         std::cerr << "Error: No PoreNetwork Object Supplied! Check Input Files" << std::endl;
-        return;
+        return -1;
     }
     
     int from, to, periodic;
@@ -277,6 +280,8 @@ void loadThroats(const char *filename, PoreNetwork *P){
         i++;
         
     }
+	
+	return 0;
     
 }
 

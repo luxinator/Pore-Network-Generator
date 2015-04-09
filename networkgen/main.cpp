@@ -242,12 +242,8 @@ Command-Line Options:\n \
 		}
 
 		// Write network to file(s)
-		
-		float *pb = new float[Res->nrOfActivePBs];
-		for(size_t i = 1; i < Res->nrOfActivePBs; i++)
-			pb[i] = 1.0f;
-		
-		writeVTK(vtkFile.c_str(), Res, pb);
+	
+		writeVTK(vtkFile.c_str(), Res, Res->pb_sizeList);
 		writeNetworkSpecs(cFile.c_str(), Res);
 		writeInterfacePores(cFile.c_str(), Res, combi);
 		writeConnectivity(cFile.c_str(), Res);

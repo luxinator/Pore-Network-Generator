@@ -239,6 +239,7 @@ PoreNetwork::PoreNetwork(const std::string networkSpecs_file) : PoreNetwork(){
 
     this->ns = readSpecsFile(networkSpecs_file.c_str());
 
+
     std::string path = networkSpecs_file.substr(0, (networkSpecs_file.length() - 15));
     std::string name = this->ns->name;
 
@@ -954,7 +955,7 @@ void PoreNetwork::generateBoundary(size_t dir){
 	// Update the Pb_Sizes
 	for(size_t i = 1; i <= nrOfInlets; i++)
 		this->pb_sizeList[i] = ns->meanPBsize;
-	for(size_t i = nrOfActivePBs - nrOfOutlets; i <= nrOfActivePBs; i++)
+	for(size_t i = nrOfActivePBs - nrOfOutlets +1; i <= nrOfActivePBs; i++)
 		this->pb_sizeList[i] = ns->meanPBsize;
 		
 	//std::cout << nrOfActivePBs << '\t' << nrOfConnections << std::endl;
