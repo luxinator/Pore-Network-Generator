@@ -72,7 +72,11 @@ void writeLocation(const char * path, PoreNetwork *P){
         file << std::setw(8)<< P->locationList[1][pn]   << ' ';
         file << std::setw(8)<< P->locationList[2][pn]   << ' ';
         file << std::setw(8)<< P->throatCounter[0][pn] << ' ';
-        file << std::setw(8)<< P->throatCounter[1][pn] << '\n';
+        file << std::setw(8)<< P->throatCounter[1][pn] << '\t' ;
+		if(P->pb_sizeList)
+			file << P->pb_sizeList[pn] << '\n';
+		else
+			file << '\n';
         //std::cout<< throatCounters[0][pn] << '\t' <<  throatCounters[1][pn] << std::endl;
     }
     
@@ -98,10 +102,6 @@ void writeNetworkSpecs(const char * path, PoreNetwork *pn){
         std::cerr<< "Error opening file [" << filename << ']' << std::endl;
         return;
     }
-    
-    size_t i = 0;
-    while (pn->locationList[0][i] == 0.0)
-        i++;
     
     file << "Number of PoreBodies = " << pn->nrOfActivePBs << '\n';
     file << "Number of Throats = " << pn->nrOfConnections << '\n';

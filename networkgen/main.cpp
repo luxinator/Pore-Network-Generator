@@ -139,6 +139,7 @@ Command-Line Options:\n \
         std::cout<< "\nGenerating Network" << std::endl;
         innerNetwork->generateConnectivity();
         innerNetwork->generateLocation();
+		innerNetwork->generatePbSizes();
         
         std::cout << "Eliminating Throats ..." << std::endl;
         eliminateThroats(innerNetwork);
@@ -151,7 +152,7 @@ Command-Line Options:\n \
         
         writeLocation(lFile.c_str(), innerNetwork);
         writeNetworkSpecs(cFile.c_str(), innerNetwork);
-        
+
 
 		// --- Generate the Boundaries and Search for Isolated pbds
         std::cout << std::endl;
@@ -178,8 +179,6 @@ Command-Line Options:\n \
                 
                 P_Bound->generateBoundary(dir);
                 
-				
-				
 				size_t lengthTL = P_Bound->generateFullConnectivity();
                 char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
                 if(!pb_list){
@@ -188,14 +187,12 @@ Command-Line Options:\n \
                 }
 				P_Bound->removeFlaggedPBs(pb_list, (char)2);
 				
-				// KilldeadEnd should be able to run after search as well...
-                if(!P_Bound->ns->keepDeadEnd){
+				// This works WAY faster when done after searching
+                if(!P_Bound->ns->keepDeadEnd)
 					P_Bound->killDeadEndPores();
-				}
-                
 				
-								
-                writeVTK(vtkFile.c_str(), P_Bound);
+				
+                writeVTK(vtkFile.c_str(), P_Bound, P_Bound->pb_sizeList);
                 writeConnectivity(cFile.c_str(), P_Bound);
                 
                 writeLocation(lFile.c_str(), P_Bound);

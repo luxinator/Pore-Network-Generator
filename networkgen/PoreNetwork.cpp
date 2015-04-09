@@ -9,6 +9,7 @@
 
 #include <math.h>
 #include <fstream>
+#include <random>
 #include "PoreNetwork.h"
 #include "inputParser.h"
 #include "ArrayFunctions.h"
@@ -166,7 +167,12 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName) : PoreNe
         this->throatCounter[0][pn] = other.throatCounter[0][pn];
         this->throatCounter[1][pn] = other.throatCounter[1][pn];
     }
-
+	
+	this->pb_sizeList = new float[other.nrOfActivePBs + 1];
+	for(pn = 1; pn <= other.nrOfActivePBs; pn++){
+        this->pb_sizeList[pn] = other.pb_sizeList[pn];
+    }
+	
     // -- periodicThroats
     this->periodicThroats = new int[other.periodicListLength];
     for (i = 0; i < other.periodicListLength; i ++){
@@ -182,6 +188,7 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName) : PoreNe
     // Guard it against unvaild access!
     this->throatList_full =  nullptr;
 
+	
     std::cout << "Done Copying" << std::endl;
 
 }
@@ -252,6 +259,8 @@ PoreNetwork::PoreNetwork(const std::string networkSpecs_file) : PoreNetwork(){
     this->throatCounter = new int*[2];
     this->throatCounter[0] = t;
     this->throatCounter[1] = t + this->nrOfActivePBs + 1; // + 1 for the 0 guard
+	
+	this->pb_sizeList = new float[nrOfActivePBs + 1];
 
     loadPoreBodyLocations((path + name + "_loc.txt").c_str(), this);
 
@@ -449,6 +458,7 @@ int PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
             this->locationList[2][newi] = this->locationList[2][i];
 
             this->throatCounter[0][newi] = this->throatCounter[0][i];
+			this->pb_sizeList[newi] = this->pb_sizeList[i];
         }
     }
     //OverWrite the last part of the locationList with guards:
@@ -456,6 +466,7 @@ int PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         this->locationList[0][i] = -1.0f;
         this->locationList[1][i] = -1.0f;
         this->locationList[2][i] = -1.0f;
+		this->pb_sizeList[i] = 0.0f;
     }
 
     //Rebuild the accumulator (throatCounter[1][pn])
@@ -692,10 +703,6 @@ void PoreNetwork::generate_naive_array(){
 template <typename T> T** PoreNetwork::paddedList(size_t amount, T **List, size_t nrOfCols ,size_t currentSize, bool headPadding) {
     size_t i,j;
 
-    if(!nrOfCols || !currentSize)
-        return nullptr;
-
-
     T *tList = new T[(currentSize + amount) * nrOfCols];
     T **newList = new T*[nrOfCols];
 
@@ -715,6 +722,25 @@ template <typename T> T** PoreNetwork::paddedList(size_t amount, T **List, size_
         for(i = 0; i < currentSize ; i++)
             for(j = 0; j < nrOfCols; j++)
                 newList[j][i] = List[j][i];
+    }
+    return newList;
+}
+
+template <typename T> T* PoreNetwork::paddedList(size_t amount, T *List, size_t currentSize, bool headPadding) {
+    size_t i;
+	
+    T *newList = new T[(currentSize + amount)];
+    
+    for(i = 0; i < currentSize + amount; i++)
+        newList[i] = (T)-1;
+
+    if(headPadding) {
+        for(i = amount; i < currentSize + amount ; i++)
+            newList[i] = List[i - amount];
+
+    } else {
+        for(i = 0; i < currentSize ; i++)
+			newList[i] = List[i];
     }
     return newList;
 }
@@ -755,6 +781,7 @@ void PoreNetwork::generateBoundary(size_t dir){
     int** newTL     = nullptr;
     float** newLL   = nullptr;
     int** newTC     = nullptr;
+	float *newPBsize = nullptr;
 
     // --------- Inlets ---------
     this->nrOfInlets = 0;
@@ -763,9 +790,10 @@ void PoreNetwork::generateBoundary(size_t dir){
         if( this->locationList[dir][i] == 0.0f )
             nrOfInlets++;
 
-    newTL = this->paddedList(nrOfInlets, this->throatList,    2, this->nrOfConnections,   true);
-    newLL = this->paddedList(nrOfInlets, this->locationList,  3, this->nrOfActivePBs + 1, true);
-    newTC = this->paddedList(nrOfInlets, this->throatCounter, 2, this->nrOfActivePBs + 1, true);
+    newTL 		= this->paddedList(nrOfInlets, this->throatList,    2, this->nrOfConnections,   true);
+    newLL 		= this->paddedList(nrOfInlets, this->locationList,  3, this->nrOfActivePBs + 1, true);
+    newTC 		= this->paddedList(nrOfInlets, this->throatCounter, 2, this->nrOfActivePBs + 1, true);
+	newPBsize 	= this->paddedList(nrOfInlets, this->pb_sizeList, this->nrOfActivePBs + 1, true);
 
 
     size_t bound_index = 1;
@@ -808,19 +836,24 @@ void PoreNetwork::generateBoundary(size_t dir){
     int **tempTL = newTL;
     int **tempTC = newTC;
     float**tempLL = newLL;
+	float* tempPbs = newPBsize;
 
     //Since the padded list is a deep copy of the given list
-    newTL = this->paddedList(nrOfOutlets, newTL, 2, this->nrOfConnections + nrOfInlets, 	false);
-    newLL = this->paddedList(nrOfOutlets, newLL, 3, this->nrOfActivePBs   + 1 + nrOfInlets, false);
-    newTC = this->paddedList(nrOfOutlets, newTC, 2, this->nrOfActivePBs   + 1 + nrOfInlets, false);
+    newTL 		= this->paddedList(nrOfOutlets, newTL, 2, this->nrOfConnections + nrOfInlets, 	false);
+    newLL 		= this->paddedList(nrOfOutlets, newLL, 3, this->nrOfActivePBs   + 1 + nrOfInlets, false);
+    newTC 		= this->paddedList(nrOfOutlets, newTC, 2, this->nrOfActivePBs   + 1 + nrOfInlets, false);
+	newPBsize 	= this->paddedList(nrOfOutlets, newPBsize, this->nrOfActivePBs + 1 + nrOfInlets, false);
 
     // delete the old lists
     delete [] tempLL;
     delete [] tempTC;
     delete [] tempTL;
+	delete [] tempPbs;
+	
     tempLL = nullptr;
     tempTC = nullptr;
     tempTL = nullptr;
+	tempPbs = nullptr;
 
     size_t transform_TL = nrOfInlets + nrOfConnections - 1;
     size_t transform_P  = nrOfInlets + nrOfActivePBs;
@@ -892,11 +925,15 @@ void PoreNetwork::generateBoundary(size_t dir){
         delete [] locationList;
         locationList = nullptr;
     }
-	
+	if (pb_sizeList){
+		delete [] pb_sizeList;
+		pb_sizeList = nullptr;
+	}
 	
     this->throatList = newTL;
     this->throatCounter = newTC;
     this->locationList = newLL;
+	this->pb_sizeList = newPBsize;
 	
 	if(arr){
 		for (size_t i = 0; i < this->ns->Ni; i++)
@@ -913,6 +950,13 @@ void PoreNetwork::generateBoundary(size_t dir){
 	
     this->nrOfActivePBs += nrOfInlets + nrOfOutlets;
     this->nrOfConnections += nrOfInlets + nrOfOutlets;
+	
+	// Update the Pb_Sizes
+	for(size_t i = 1; i <= nrOfInlets; i++)
+		this->pb_sizeList[i] = ns->meanPBsize;
+	for(size_t i = nrOfActivePBs - nrOfOutlets; i <= nrOfActivePBs; i++)
+		this->pb_sizeList[i] = ns->meanPBsize;
+		
 	//std::cout << nrOfActivePBs << '\t' << nrOfConnections << std::endl;
 	
 
@@ -1024,6 +1068,31 @@ size_t PoreNetwork::generateFullConnectivity(){
     this->throatList_full = connection;
 
     return maxConnections - 1;
+}
+
+void PoreNetwork::generatePbSizes(){
+	
+	std::cout << "Generating PoreBody Sizes" << std::endl;
+	if(!pb_sizeList)
+		pb_sizeList = new float[nrOfActivePBs+1];
+	else{
+		delete[] pb_sizeList;
+		pb_sizeList = new float[nrOfActivePBs+1];
+	}
+	
+	std::default_random_engine generator;
+	std::lognormal_distribution<float> distribution( log(ns->meanPBsize), ns->stdDev);
+	
+	
+	float number; size_t i = 1;
+	while(i < nrOfActivePBs){
+		number = distribution(generator);
+		if(number >= ns->minPbSize && number <= ns->maxPbSize){
+			pb_sizeList[i] = number;
+			i++;
+			//std::cout << i << std::endl;
+		}
+	}
 }
 
 

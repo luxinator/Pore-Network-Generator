@@ -1,23 +1,27 @@
 Name = bottom
 
 # The Number of Porebodies in the x,y,z-directions
-Ni = 30
-Nj = 30
+Ni = 10
+Nj = 10
 Nk = 10
 
 # Periodic Boundaries, 0 = off, all else is on
 periodic = 0
 
 # The Distance between the lattice points
-pbDist = 6.0e-5
+pbDist = 6.0e-4
 
 #The Minimal Distance between two connected porebodies
 #As if this distance was squared and divided by the pbDist (choices are 1.0, 2.0 and 3.0)
 # ! Elemination does not work on searchDistance = 3.0 as of now!
 searchDistance = 2.00
 
-#Pb_size file, may be empty
+#Pb_sizes
 pbsize = pb_size.txt
+mean = 1.5e-4
+stdDev = 0.2
+maxpbSize = 3.0e-4
+minPbSize = 0.5e-5
 
 
 # Possible Flow Directions

@@ -106,7 +106,18 @@ NetworkSpecs *readSpecsFile(const char *filename){
 		else if( s.compare(0,6, "pbsize") == 0){
             NS->pbSizeFile = s.substr(i+1); // if not zero then true
         }
-		
+		else if( s.compare(0,4, "mean") == 0){
+            NS->meanPBsize = std::stof(s.substr(i+1)); // if not zero then true
+        }
+		else if( s.compare(0,6, "stddev") == 0){
+            NS->stdDev = std::stof(s.substr(i+1)); // if not zero then true
+        }
+		else if( s.compare(0,9, "maxpbsize") == 0){
+            NS->maxPbSize = std::stof(s.substr(i+1)); // if not zero then true
+        }
+		else if( s.compare(0,9, "minpbsize") == 0){
+            NS->minPbSize = std::stof(s.substr(i+1)); // if not zero then true
+        }
         // ----- ChanceList is kind of a special Case
         else if( s.compare(0,1,"c")  == 0) {
             try{
@@ -215,11 +226,11 @@ void loadPoreBodyLocations(const char *filename, PoreNetwork *P){
         return;
     }
    
-    float x, y, z;
+    float x, y, z, pbsize;
     int counter, accu;
     int i = 1;
     
-    while (file >> x >> y >> z >> counter >> accu && i <= P->nrOfActivePBs){
+    while (file >> x >> y >> z >> counter >> accu >> pbsize && i <= P->nrOfActivePBs){
 
         P->locationList[0][i] = x;
         P->locationList[1][i] = y;
@@ -228,6 +239,7 @@ void loadPoreBodyLocations(const char *filename, PoreNetwork *P){
         P->throatCounter[0][i] = counter;
         P->throatCounter[1][i] = accu;
         
+		P->pb_sizeList[i] = pbsize;
         //std::cout << P->locationList[0][i] << '\t'<< P->locationList[1][i] << '\t'<< P->locationList[2][i] << std::endl;
         
         i++;
