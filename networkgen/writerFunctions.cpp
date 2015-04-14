@@ -107,6 +107,7 @@ void writeNetworkSpecs(const char * path, PoreNetwork *pn){
     file << "Number of Throats = " << pn->nrOfConnections << '\n';
     file << "Number of InletPBs = " << pn->nrOfInlets << '\n';
     file << "Number of OutletPBs = " << pn->nrOfOutlets << '\n';
+    file << "Lattice Distance = " << pn->ns->pbDist << '\n';
     
     file.close();
     
