@@ -1082,18 +1082,21 @@ void PoreNetwork::generatePbSizes(){
 		pb_sizeList = new float[nrOfActivePBs+1];
 	}
 	
-	std::default_random_engine generator;
+	std::default_random_engine generator((unsigned int) time(0));
 	std::lognormal_distribution<float> distribution( log(ns->meanPBsize), ns->stdDev);
 	
 	
 	float number; size_t i = 1;
-	while(i < nrOfActivePBs){
-		number = distribution(generator);
-		if(!ns->constantPBSize && number >= ns->minPbSize && number <= ns->maxPbSize){
-			pb_sizeList[i] = number;
-			i++;
-			//std::cout << i << std::endl;
-		} else{
+	while(i <= nrOfActivePBs){
+        if(!ns->constantPBSize ){
+    		number = distribution(generator);
+    		if(number >= ns->minPbSize && number <= ns->maxPbSize){
+    			pb_sizeList[i] = number;
+    			i++;
+    			//std::cout << i << std::endl;
+	        } 
+        }
+        else{
             pb_sizeList[i] = ns->meanPBsize;
             i++;
         }

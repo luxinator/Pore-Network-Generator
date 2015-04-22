@@ -3,7 +3,7 @@ Name = bottom
 # The Number of Porebodies in the x,y,z-directions
 Ni = 3
 Nj = 3
-Nk = 3
+Nk = 1
 
 # Periodic Boundaries, 0 = off, all else is on
 periodic = 0
@@ -13,16 +13,16 @@ pbDist = 3.0e-4
 
 #The Minimal Distance between two connected porebodies
 #As if this distance was squared and divided by the pbDist (choices are 1.0, 2.0 and 3.0)
-# ! Elemination does not work on searchDistance = 3.0 as of now!
+# ! Elimination does not work on searchDistance = 3.0 as of now!
 searchDistance = 2.00
 
 #Pb_sizes
-pbsize = pb_size.txt
-pbsizedistributed = 0
+pbsizeConstant = 1
 mean = 0.75e-4
 stdDev = 0.2
 maxpbSize = 1.5e-4
 minPbSize = 0.25e-5
+
 
 
 # Possible Flow Directions
@@ -40,7 +40,7 @@ keepDeadEnd = 0
 #c2 = 	0.4000
 #c3 =	0.4000
 #c4 = 	0.4000
-#c5 = 	0.4000
+#c5 = 	0.4000 
 #c6 =	0.4000
 #c7 = 	0.4000
 #c8 = 	0.4000

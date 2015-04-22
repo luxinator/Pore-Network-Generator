@@ -27,7 +27,7 @@ struct NetworkSpecs {
     bool periodicBounndaries = false;
     bool flowDirs[3]; // flowDirs[0] -> x-boundaries, flowDirs[1] -> y-boundaries, flowDirts[2] -> z-boundaries
 	bool keepDeadEnd = false;
-    bool constantPBSize;
+    bool constantPBSize = false;
 };
 
 class PoreNetwork{

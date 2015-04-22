@@ -75,50 +75,50 @@ NetworkSpecs *readSpecsFile(const char *filename){
         //use the smart ass string function of C++
         std::string s = std::string(buff);
         
-        if ( s.compare(0,2,"ni")  == 0) {
+        if ( s.compare(0,i,"ni")  == 0) {
             NS->Ni = std::stoi(s.substr(i+1));
         }
-        else if ( s.compare(0,2,"nj")  == 0) {
+        else if ( s.compare(0,i,"nj")  == 0) {
             NS->Nj = std::stoi(s.substr(i+1));
         }
         
-        else if( s.compare(0,2,"nk") == 0) {
+        else if( s.compare(0,i,"nk") == 0) {
             NS->Nk = std::stoi(s.substr(i+1));
         }
-        else if( s.compare(0,6,"pbdist")  == 0) {
+        else if( s.compare(0,i,"pbdist")  == 0) {
             NS->pbDist = std::stof(s.substr(i+1));
         }
-        else if( s.compare(0,8, "periodic") == 0){
+        else if( s.compare(0,i, "periodic") == 0){
             NS->periodicBounndaries = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         }
-        else if( s.compare(0,5, "xflow") == 0){
+        else if( s.compare(0,i, "xflow") == 0){
             NS->flowDirs[0] = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         }
-        else if( s.compare(0,5, "yflow") == 0){
+        else if( s.compare(0,i, "yflow") == 0){
             NS->flowDirs[1] = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         }
-        else if( s.compare(0,5, "zflow") == 0){
+        else if( s.compare(0,i, "zflow") == 0){
             NS->flowDirs[2] = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         } 
-        else if( s.compare(0,11, "keepdeadend") == 0){
+        else if( s.compare(0,i, "keepdeadend") == 0){
             NS->keepDeadEnd = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         } 
-		else if( s.compare(0,6, "pbsize") == 0){
+		else if( s.compare(0,i, "pbsize") == 0){
             NS->pbSizeFile = s.substr(i+1); // if not zero then true
         }
-        else if( s.compare(0,17, "pbsizedistributed") == 0){
-            NS->constantPBSize = std::stoi(s.substr(i+1)) == 0; // if zero then true, else false
+        else if( s.compare(0,i, "pbsizeconstant") == 0){
+            NS->constantPBSize = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         }
-		else if( s.compare(0,4, "mean") == 0){
+		else if( s.compare(0,i, "mean") == 0){
             NS->meanPBsize = std::stof(s.substr(i+1)); // if not zero then true
         }
-		else if( s.compare(0,6, "stddev") == 0){
+		else if( s.compare(0,i, "stddev") == 0){
             NS->stdDev = std::stof(s.substr(i+1)); // if not zero then true
         }
-		else if( s.compare(0,9, "maxpbsize") == 0){
+		else if( s.compare(0,i, "maxpbsize") == 0){
             NS->maxPbSize = std::stof(s.substr(i+1)); // if not zero then true
         }
-		else if( s.compare(0,9, "minpbsize") == 0){
+		else if( s.compare(0,i, "minpbsize") == 0){
             NS->minPbSize = std::stof(s.substr(i+1)); // if not zero then true
         }
         // ----- ChanceList is kind of a special Case
@@ -160,6 +160,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
     std::cout << "\tCoordination Number:\t\t\t" << NS->coordNr << '\n';
     std::cout << "\tPeriodic Boundaries:\t\t\t" << NS->periodicBounndaries << '\n';
     std::cout << "\tPossible Flow Dir:\n\t\t\tX-Flow: " << NS->flowDirs[0] << " Y-Flow: " << NS->flowDirs[1] << " Z-Flow: " << NS->flowDirs[2] << '\n';
+    std::cout << "\tPoreBody Sizes are LogNormal Distributed: " << !NS->constantPBSize << '\n';
 
     std::cout << std::endl;
     
