@@ -106,6 +106,9 @@ NetworkSpecs *readSpecsFile(const char *filename){
 		else if( s.compare(0,6, "pbsize") == 0){
             NS->pbSizeFile = s.substr(i+1); // if not zero then true
         }
+        else if( s.compare(0,17, "pbsizedistributed") == 0){
+            NS->constantPBSize = std::stoi(s.substr(i+1)) == 0; // if zero then true, else false
+        }
 		else if( s.compare(0,4, "mean") == 0){
             NS->meanPBsize = std::stof(s.substr(i+1)); // if not zero then true
         }

@@ -23,20 +23,20 @@
 
 int PoreNetwork::checkInput(){
 
-    if (this->ns->Ni < 3 && this->ns->flowDirs[0]){
-        std::cerr << "ERROR: The X-boundary Condition is turnend on\nBut Ni is smaller then 3: Not Enough PB's for conditions!\n" << std::endl;
-        return 1;
-    }
+    // if (this->ns->Ni < 3 && this->ns->flowDirs[0]){
+    //     std::cerr << "ERROR: The X-boundary Condition is turnend on\nBut Ni is smaller then 3: Not Enough PB's for conditions!\n" << std::endl;
+    //     return 1;
+    // }
 
-    if (this->ns->Nj < 3 && this->ns->flowDirs[1]){
-        std::cerr << "ERROR: The Y-boundary Condition is turnend on\nBut Nj is smaller then 3: Not Enough PB's for conditions!\n" << std::endl;
-        return 1;
-    }
+    // if (this->ns->Nj < 3 && this->ns->flowDirs[1]){
+    //     std::cerr << "ERROR: The Y-boundary Condition is turnend on\nBut Nj is smaller then 3: Not Enough PB's for conditions!\n" << std::endl;
+    //     return 1;
+    // }
 
-    if (this->ns->Nk < 3 && this->ns->flowDirs[2]){
-        std::cerr << "ERROR: The Z-boundary Condition is turnend on\nBut Nk is smaller then 3: Not Enough PB's for conditions!\n" << std::endl;
-        return 1;
-    }
+    // if (this->ns->Nk < 3 && this->ns->flowDirs[2]){
+    //     std::cerr << "ERROR: The Z-boundary Condition is turnend on\nBut Nk is smaller then 3: Not Enough PB's for conditions!\n" << std::endl;
+    //     return 1;
+    // }
 
     this->nrOfActivePBs = ns->Ni*ns->Nj*ns->Nk;
     this->nrOfInlets = 0;
@@ -107,6 +107,7 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName) : PoreNe
     this->ns->searchDistance = other.ns->searchDistance;
     this->ns->pbDist         = other.ns->pbDist;
     this->ns->periodicBounndaries = other.ns->periodicBounndaries;
+    this->ns->constantPBSize = other.ns->constantPBSize;
     for(size_t i = 0; i < 3; i++)
         this->ns->flowDirs[i] = other.ns->flowDirs[i];
 
@@ -1088,11 +1089,14 @@ void PoreNetwork::generatePbSizes(){
 	float number; size_t i = 1;
 	while(i < nrOfActivePBs){
 		number = distribution(generator);
-		if(number >= ns->minPbSize && number <= ns->maxPbSize){
+		if(!ns->constantPBSize && number >= ns->minPbSize && number <= ns->maxPbSize){
 			pb_sizeList[i] = number;
 			i++;
 			//std::cout << i << std::endl;
-		}
+		} else{
+            pb_sizeList[i] = ns->meanPBsize;
+            i++;
+        }
 	}
 }
 
@@ -1148,16 +1152,6 @@ char * PoreNetwork::killDeadEndPores(){
  */
 size_t PoreNetwork::delelteThroat(size_t i, size_t deleted, int flag){
 
-//
-  /*  if (this->throatList[0][i] > this->throatList[1][i]) {
-        std::cout << "Deleting: "<<  this->throatList[0][i] << '\t' << this->throatList[1][i] << std::endl;
-        for(size_t j = 0; this->periodicThroats[j] != 0; j++){
-            if(j == i){
-                this->periodicThroats[j] = -1;
-            }
-        }
-    }
-   */
     this->throatList[1][i] = flag;
     deleted++;
     this->throatCounter[0][this->throatList[0][i]] -= 1;

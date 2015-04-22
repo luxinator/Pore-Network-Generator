@@ -45,6 +45,7 @@ Command-Line Options:\n \
     bool writeVTKswitch = false;
     bool generate = true;
     bool combine = false;
+
 	
 	float c_sep_dist 	= 0.0f;
 	float c_search_dist = 0.0f;
@@ -217,13 +218,14 @@ Command-Line Options:\n \
     	combi->setSeparation(c_sep_dist);
     	combi->setSearchDist(c_search_dist);
     	combi->setSurvival(c_survival);
-    	combi->Combine(2);
+        combi->sortConnectionsList(false);
+    	combi->Combine(1);
     	combi->builtConnectionList();
     	PoreNetwork *Res = combi->getResult(); // This is not a completely valid network! NetworkSpecs is mostly empty!
 		
 	
 		// Generate Boudnaries
-		Res->generateBoundary(2);
+		Res->generateBoundary(1);
 		
 		// Generate Full_conn
 		size_t lengthTL = Res->generateFullConnectivity();

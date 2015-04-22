@@ -24,9 +24,10 @@ struct NetworkSpecs {
     unsigned int coordNr;
     double searchDistance;
     float pbDist;
-    bool periodicBounndaries;
+    bool periodicBounndaries = false;
     bool flowDirs[3]; // flowDirs[0] -> x-boundaries, flowDirs[1] -> y-boundaries, flowDirts[2] -> z-boundaries
-	bool keepDeadEnd;
+	bool keepDeadEnd = false;
+    bool constantPBSize;
 };
 
 class PoreNetwork{

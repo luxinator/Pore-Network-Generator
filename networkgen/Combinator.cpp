@@ -12,11 +12,13 @@
 #include "ArrayFunctions.h"
 
 
-void Combinator::setSurvival(float survival)	{ this->Survival = survival; 	 };
+void Combinator::setSurvival(float survival)	{ this->Survival = survival; 	 }
 
-void Combinator::setSeparation(float separation){ this->Separation = separation; };
+void Combinator::setSeparation(float separation){ this->Separation = separation; }
 
-void Combinator::setSearchDist(float searchDist){ this->SearchDist = searchDist; };
+void Combinator::setSearchDist(float searchDist){ this->SearchDist = searchDist; }
+
+void Combinator::sortConnectionsList(bool toSort) { this->sortConnections = toSort; }
 
 PoreNetwork * Combinator::getResult(){ return Result; };
 
@@ -193,7 +195,8 @@ void Combinator::builtConnectionList(){
 	}
 	
 	// Sort 
-	bubbleSortList(Result->throatList, Result->nrOfConnections);
+	if(sortConnections)
+		bubbleSortList(Result->throatList, Result->nrOfConnections);
 
 
 }

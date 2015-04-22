@@ -29,9 +29,10 @@ void writeConnectivity(const char * path, PoreNetwork *pn){
     
     size_t i, j;
     int periodic = 0;
-    for(i = 0; pn->throatList[0][i] != 0 && i < pn->nrOfConnections ; i ++){
+    for(i = 0; i < pn->nrOfConnections ; i ++){
         periodic = 0;
         
+        if(pn->ns->periodicBounndaries)
         for( j = 0; pn->ns->periodicBounndaries && pn->periodicThroats[j] != 0; j ++)
             if (pn->periodicThroats[j] == i)
                 periodic = 1;
