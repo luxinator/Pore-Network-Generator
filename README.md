@@ -29,7 +29,7 @@ The `NetworkSpecs.in` file is pretty self-explantory. Comments lines can be adde
 * `outlet` porebodies are the last lines in the location list, and their connections are also at the tail of the connectivity file.
 
 ### Top and Bot ###
-Combining networks is done with the '-combine' switch. At least the 'NetworkSpecs.in' files are needed per network and a set of 'networkname_conn.txt' , 'networkname_loc.txt' files.
+Combining networks is done with the `-combine` switch. At least the `NetworkSpecs.in` files are needed per network and a set of `networkname_conn.txt` , `networkname_loc.txt` files.
 
 ### Who do I talk to? ###
 * For more information see the contact information at the github page of this project <https://github.com/luxinator/Pore-Network-Generator>
