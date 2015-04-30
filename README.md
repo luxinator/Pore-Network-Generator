@@ -13,7 +13,7 @@
 * At the moment the clang compiler is used, if you want to change this to gcc change the `CXX := clang++` to `CXX:=g++` and you are set to use gnu GCC.
 
 ### Input ###
-* For most cases executing the Generator file is enough, just make sure there is a `data` directory present with the `NetworkSpecs.in` file in it. 
+* For most cases executing Generator is enough, just make sure there is a `data` directory present with the `NetworkSpecs.in` file in it. Other options are supplied via de '-h' switch. 
 
 ###The NetworkSpecs.in File ###
 The `NetworkSpecs.in` file is pretty self-explantory. Comments lines can be added with the `#` character.
@@ -28,7 +28,8 @@ The `NetworkSpecs.in` file is pretty self-explantory. Comments lines can be adde
 * `inlet` porebodies are the first pores in the location list, and their connections are also at the head of the connectivity file.
 * `outlet` porebodies are the last lines in the location list, and their connections are also at the tail of the connectivity file.
 
-
+### Top and Bot ###
+Combining networks is done with the '-combine' switch. At least the 'NetworkSpecs.in' files are needed per network and a set of 'networkname_conn.txt' , 'networkname_loc.txt' files.
 
 ### Who do I talk to? ###
 * For more information see the contact information at the github page of this project <https://github.com/luxinator/Pore-Network-Generator>
