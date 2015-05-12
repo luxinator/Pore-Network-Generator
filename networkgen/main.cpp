@@ -219,13 +219,13 @@ Command-Line Options:\n \
     	combi->setSearchDist(c_search_dist);
     	combi->setSurvival(c_survival);
         combi->sortConnectionsList(false);
-    	combi->Combine(0);
+    	combi->Combine(2);
     	combi->builtConnectionList();
     	PoreNetwork *Res = combi->getResult(); // This is not a completely valid network! NetworkSpecs is mostly empty!
 		
 	
 		// Generate Boudnaries
-		Res->generateBoundary(0, bot->ns->meanPBsize,top->ns->meanPBsize);
+		Res->generateBoundary(2, bot->ns->meanPBsize,top->ns->meanPBsize);
 		
 		// Generate Full_conn
 		size_t lengthTL = Res->generateFullConnectivity();
