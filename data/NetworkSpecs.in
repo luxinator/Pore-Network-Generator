@@ -1,9 +1,9 @@
-Name = bottom
+Name = fine
 
 # The Number of Porebodies in the x,y,z-directions
-Ni = 3
-Nj = 3
-Nk = 1
+Ni = 59
+Nj = 59
+Nk = 8
 
 # Periodic Boundaries, 0 = off, all else is on
 periodic = 0
@@ -17,16 +17,15 @@ pbDist = 3.0e-4
 searchDistance = 2.00
 
 #Pb_sizes
-pbsizeConstant = 1
-mean = 0.75e-4
-stdDev = 0.2
+pbsizeConstant = 0
+mean = 1.0e-4
 maxpbSize = 1.5e-4
-minPbSize = 0.25e-5
-
+minPbSize = 0.375e-5
+stdDev = 0.6
 
 
 # Possible Flow Directions
-xFlow = 1
+xFlow = 0
 yFlow = 0
 zFlow = 1
 
@@ -35,27 +34,27 @@ keepDeadEnd = 0
 
 #Chance of a throat to survive, every value of c# represents a throat from a porebody.
 #
-#c0 = 	0.4000
-#c1 = 	0.4000
-#c2 = 	0.4000
-#c3 =	0.4000
-#c4 = 	0.4000
-#c5 = 	0.4000 
-#c6 =	0.4000
-#c7 = 	0.4000
-#c8 = 	0.4000
-#c9 = 	0.4000
+c0 = 	0.4000
+c1 = 	0.4000
+c2 = 	0.4000
+c3 =	0.4000
+c4 = 	0.4000
+c5 = 	0.4000
+c6 =	0.4000
+c7 = 	0.4000
+c8 = 	0.4000
+c9 = 	0.4000
 
-c0 = 1.000
-c1 = 1.000
-c2 = 1.000
-c3 = 1.000
-c4 = 1.000
-c5 = 1.000
-c6 = 1.000
-c7 = 1.000
-c8 = 1.000
-c9 = 1.000
+#c0 = 1.000
+#c1 = 1.000
+#c2 = 1.000
+#c3 = 1.000
+#c4 = 1.000
+#c5 = 1.000
+#c6 = 1.000
+#c7 = 1.000
+#c8 = 1.000
+#c9 = 1.000
 
 
 # To identify a pore throat in the elimination process, a vector is build up.

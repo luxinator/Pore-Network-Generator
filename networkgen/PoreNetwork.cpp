@@ -87,7 +87,6 @@ PoreNetwork::PoreNetwork(){
 	this->nrOfInlets 		= 0;
 	this->nrOfOutlets		= 0;
 	this->periodicListLength= 0;
-	
 }
 
 PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName) : PoreNetwork(){
@@ -757,7 +756,7 @@ template <typename T> T* PoreNetwork::paddedList(size_t amount, T *List, size_t 
  *  !!!! This Code needs some revision! but not  now...
  */
 
-void PoreNetwork::generateBoundary(size_t dir){
+void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize){
 
     if (dir > 2) {
         std::cerr << "\nCRITICAL ERROR: COULD NOT GENERATE BOUNDARIES!" << std::endl;
@@ -955,13 +954,9 @@ void PoreNetwork::generateBoundary(size_t dir){
 	
 	// Update the Pb_Sizes
 	for(size_t i = 1; i <= nrOfInlets; i++)
-		this->pb_sizeList[i] = ns->meanPBsize;
+		this->pb_sizeList[i] = inletSize;
 	for(size_t i = nrOfActivePBs - nrOfOutlets +1; i <= nrOfActivePBs; i++)
-		this->pb_sizeList[i] = ns->meanPBsize;
-		
-	//std::cout << nrOfActivePBs << '\t' << nrOfConnections << std::endl;
-	
-
+		this->pb_sizeList[i] = outletSize;
 
 //	for(size_t i = 1; i <= nrOfActivePBs; i++)
 //		std::cout << locationList[0][i] << '\t' << locationList[1][i] << '\t' << locationList[2][i] << std::endl;

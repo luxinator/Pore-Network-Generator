@@ -178,7 +178,7 @@ Command-Line Options:\n \
                 
                 PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, innerNetwork->ns->name + suffix);
                 
-                P_Bound->generateBoundary(dir);
+                P_Bound->generateBoundary(dir, P_Bound->ns->meanPBsize, P_Bound->ns->meanPBsize);
                 
 				size_t lengthTL = P_Bound->generateFullConnectivity();
                 char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
@@ -219,13 +219,13 @@ Command-Line Options:\n \
     	combi->setSearchDist(c_search_dist);
     	combi->setSurvival(c_survival);
         combi->sortConnectionsList(false);
-    	combi->Combine(1);
+    	combi->Combine(0);
     	combi->builtConnectionList();
     	PoreNetwork *Res = combi->getResult(); // This is not a completely valid network! NetworkSpecs is mostly empty!
 		
 	
 		// Generate Boudnaries
-		Res->generateBoundary(1);
+		Res->generateBoundary(0, bot->ns->meanPBsize,top->ns->meanPBsize);
 		
 		// Generate Full_conn
 		size_t lengthTL = Res->generateFullConnectivity();
@@ -293,7 +293,7 @@ Command-Line Options:\n \
 
                 PoreNetwork *P_Bound = new PoreNetwork(*inner, prefix + inner->ns->name);
                 
-                P_Bound->generateBoundary(dir);
+                P_Bound->generateBoundary(dir, inner->ns->meanPBsize, inner->ns->meanPBsize);
                 
 				size_t lengthTL = P_Bound->generateFullConnectivity();
                 char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);

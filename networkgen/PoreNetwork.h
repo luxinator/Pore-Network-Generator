@@ -18,7 +18,7 @@ struct NetworkSpecs {
 	float stdDev;
 	float maxPbSize;
 	float minPbSize;
-	
+
     unsigned int Ni, Nj, Nk;
     float C[26];
     unsigned int coordNr;
@@ -28,19 +28,21 @@ struct NetworkSpecs {
     bool flowDirs[3]; // flowDirs[0] -> x-boundaries, flowDirs[1] -> y-boundaries, flowDirts[2] -> z-boundaries
 	bool keepDeadEnd = false;
     bool constantPBSize = false;
+
 };
 
 class PoreNetwork{
     
     
 private:
+
     int checkInput();
     template <typename T> T** paddedList(size_t amount, T **List, size_t nrOfCols ,size_t currentSize, bool headPadding);
 	template <typename T> T*  paddedList(size_t amount, T *List, size_t currentSize, bool headPadding);
     void cleanPeriodic(size_t flowDir);
     
 public:
-    
+
     NetworkSpecs *ns;
 	float *pb_sizeList; //pB_SIZES read from file
     int ***arr; //contains the pb number at the lattic coordinates, (Known as a Lookup Table)
@@ -69,7 +71,7 @@ public:
     
     virtual ~PoreNetwork();
     
-    void generateBoundary(size_t dir);
+    void generateBoundary(size_t dir, float inletSize, float outletSize);
     
     void removeFlaggedThroats(const int Flag = 0);
 
