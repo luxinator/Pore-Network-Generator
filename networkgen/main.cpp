@@ -15,6 +15,16 @@
 #include "writerFunctions.h"
 #include "Combinator.h"
 
+// Forward Declaration
+int Finalize(PoreNetwork * pn);
+
+std::string nSpecs = "./data/NetworkSpecs.in";
+std::string cFile   = "./data/";
+std::string fcFile   = "./data/";
+std::string lFile   = "./data/";
+
+std::string vtkFile = "./data/";
+
 int main(int argc, char *argv[]) {
     
     std::cout << "\nPore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__<<std::endl;
@@ -31,12 +41,12 @@ Command-Line Options:\n \
     -inner [location] \t Load Inner Network from file(s) and Generate with Boundaries as specified in the NetworkSpecs.in\n \
     -combine [top_network] [bottom_network] [Separation Dist] [Search Dist] [Survival] combines (innner) networks into one network with boundaries as specified in bot_network/NetworkSpecs.in \n";
     
-    std::string nSpecs = "./data/NetworkSpecs.in";
-    std::string cFile   = "./data/";
-    std::string fcFile   = "./data/";
-    std::string lFile   = "./data/";
+    nSpecs = "./data/NetworkSpecs.in";
+    cFile   = "./data/";
+    fcFile   = "./data/";
+    lFile   = "./data/";
     
-    std::string vtkFile = "./data/";
+    vtkFile = "./data/";
  
     std::string name = "";
     std::string top_network, bot_network = "";
@@ -158,52 +168,12 @@ Command-Line Options:\n \
 		// --- Generate the Boundaries and Search for Isolated pbds
         std::cout << std::endl;
         std::string suffix;
-        
-        for(int dir = 0; dir <= 2; dir++){
-            if(innerNetwork->ns->flowDirs[dir]){
-                
-                switch (dir) {
-                    case 0:
-                        suffix = "_x";
-                        break;
-                        
-                    case 1:
-                        suffix = "_y";
-                        break;
-                        
-                    case 2:
-                        suffix = "_z";
-                        break;
-                }
-                
-                PoreNetwork *P_Bound = new PoreNetwork(*innerNetwork, innerNetwork->ns->name + suffix);
-                
-                P_Bound->generateBoundary(dir, P_Bound->ns->meanPBsize, P_Bound->ns->meanPBsize);
-                
-				size_t lengthTL = P_Bound->generateFullConnectivity();
-                char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
-                if(!pb_list){
-                    std::cout << "Network is Broken Aborting" << std::endl;
-                    return 1;
-                }
-				P_Bound->removeFlaggedPBs(pb_list, (char)2);
-				
-				// This works WAY faster when done after searching
-                if(!P_Bound->ns->keepDeadEnd)
-					P_Bound->killDeadEndPores();
-				
-				
-                writeVTK(vtkFile.c_str(), P_Bound, P_Bound->pb_sizeList);
-                writeConnectivity(cFile.c_str(), P_Bound);
-                
-                writeLocation(lFile.c_str(), P_Bound);
-                writeNetworkSpecs(cFile.c_str(), P_Bound);
-                
-                delete P_Bound;
-                std::cout << std::endl;
-            }
+
+        if(Finalize(innerNetwork) != 0){
+            std::cerr << "Something bad happend. \nI am sorry but, I QUIT!";
+            return -1;
         }
-              
+//
         delete innerNetwork;
     }
     
@@ -223,9 +193,10 @@ Command-Line Options:\n \
     	combi->builtConnectionList();
     	PoreNetwork *Res = combi->getResult(); // This is not a completely valid network! NetworkSpecs is mostly empty!
 		
-	
+	// **** COMBINED networks are special and don't use Finalize
+
 		// Generate Boudnaries
-		Res->generateBoundary(2, bot->ns->meanPBsize,top->ns->meanPBsize);
+		Res->generateBoundary(2, bot->ns->pbDist,top->ns->pbDist);
 		
 		// Generate Full_conn
 		size_t lengthTL = Res->generateFullConnectivity();
@@ -254,7 +225,6 @@ Command-Line Options:\n \
     	std::cout << "Done!" << std::endl;
 		
     }
-
     else{
 
         PoreNetwork *inner = new PoreNetwork(name);
@@ -267,67 +237,66 @@ Command-Line Options:\n \
         std::string lFile   = path;
         std::string vtkFile = path;
 
-
-
-        std::string prefix;
-
         //writeVTK(vtkFile.c_str(), inner);
-
-
-        for(int dir = 0; dir <= 2; dir++){
-            if(inner->ns->flowDirs[dir]){
-
-                switch (dir) {
-                    case 0:
-                        prefix = "x_";
-                        break;
-
-                    case 1:
-                        prefix = "y_";
-                        break;
-
-                    case 2:
-                        prefix = "z_";
-                        break;
-                }
-
-                PoreNetwork *P_Bound = new PoreNetwork(*inner, prefix + inner->ns->name);
-                
-                P_Bound->generateBoundary(dir, inner->ns->meanPBsize, inner->ns->meanPBsize);
-                
-				size_t lengthTL = P_Bound->generateFullConnectivity();
-                char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
-                if(!pb_list){
-                    std::cout << "Network is Broken Aborting" << std::endl;
-                    return 1;
-                }
-				
-				P_Bound->removeFlaggedPBs(pb_list, (char)2);
-								
-				// KilldeadEnd should be able to run after search as well...
-                if(!P_Bound->ns->keepDeadEnd){
-					P_Bound->killDeadEndPores();
-				}
-                
-                writeVTK(vtkFile.c_str(), P_Bound);
-                writeConnectivity(cFile.c_str(), P_Bound);
-                
-                writeLocation(lFile.c_str(), P_Bound);
-                writeNetworkSpecs(cFile.c_str(), P_Bound);
-                
-                delete P_Bound;
-                std::cout << std::endl;
-            }
+        if(Finalize(inner) != 0){
+            std::cerr << "Something bad happend. \nI am sorry but, I QUIT!";
+            return -1;
         }
-
-
-
-
-
     }
     
 }
 
 
+int Finalize(PoreNetwork * pn){
 
+    std::string suffix = "_x";
+
+    for(int dir = 0; dir <= 2; dir++){
+        if(pn->ns->flowDirs[dir]){
+
+            switch (dir) {
+                case 0:
+                    suffix = "_x";
+                    break;
+
+                case 1:
+                    suffix = "_y";
+                    break;
+
+                case 2:
+                    suffix = "_z";
+                    break;
+            }
+
+            PoreNetwork *P_Bound = new PoreNetwork(*pn, pn->ns->name + suffix);
+
+            P_Bound->generateBoundary(dir, P_Bound->ns->meanPBsize, P_Bound->ns->meanPBsize);
+
+            size_t lengthTL = P_Bound->generateFullConnectivity();
+
+            char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
+            if(!pb_list){
+                std::cerr << "Network is Broken Aborting" << std::endl;
+                return -1;
+            }
+            P_Bound->removeFlaggedPBs(pb_list, (char)2);
+
+            // This works WAY faster when done after searching
+            if(!P_Bound->ns->keepDeadEnd)
+                P_Bound->killDeadEndPores();
+
+
+            writeVTK(vtkFile.c_str(), P_Bound, P_Bound->pb_sizeList);
+            writeConnectivity(cFile.c_str(), P_Bound);
+
+            writeLocation(lFile.c_str(), P_Bound);
+            writeNetworkSpecs(cFile.c_str(), P_Bound);
+
+            delete P_Bound;
+            std::cout << std::endl;
+        }
+    }
+
+    return 0;
+}
 

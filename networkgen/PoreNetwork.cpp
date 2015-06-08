@@ -256,14 +256,14 @@ PoreNetwork::PoreNetwork(const std::string networkSpecs_file) : PoreNetwork(){
     this->locationList[1] = temp + this->nrOfActivePBs;
     this->locationList[2] = temp + 2*this->nrOfActivePBs;
 
+    this->pb_sizeList = new float[nrOfActivePBs + 1];
+
+    loadPoreBodyLocations((path + name + "_loc.txt").c_str(), this);
+
     int *t = new int[2 * this->nrOfActivePBs + 2];
     this->throatCounter = new int*[2];
     this->throatCounter[0] = t;
     this->throatCounter[1] = t + this->nrOfActivePBs + 1; // + 1 for the 0 guard
-	
-	this->pb_sizeList = new float[nrOfActivePBs + 1];
-
-    loadPoreBodyLocations((path + name + "_loc.txt").c_str(), this);
 
     t = new int[this->nrOfConnections * 2];
     this->throatList = new int*[2];
@@ -1104,44 +1104,40 @@ void PoreNetwork::generatePbSizes(){
  * if it is 2 or less, a pb is a dead end.
  * except for inlets and outlets
  */ 
-char * PoreNetwork::killDeadEndPores(){
-	
-	std::cout << "Killing dead end Pores"<< std::endl;
+char * PoreNetwork::killDeadEndPores() {
 
-	char* mask ;
-	
-	bool clean = false;
-	int j = 1;
-	while(!clean){
-		std::cout << "PASS " << j << std::endl;
-		
-		mask = new char[nrOfActivePBs + 1];
-		
-		for(size_t i = 0; i <= nrOfActivePBs; i++)
-			mask[i] = 0;
-		
-		for(size_t i = 1; i <= nrOfInlets; i++)
-			mask[i] = 2;
-			
-		for(size_t i = nrOfActivePBs - nrOfOutlets; i <= nrOfActivePBs; i++)
-			mask[i] = 2;
-		
-		for(size_t i = 0; i < this->nrOfConnections; i++){
-				mask[throatList[0][i]]++;
-				mask[throatList[1][i]]++;
-		}
-		
-		
-	//	for(size_t i = 0; i <= nrOfActivePBs; i++)
-	//		std::cout <<i << '\t' <<  (int)mask[i] << std::endl;
-	//	
-		if(removeFlaggedPBs(mask, (char)2) < 1){
-			clean = true;
-		}
-		j++;
-				
-	}
-	return mask;
+    std::cout << "Killing dead end Pores" << std::endl;
+
+    char *mask;
+
+    bool clean = false;
+    int j = 1;
+    while (!clean) {
+        std::cout << "PASS " << j << std::endl;
+
+        mask = new char[nrOfActivePBs + 1];
+
+        for (size_t i = 0; i <= nrOfActivePBs; i++)
+            mask[i] = 0;
+
+        for (size_t i = 1; i <= nrOfInlets; i++)
+            mask[i] = 2;
+
+        for (size_t i = nrOfActivePBs - nrOfOutlets; i <= nrOfActivePBs; i++)
+            mask[i] = 2;
+
+        for (size_t i = 0; i < this->nrOfConnections; i++) {
+            mask[throatList[0][i]]++;
+            mask[throatList[1][i]]++;
+        }
+        // removeFlaggedPBs deletes mask
+        if (removeFlaggedPBs(mask, (char) 2) < 1) {
+            clean = true;
+        }
+        j++;
+
+    }
+    return mask;
 }
 
 /*

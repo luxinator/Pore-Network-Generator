@@ -25,7 +25,7 @@ stdDev = 0.6
 
 
 # Possible Flow Directions
-xFlow = 0
+xFlow = 1
 yFlow = 0
 zFlow = 1
 
