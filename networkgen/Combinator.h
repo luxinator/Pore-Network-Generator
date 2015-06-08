@@ -29,6 +29,8 @@ private:
 	 float Survival;
 	 float Separation;
 	 float SearchDist;
+	 bool sortConnections;	
+	 
 
 public:
 	/* Public Constructor */
@@ -41,6 +43,8 @@ public:
 	void setSurvival(float survival);
 	void setSeparation(float separation);
 	void setSearchDist(float searchDist);
+	void sortConnectionsList(bool toSort);
+
 	PoreNetwork * getResult();
 	
 	const std::vector<std::pair<int,int>>& getInterface() { return Boundary_Layer; };

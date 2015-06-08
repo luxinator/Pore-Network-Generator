@@ -1,23 +1,32 @@
-Name = Coarse_LowCoord
+Name = fine
+
 # The Number of Porebodies in the x,y,z-directions
-Ni = 30
-Nj = 30
-Nk = 10
+Ni = 59
+Nj = 59
+Nk = 8
 
 # Periodic Boundaries, 0 = off, all else is on
 periodic = 0
 
 # The Distance between the lattice points
-pbDist = 6.0e-5
+pbDist = 3.0e-4
 
-#The Minimal Distance between two porebodies
+#The Minimal Distance between two connected porebodies
 #As if this distance was squared and divided by the pbDist (choices are 1.0, 2.0 and 3.0)
-# ! Elemination does not work on searchDistance = 3.0 as of now!
+# ! Elimination does not work on searchDistance = 3.0 as of now!
 searchDistance = 2.00
+
+#Pb_sizes
+pbsizeConstant = 0
+mean = 1.0e-4
+maxpbSize = 1.5e-4
+minPbSize = 0.375e-5
+stdDev = 0.6
+
 
 # Possible Flow Directions
 xFlow = 1
-yFlow = 1
+yFlow = 0
 zFlow = 1
 
 # Keep deadend porebodies in the network

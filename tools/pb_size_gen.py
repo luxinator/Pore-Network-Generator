@@ -9,8 +9,8 @@ __author__ = 'Lucas van Oosterhout'
 import matplotlib.pyplot as plt
 import numpy as np
 
-mu, sigma = np.log(2.0e-4), 0.250
-maxV, minV = 3.0e-4, 0.50e-4
+mu, sigma = np.log(0.75e-4), 0.6
+maxV, minV = 1.5e-4, 0.03e-4
 
 s = np.random.lognormal(mu, sigma, 100000)
 trunc = []

@@ -75,33 +75,51 @@ NetworkSpecs *readSpecsFile(const char *filename){
         //use the smart ass string function of C++
         std::string s = std::string(buff);
         
-        if ( s.compare(0,2,"ni")  == 0) {
+        if ( s.compare(0,i,"ni")  == 0) {
             NS->Ni = std::stoi(s.substr(i+1));
         }
-        else if ( s.compare(0,2,"nj")  == 0) {
+        else if ( s.compare(0,i,"nj")  == 0) {
             NS->Nj = std::stoi(s.substr(i+1));
         }
         
-        else if( s.compare(0,2,"nk") == 0) {
+        else if( s.compare(0,i,"nk") == 0) {
             NS->Nk = std::stoi(s.substr(i+1));
         }
-        else if( s.compare(0,6,"pbdist")  == 0) {
+        else if( s.compare(0,i,"pbdist")  == 0) {
             NS->pbDist = std::stof(s.substr(i+1));
         }
-        else if( s.compare(0,8, "periodic") == 0){
+        else if( s.compare(0,i, "periodic") == 0){
             NS->periodicBounndaries = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         }
-        else if( s.compare(0,5, "xflow") == 0){
+        else if( s.compare(0,i, "xflow") == 0){
             NS->flowDirs[0] = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         }
-        else if( s.compare(0,5, "yflow") == 0){
+        else if( s.compare(0,i, "yflow") == 0){
             NS->flowDirs[1] = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         }
-        else if( s.compare(0,5, "zflow") == 0){
+        else if( s.compare(0,i, "zflow") == 0){
             NS->flowDirs[2] = std::stoi(s.substr(i+1)) != 0; // if not zero then true
         } 
-        else if( s.compare(0,11, "keepdeadend") == 0){
+        else if( s.compare(0,i, "keepdeadend") == 0){
             NS->keepDeadEnd = std::stoi(s.substr(i+1)) != 0; // if not zero then true
+        } 
+		else if( s.compare(0,i, "pbsize") == 0){
+            NS->pbSizeFile = s.substr(i+1); // if not zero then true
+        }
+        else if( s.compare(0,i, "pbsizeconstant") == 0){
+            NS->constantPBSize = std::stoi(s.substr(i+1)) != 0; // if not zero then true
+        }
+		else if( s.compare(0,i, "mean") == 0){
+            NS->meanPBsize = std::stof(s.substr(i+1)); // if not zero then true
+        }
+		else if( s.compare(0,i, "stddev") == 0){
+            NS->stdDev = std::stof(s.substr(i+1)); // if not zero then true
+        }
+		else if( s.compare(0,i, "maxpbsize") == 0){
+            NS->maxPbSize = std::stof(s.substr(i+1)); // if not zero then true
+        }
+		else if( s.compare(0,i, "minpbsize") == 0){
+            NS->minPbSize = std::stof(s.substr(i+1)); // if not zero then true
         }
         // ----- ChanceList is kind of a special Case
         else if( s.compare(0,1,"c")  == 0) {
@@ -142,6 +160,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
     std::cout << "\tCoordination Number:\t\t\t" << NS->coordNr << '\n';
     std::cout << "\tPeriodic Boundaries:\t\t\t" << NS->periodicBounndaries << '\n';
     std::cout << "\tPossible Flow Dir:\n\t\t\tX-Flow: " << NS->flowDirs[0] << " Y-Flow: " << NS->flowDirs[1] << " Z-Flow: " << NS->flowDirs[2] << '\n';
+    std::cout << "\tPoreBody Sizes are LogNormal Distributed: " << !NS->constantPBSize << '\n';
 
     std::cout << std::endl;
     
@@ -150,7 +169,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
     return NS;
 }
 
-void loadNrs(const char *filename, PoreNetwork *P){
+int loadNrs(const char *filename, PoreNetwork *P){
     
     std::fstream file;
     
@@ -158,11 +177,11 @@ void loadNrs(const char *filename, PoreNetwork *P){
     file.open(filename, std::ios::in);
     if(!file){
         std::cerr<< "Error in opening file [" << filename << ']' << std::endl;
-        return;
+        return -1;
     }
     if(!P){
         std::cerr << "Error: No PoreNetwork Object Supplied! Check Input Files" << std::endl;
-        return;
+        return -2;
     }
     
     const int buffsize = 255;
@@ -199,23 +218,24 @@ void loadNrs(const char *filename, PoreNetwork *P){
     }
     
     file.close();
+	return 0;
 }
 
-void loadPoreBodyLocations(const char *filename, PoreNetwork *P){
+int loadPoreBodyLocations(const char *filename, PoreNetwork *P){
     std::ifstream file;
     
     std::cout << "Opening File: " << filename << std::endl;
     file.open(filename, std::ios::in);
     if(!file){
         std::cerr<< "Error in opening file [" << filename << ']' << std::endl;
-        return;
+        return -1;
     }
    
-    float x, y, z;
+    float x, y, z, pbsize;
     int counter, accu;
     int i = 1;
     
-    while (file >> x >> y >> z >> counter >> accu && i <= P->nrOfActivePBs){
+    while (file >> x >> y >> z >> counter >> accu >> pbsize && i <= P->nrOfActivePBs){
 
         P->locationList[0][i] = x;
         P->locationList[1][i] = y;
@@ -224,25 +244,28 @@ void loadPoreBodyLocations(const char *filename, PoreNetwork *P){
         P->throatCounter[0][i] = counter;
         P->throatCounter[1][i] = accu;
         
+		P->pb_sizeList[i] = pbsize;
         //std::cout << P->locationList[0][i] << '\t'<< P->locationList[1][i] << '\t'<< P->locationList[2][i] << std::endl;
         
         i++;
     }
+	
+	return 0;
     
 }
 
-void loadThroats(const char *filename, PoreNetwork *P){
+int loadThroats(const char *filename, PoreNetwork *P){
     std::ifstream file;
     
     std::cout << "Opening File: " << filename << std::endl;
     file.open(filename, std::ios::in);
     if(!file){
         std::cerr<< "Error in opening file [" << filename << ']' << std::endl;
-        return;
+        return -1;
     }
     if(!P){
         std::cerr << "Error: No PoreNetwork Object Supplied! Check Input Files" << std::endl;
-        return;
+        return -1;
     }
     
     int from, to, periodic;
@@ -261,6 +284,8 @@ void loadThroats(const char *filename, PoreNetwork *P){
         i++;
         
     }
+	
+	return 0;
     
 }
 
