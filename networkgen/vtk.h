@@ -12,7 +12,19 @@
 
 #include "PoreNetwork.h"
 
-void writeVTK(const char* filename, PoreNetwork *P_net, float * pb_values =  nullptr, const int precision = 0);
+void writeVTK(std::string filename, const PoreNetwork *P_net, double * pb_values = nullptr,
+              const int precision = 0, int offset_start = 0, int offset_end = 0);
+
+void writeVTK(std::string filename, const PoreNetwork *P_net, float * pb_values,
+              const int precision = 0, int offset_start = 0, int offset_end = 0);
+
+void writeVTK(std::string filename, const PoreNetwork *P_net, bool * pb_values,
+              const int precision = 0, int offset_start = 0, int offset_end = 0);
+
+void writeVTK(std::string filename, const PoreNetwork *P_net, char * pb_values,
+              const int precision = 0, int offset_start = 0, int offset_end = 0);
+
+//void writeVTK(std::string filename, const PoreNetwork *P_net);
 
 ///void writeVTK(const char* filename, const PoreNetwork *P_net, const int precision = 0);
 

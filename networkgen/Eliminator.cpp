@@ -9,6 +9,7 @@
 
 
 #include "Eliminator.h"
+#include "vtk.h"
 #include <random>
 
 /*
@@ -316,7 +317,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
         std::cout << "!!! --- 2 : Network is Broken no Connection between Inlet and Outlet ---!!!" << std::endl;
         return nullptr;
     }
-	    
+
     // we now have a flagged list of pb's which are connected to the inlets AND outlets
     std::cout << "Done!"<< std::endl;
     return flagged_PB;

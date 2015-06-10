@@ -71,7 +71,7 @@ public:
     
     virtual ~PoreNetwork();
     
-    void generateBoundary(size_t dir, float inletSize, float outletSize);
+    void generateBoundary(size_t dir, float inletSize, float outletSize, float inletThroatLength, float outletThroatLength);
     
     void removeFlaggedThroats(const int Flag = 0);
 

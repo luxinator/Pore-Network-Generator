@@ -46,7 +46,7 @@ Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name) {
 	PoreNetwork *result = new PoreNetwork();
 	result->ns = new NetworkSpecs;
 	result->ns->name = name;
-	result->ns->pbDist = Bot->ns->pbDist;
+	result->ns->pbDist = Top->ns->pbDist;
 	result->ns->Ni = 0;
 	result->ns->Nj = 0;
 	result->ns->Nk = 0;
@@ -158,9 +158,7 @@ void Combinator::Combine(short side){
 
 	// We now have a List of Boundary layer connections
 	std::cout << "Nr of Interface Conns: " << Boundary_Layer.size() << std::endl;
-	
-	//Add the Pb_sizes
-	
+
 }
 
 

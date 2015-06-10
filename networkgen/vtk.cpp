@@ -1,4 +1,11 @@
 //
+// Created by lucas on 4/16/15.
+//
+
+#include "vtk.h"
+
+
+//
 //  vtk.cpp
 //  networkgen
 //
@@ -17,19 +24,15 @@
  * Enhance the shit out of this, we want te select what to put in the files
  * Or even better put any and everything in the file!
  */
-void writeVTK(const char* path, PoreNetwork *P_net, float * pb_values, const int precision){
+
+void writeVTK(std::string filename, const PoreNetwork *P_net, double * pb_values,
+              const int precision, int offset_start, int offset_end){
 
     size_t PNMax = P_net->nrOfActivePBs;
     std::ofstream file;
-    if(!path){
-        std::cerr << "Invalid filename specified! " << std::endl;
-    }
-
-	std::string filename = std::string(path) + P_net->ns->name + ".vtk";
-    
     std::cout << "Opening File: " << filename << std::endl;
     file.open(filename, std::ios::trunc);
-    if(!file){
+    if(!file.is_open()){
         std::cerr<< "Error opening file [" << filename << ']' << std::endl;
         return;
     }
@@ -62,113 +65,268 @@ void writeVTK(const char* path, PoreNetwork *P_net, float * pb_values, const int
     /*
      * Write throat data
      */
-  
+
     file << "LINES" << '\t'<< P_net->nrOfConnections << '\t'<<  P_net->nrOfConnections * 3 <<std::endl;
     for(size_t i = 0; i <  P_net->nrOfConnections; i++){
-		// VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
-            file << 2 << '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
+        // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
+        file << 2 << '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
     }
 
     /*
      * Write Point Data if any
      */
-	
-	if( pb_values ){
-		file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
-		file << "LOOKUP_TABLE default" << std::endl;
-		// Pn Size
-		for(size_t pn = 1; pn <= PNMax; pn++){
-			file << pb_values[pn] << '\n';
-			//std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
-		}
-	} 
-//	else 
+
+    if( pb_values ){
+        file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
+        file << "LOOKUP_TABLE default" << std::endl;
+        // Pn Size
+        for(size_t pn = 1; pn <= PNMax; pn++){
+            if(pn < offset_start)
+                file << 0.0f << '\n';
+            else if(offset_end && pn >= offset_end)
+                file << 0.0f << '\n';
+            else
+                file << pb_values[pn] << '\n';
+            //std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
+        }
+    }
+//	else
 //		for(size_t pn = 1; pn <= PNMax; pn++)
 //			file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
 //			file << "LOOKUP_TABLE default" << std::endl;
 //			file << 1.0 << '\n';
-	
-	file.close();
+
+    file.close();
 
 }
 
-//void writeVTK(const char* path, const PoreNetwork *P_net, const int precision){
-//    
-//    size_t i = 0;
-//    
-//    size_t PNMax = P_net->nrOfActivePBs;
-//    
-//    std::ofstream file;
-//    if( path == nullptr){
-//        std::cerr << "Invalid filename specified! " << std::endl;
-//    }
-//    
-//    std::string filename = std::string(path) + P_net->ns->name + ".vtk";
-//    
-//    std::cout << "Opening File: " << filename << std::endl;
-//    file.open(filename, std::ios::trunc);
-//    if(!file){
-//        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
-//        return;
-//    }
-//    
-//    file.setf(std::ios_base::scientific );
-//    if(precision)
-//        file.precision(precision);
-//    
-//    /*
-//     * Write the header
-//     */
-//    file << "# vtk DataFile Version 3.0"     << std::endl;
-//    file << "pore-scale field varables"     << std::endl;
-//    file << "ASCII"                         << std::endl;
-//    file << "DATASET POLYDATA "             << std::endl;
-//    file << "POINTS "<<'\t' << PNMax <<'\t'<< "FLOAT"   << std::endl;
-//    
-//    
-//    /*
-//     * Write pb location data
-//     */
-//    for(int pn = 1; pn <= PNMax; pn++){
-//        file << P_net->locationList[0][pn]<< '\t';
-//        file << P_net->locationList[1][pn]<< '\t';
-//        file << P_net->locationList[2][pn] << '\n';
-//        
-//    }
-//    
-//    /*
-//     * Write throat data
-//     */
-//    size_t periodicTrsC = 0;
-//    if(P_net->ns->periodicBounndaries){
-//        for(periodicTrsC = 0; periodicTrsC < P_net->ns->Nk * P_net->ns->Nj * 2 + 1; periodicTrsC++)
-//            if(P_net->periodicThroats[periodicTrsC] == 0){
-//                //std::cout << "ZERO" << std::endl;
-//                break;
-//            }
-//        }
-//    std::cout << P_net->nrOfConnections << std::endl;
-//    
-//    file << "LINES" << '\t'<< P_net->nrOfConnections - periodicTrsC << '\t'<< (P_net->nrOfConnections - periodicTrsC) * 3 <<std::endl;
-//    periodicTrsC = 0;
-//    for(i = 0; i < P_net->nrOfConnections; i++){
-//        if(P_net->ns->periodicBounndaries && i == P_net->periodicThroats[periodicTrsC]){
-//            periodicTrsC++;
-//            continue;
-//        }
-//        
-//        file<< 2 << '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
-//        // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
-//    }
-//    
-//    file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
-//    file << "LOOKUP_TABLE default" <<std::endl;
-//    // Pn Size
-//    for(int pn = 1; pn < PNMax + 1; pn++){
-//        file << 1.0 << '\n';
-//    }
-//	file<<std::endl;
-//    
-//    file.close();
-//    
+void writeVTK(std::string filename, const PoreNetwork *P_net, float * pb_values,
+              const int precision, int offset_start, int offset_end){
+
+    size_t PNMax = P_net->nrOfActivePBs;
+    std::ofstream file;
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename, std::ios::trunc);
+    if(!file.is_open()){
+        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        return;
+    }
+
+    //Set output Format
+    file.setf(std::ios_base::scientific );
+    if(precision)
+        file.precision(precision);
+
+    /*
+     * Write the header
+     */
+    file << "# vtk DataFile Version 3.0"     << std::endl;
+    file << "pore-scale field varables"     << std::endl;
+    file << "ASCII"                         << std::endl;
+    file << "DATASET POLYDATA "             << std::endl;
+    file << "POINTS "<<'\t' << PNMax <<'\t'<< "FLOAT"   << std::endl;
+
+
+    /*
+     * Write pb location data
+     */
+    for(size_t pn = 1; pn <= PNMax; pn++){
+        file << P_net->locationList[0][pn]<< '\t';
+        file << P_net->locationList[1][pn]<< '\t';
+        file << P_net->locationList[2][pn] << '\n';
+    }
+
+
+    /*
+     * Write throat data
+     */
+
+    file << "LINES" << '\t'<< P_net->nrOfConnections << '\t'<<  P_net->nrOfConnections * 3 <<std::endl;
+    for(size_t i = 0; i <  P_net->nrOfConnections; i++){
+        // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
+        file << 2 << '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
+    }
+
+    /*
+     * Write Point Data if any
+     */
+
+    if( pb_values ){
+        file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
+        file << "LOOKUP_TABLE default" << std::endl;
+        // Pn Size
+        for(size_t pn = 1; pn <= PNMax; pn++){
+            if(pn < offset_start)
+                file << 0.0f << '\n';
+            else if(offset_end && pn >= offset_end)
+                file << 0.0f << '\n';
+            else
+                file << pb_values[pn] << '\n';
+            //std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
+        }
+    }
+//	else
+//		for(size_t pn = 1; pn <= PNMax; pn++)
+//			file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
+//			file << "LOOKUP_TABLE default" << std::endl;
+//			file << 1.0 << '\n';
+
+    file.close();
+
+}
+
+void writeVTK(std::string filename, const PoreNetwork *P_net, bool * pb_values,
+              const int precision, int offset_start, int offset_end){
+
+    size_t PNMax = P_net->nrOfActivePBs;
+    std::ofstream file;
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename, std::ios::trunc);
+    if(!file.is_open()){
+        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        return;
+    }
+
+    //Set output Format
+    file.setf(std::ios_base::scientific );
+    if(precision)
+        file.precision(precision);
+
+    /*
+     * Write the header
+     */
+    file << "# vtk DataFile Version 3.0"     << std::endl;
+    file << "pore-scale field varables"     << std::endl;
+    file << "ASCII"                         << std::endl;
+    file << "DATASET POLYDATA "             << std::endl;
+    file << "POINTS "<<'\t' << PNMax <<'\t'<< "FLOAT"   << std::endl;
+
+
+    /*
+     * Write pb location data
+     */
+    for(size_t pn = 1; pn <= PNMax; pn++){
+        file << P_net->locationList[0][pn]<< '\t';
+        file << P_net->locationList[1][pn]<< '\t';
+        file << P_net->locationList[2][pn] << '\n';
+    }
+
+
+    /*
+     * Write throat data
+     */
+
+    file << "LINES" << '\t'<< P_net->nrOfConnections << '\t'<<  P_net->nrOfConnections * 3 <<std::endl;
+    for(size_t i = 0; i <  P_net->nrOfConnections; i++){
+        // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
+        file << 2 << '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
+    }
+
+    /*
+     * Write Point Data if any
+     */
+
+    if( pb_values ){
+        file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
+        file << "LOOKUP_TABLE default" << std::endl;
+        // Pn Size
+        for(size_t pn = 1; pn <= PNMax; pn++){
+            if(pn < offset_start)
+                file << 0.0f << '\n';
+            else if(offset_end && pn >= offset_end)
+                file << 0.0f << '\n';
+            else
+                file << (float) pb_values[pn] << '\n';
+            //std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
+        }
+    }
+//	else
+//		for(size_t pn = 1; pn <= PNMax; pn++)
+//			file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
+//			file << "LOOKUP_TABLE default" << std::endl;
+//			file << 1.0 << '\n';
+
+    file.close();
+
+}
+
+
+void writeVTK(std::string filename, const PoreNetwork *P_net, char * pb_values,
+              const int precision, int offset_start, int offset_end){
+
+    size_t PNMax = P_net->nrOfActivePBs;
+    std::ofstream file;
+    std::cout << "Opening File: " << filename << std::endl;
+    file.open(filename, std::ios::trunc);
+    if(!file.is_open()){
+        std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        return;
+    }
+
+    //Set output Format
+    file.setf(std::ios_base::scientific );
+    if(precision)
+        file.precision(precision);
+
+    /*
+     * Write the header
+     */
+    file << "# vtk DataFile Version 3.0"     << std::endl;
+    file << "pore-scale field varables"     << std::endl;
+    file << "ASCII"                         << std::endl;
+    file << "DATASET POLYDATA "             << std::endl;
+    file << "POINTS "<<'\t' << PNMax <<'\t'<< "FLOAT"   << std::endl;
+
+
+    /*
+     * Write pb location data
+     */
+    for(size_t pn = 1; pn <= PNMax; pn++){
+        file << P_net->locationList[0][pn]<< '\t';
+        file << P_net->locationList[1][pn]<< '\t';
+        file << P_net->locationList[2][pn] << '\n';
+    }
+
+
+    /*
+     * Write throat data
+     */
+
+    file << "LINES" << '\t'<< P_net->nrOfConnections << '\t'<<  P_net->nrOfConnections * 3 <<std::endl;
+    for(size_t i = 0; i <  P_net->nrOfConnections; i++){
+        // VTK is zero based zo a line from pb[1] to pb[10] -> p[0] - p[9]
+        file << 2 << '\t' << P_net->throatList[0][i] - 1 << '\t' << P_net->throatList[1][i] - 1 << '\n';
+    }
+
+    /*
+     * Write Point Data if any
+     */
+
+    if( pb_values ){
+        file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
+        file << "LOOKUP_TABLE default" << std::endl;
+        // Pn Size
+        for(size_t pn = 1; pn <= PNMax; pn++){
+            if(pn < offset_start)
+                file << 0.0f << '\n';
+            else if(offset_end && pn >= offset_end)
+                file << 0.0f << '\n';
+            else
+                file << (float) pb_values[pn] << '\n';
+            //std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
+        }
+    }
+//	else
+//		for(size_t pn = 1; pn <= PNMax; pn++)
+//			file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
+//			file << "LOOKUP_TABLE default" << std::endl;
+//			file << 1.0 << '\n';
+
+    file.close();
+
+}
+
+//void writeVTK(std::string filename, const PoreNetwork *P_net) {
+//    double * empty = nullptr;
+//    writeVTK(filename, P_net, empty);
 //}

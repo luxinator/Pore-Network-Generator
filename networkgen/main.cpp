@@ -121,7 +121,6 @@ Command-Line Options:\n \
             		return 1;
             	}
 				break;
-            	i += 2;
             }
 			
 			else
@@ -158,7 +157,8 @@ Command-Line Options:\n \
         
         // --- Write the Inner network to file, no search for isolated pbs!
 
-        writeVTK(vtkFile.c_str(), innerNetwork);
+        vtkFile = cFile + innerNetwork->ns->name + ".vtk";
+        writeVTK(vtkFile, innerNetwork, innerNetwork->pb_sizeList);
         writeConnectivity(cFile.c_str(), innerNetwork);
         
         writeLocation(lFile.c_str(), innerNetwork);
@@ -167,7 +167,6 @@ Command-Line Options:\n \
 
 		// --- Generate the Boundaries and Search for Isolated pbds
         std::cout << std::endl;
-        std::string suffix;
 
         if(Finalize(innerNetwork) != 0){
             std::cerr << "Something bad happend. \nI am sorry but, I QUIT!";
@@ -196,18 +195,15 @@ Command-Line Options:\n \
 	// **** COMBINED networks are special and don't use Finalize
 
 		// Generate Boudnaries
-		Res->generateBoundary(2, bot->ns->pbDist,top->ns->pbDist);
-		
-		// Generate Full_conn
+		Res->generateBoundary(2, bot->ns->meanPBsize,top->ns->meanPBsize, bot->ns->pbDist, top->ns->pbDist);
+
 		size_t lengthTL = Res->generateFullConnectivity();
-		// Search for Isolated
+
 		char * pb_list = searchForIsolatedPB(Res,lengthTL);
-		// Remove flagged porebodiesDebug session ended
 		if(!pb_list){
 		std::cout << "Network is Broken Aborting" << std::endl;
 			return 1;
 		}
-                
 		Res->removeFlaggedPBs(pb_list, (char)2);
 		
 		if(!top->ns->keepDeadEnd || !bot->ns->keepDeadEnd){
@@ -215,8 +211,8 @@ Command-Line Options:\n \
 		}
 
 		// Write network to file(s)
-	
-		writeVTK(vtkFile.c_str(), Res, Res->pb_sizeList);
+	    vtkFile = cFile + Res->ns->name + ".vtk";
+		writeVTK(vtkFile, Res, Res->pb_sizeList);
 		writeNetworkSpecs(cFile.c_str(), Res);
 		writeInterfacePores(cFile.c_str(), Res, combi);
 		writeConnectivity(cFile.c_str(), Res);
@@ -249,7 +245,7 @@ Command-Line Options:\n \
 
 int Finalize(PoreNetwork * pn){
 
-    std::string suffix = "_x";
+    std::string suffix;
 
     for(int dir = 0; dir <= 2; dir++){
         if(pn->ns->flowDirs[dir]){
@@ -270,7 +266,7 @@ int Finalize(PoreNetwork * pn){
 
             PoreNetwork *P_Bound = new PoreNetwork(*pn, pn->ns->name + suffix);
 
-            P_Bound->generateBoundary(dir, P_Bound->ns->meanPBsize, P_Bound->ns->meanPBsize);
+            P_Bound->generateBoundary(dir, P_Bound->ns->meanPBsize, P_Bound->ns->meanPBsize, pn->ns->pbDist, pn->ns->pbDist);
 
             size_t lengthTL = P_Bound->generateFullConnectivity();
 
@@ -285,8 +281,8 @@ int Finalize(PoreNetwork * pn){
             if(!P_Bound->ns->keepDeadEnd)
                 P_Bound->killDeadEndPores();
 
-
-            writeVTK(vtkFile.c_str(), P_Bound, P_Bound->pb_sizeList);
+            vtkFile = cFile + P_Bound->ns->name + ".vtk";
+            writeVTK(vtkFile, P_Bound, P_Bound->pb_sizeList);
             writeConnectivity(cFile.c_str(), P_Bound);
 
             writeLocation(lFile.c_str(), P_Bound);

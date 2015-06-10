@@ -258,12 +258,12 @@ PoreNetwork::PoreNetwork(const std::string networkSpecs_file) : PoreNetwork(){
 
     this->pb_sizeList = new float[nrOfActivePBs + 1];
 
-    loadPoreBodyLocations((path + name + "_loc.txt").c_str(), this);
-
     int *t = new int[2 * this->nrOfActivePBs + 2];
     this->throatCounter = new int*[2];
     this->throatCounter[0] = t;
-    this->throatCounter[1] = t + this->nrOfActivePBs + 1; // + 1 for the 0 guard
+    this->throatCounter[1] = t + this->nrOfActivePBs + 1;
+
+    loadPoreBodyLocations((path + name + "_loc.txt").c_str(), this);
 
     t = new int[this->nrOfConnections * 2];
     this->throatList = new int*[2];
@@ -386,7 +386,7 @@ int PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         }
     }
 	
-	//Check for Inlet of Outlet changes
+	//Check for Inlet or Outlet changes
 	for(i = 0; i < this->nrOfInlets; i++){
 		if(this->throatList[0][i] == -1 )
 			in++;
@@ -756,17 +756,12 @@ template <typename T> T* PoreNetwork::paddedList(size_t amount, T *List, size_t 
  *  !!!! This Code needs some revision! but not  now...
  */
 
-void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize){
+void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize, float inletThroatLength, float outletThroatLength){
 
     if (dir > 2) {
         std::cerr << "\nCRITICAL ERROR: COULD NOT GENERATE BOUNDARIES!" << std::endl;
         return;
     }
-	if(this->ns->pbDist <=0.0f){
-		std::cerr << "\nCRITICAL ERROR: COULD NOT GENERATE BOUNDARIES!" << std::endl;
-        std::cerr << "Porebody Distance is not set!" << std::endl;
-		return;
-	}
 
     std::cout << "Genrating Boundaries" << std::endl;
     // --- First clean the Periodic Throats!!!
@@ -783,6 +778,8 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
     float** newLL   = nullptr;
     int** newTC     = nullptr;
 	float *newPBsize = nullptr;
+
+
 
     // --------- Inlets ---------
     this->nrOfInlets = 0;
@@ -814,17 +811,9 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
         }
     }
 
-    // ------------ Outlets ---------------
-//    float lastPbLocs = 0.0f;
-//    if ( dir == 0 ) {
-//        lastPbLocs = this->ns->pbDist * (Ni - 1);
-//    } else if (dir == 1) {
-//        lastPbLocs = this->ns->pbDist * (Nj - 1);
-//    } else if (dir == 2) {
-//        lastPbLocs = this->ns->pbDist * (Nk - 1);
-//    }
-//
 
+
+    // ------------ Outlets ---------------
 	float lastPbLocs = locationList[dir][this->nrOfActivePBs];
 	
     nrOfOutlets = 0;
@@ -872,7 +861,7 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
             newLL[1][bound_index + transform_P] = this->locationList[1][i];
             newLL[2][bound_index + transform_P] = this->locationList[2][i];
 
-            newLL[dir][bound_index + transform_P] += 2 * this->ns->pbDist;
+            newLL[dir][bound_index + transform_P] += inletThroatLength + outletThroatLength;
 
             // TC_list
             newTC[0][i + nrOfInlets] += 1;
@@ -898,7 +887,7 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
 
     for(size_t i = nrOfInlets + 1; i <= this->nrOfActivePBs + nrOfInlets; i++){
         // --Translate a PbDistance
-        newLL[dir][i] += this->ns->pbDist;
+        newLL[dir][i] += inletThroatLength;
     }
 
     // --- Rebuild the accumulators
