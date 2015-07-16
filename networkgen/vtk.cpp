@@ -19,13 +19,38 @@
 #include <iomanip>
 #include <fstream>
 
+
+void writeCoord(std::ofstream &file, const PoreNetwork *P_net){
+
+    size_t PNMax = P_net->nrOfActivePBs;
+
+    file << '\n' << "SCALARS x-coord float" << '\n';
+    file << "LOOKUP_TABLE default" << std::endl;
+    // Pn Size
+    for (size_t pn = 1; pn <= PNMax; pn++)
+        file << (float) P_net->locationList[0][pn] << '\n';
+
+    file <<  '\n' << "SCALARS y-coord float" << '\n';
+    file << "LOOKUP_TABLE default" << std::endl;
+    // Pn Size
+    for (size_t pn = 1; pn <= PNMax; pn++)
+        file << (float) P_net->locationList[1][pn] << '\n';
+
+
+    file <<  '\n' << "SCALARS z-coord float" << '\n';
+    file << "LOOKUP_TABLE default" << std::endl;
+    // Pn Size
+    for (size_t pn = 1; pn <= PNMax; pn++)
+        file << (float) P_net->locationList[2][pn] << '\n';
+}
+
 /*
  * Write current network to vtk file,
  * Enhance the shit out of this, we want te select what to put in the files
  * Or even better put any and everything in the file!
  */
 
-void writeVTK(std::string filename, const PoreNetwork *P_net, double * pb_values,
+void writeVTK(std::string filename, const PoreNetwork *P_net, double * pb_values, bool doCoords,
               const int precision, int offset_start, int offset_end){
 
     size_t PNMax = P_net->nrOfActivePBs;
@@ -90,17 +115,14 @@ void writeVTK(std::string filename, const PoreNetwork *P_net, double * pb_values
             //std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
         }
     }
-//	else
-//		for(size_t pn = 1; pn <= PNMax; pn++)
-//			file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
-//			file << "LOOKUP_TABLE default" << std::endl;
-//			file << 1.0 << '\n';
-
+    if(doCoords) {
+        writeCoord(file, P_net);
+    }
     file.close();
 
 }
 
-void writeVTK(std::string filename, const PoreNetwork *P_net, float * pb_values,
+void writeVTK(std::string filename, const PoreNetwork *P_net, float * pb_values, bool doCoords,
               const int precision, int offset_start, int offset_end){
 
     size_t PNMax = P_net->nrOfActivePBs;
@@ -165,17 +187,14 @@ void writeVTK(std::string filename, const PoreNetwork *P_net, float * pb_values,
             //std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
         }
     }
-//	else
-//		for(size_t pn = 1; pn <= PNMax; pn++)
-//			file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
-//			file << "LOOKUP_TABLE default" << std::endl;
-//			file << 1.0 << '\n';
-
+    if(doCoords) {
+        writeCoord(file, P_net);
+    }
     file.close();
 
 }
 
-void writeVTK(std::string filename, const PoreNetwork *P_net, bool * pb_values,
+void writeVTK(std::string filename, const PoreNetwork *P_net, bool * pb_values, bool doCoords,
               const int precision, int offset_start, int offset_end){
 
     size_t PNMax = P_net->nrOfActivePBs;
@@ -240,18 +259,16 @@ void writeVTK(std::string filename, const PoreNetwork *P_net, bool * pb_values,
             //std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
         }
     }
-//	else
-//		for(size_t pn = 1; pn <= PNMax; pn++)
-//			file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
-//			file << "LOOKUP_TABLE default" << std::endl;
-//			file << 1.0 << '\n';
+    if(doCoords) {
+        writeCoord(file, P_net);
+    }		file << 1.0 << '\n';
 
     file.close();
 
 }
 
 
-void writeVTK(std::string filename, const PoreNetwork *P_net, char * pb_values,
+void writeVTK(std::string filename, const PoreNetwork *P_net, char * pb_values, bool doCoords,
               const int precision, int offset_start, int offset_end){
 
     size_t PNMax = P_net->nrOfActivePBs;
@@ -316,11 +333,11 @@ void writeVTK(std::string filename, const PoreNetwork *P_net, char * pb_values,
             //std::cout<< pn << '\t' << (float)(int)pb_flags[pn] << std::endl;
         }
     }
-//	else
-//		for(size_t pn = 1; pn <= PNMax; pn++)
-//			file << "POINT_DATA" << ' '<<PNMax << '\n'<< "SCALARS size_pb float" << '\n';
-//			file << "LOOKUP_TABLE default" << std::endl;
-//			file << 1.0 << '\n';
+
+    if(doCoords) {
+        writeCoord(file, P_net);
+    }
+
 
     file.close();
 

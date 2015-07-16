@@ -9,8 +9,8 @@ __author__ = 'Lucas van Oosterhout'
 import matplotlib.pyplot as plt
 import numpy as np
 
-mu, sigma = np.log(0.75e-4), 0.6
-maxV, minV = 1.5e-4, 0.03e-4
+mu, sigma = np.log(2.0e-4), 0.6
+maxV, minV = 3.0e-4, 1.5e-4
 
 s = np.random.lognormal(mu, sigma, 100000)
 trunc = []
@@ -40,3 +40,10 @@ f.write('mu: {}, sigma: {}\n'.format(np.exp(mu), sigma))
 f.write('max: {}, min: {}\n'.format(maxV, minV))
 f.write('nr of Pb_sizes: {}\n'.format(len(s)))
 f.close()
+
+
+mean = 2.0e-4
+stdDev = 0.6
+maxpbSize = 3.0e-4
+minPbSize = 0.75e-4
+

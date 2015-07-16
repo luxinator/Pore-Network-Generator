@@ -756,7 +756,7 @@ template <typename T> T* PoreNetwork::paddedList(size_t amount, T *List, size_t 
  *  !!!! This Code needs some revision! but not  now...
  */
 
-void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize, float inletThroatLength, float outletThroatLength){
+void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize, float inletThroatLength, float outletThroatLength) {
 
     if (dir > 2) {
         std::cerr << "\nCRITICAL ERROR: COULD NOT GENERATE BOUNDARIES!" << std::endl;
@@ -765,7 +765,7 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
 
     std::cout << "Genrating Boundaries" << std::endl;
     // --- First clean the Periodic Throats!!!
-    if(this->ns->periodicBounndaries)
+    if (this->ns->periodicBounndaries)
         this->cleanPeriodic(dir);
 
 
@@ -774,31 +774,31 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
 //    int Nk = this->ns->Nk;
 //    //int *coord = new int[3];
 
-    int** newTL     = nullptr;
-    float** newLL   = nullptr;
-    int** newTC     = nullptr;
-	float *newPBsize = nullptr;
+    int **newTL = nullptr;
+    float **newLL = nullptr;
+    int **newTC = nullptr;
+    float *newPBsize = nullptr;
 
 
 
     // --------- Inlets ---------
     this->nrOfInlets = 0;
 
-    for( size_t i = 1; i <= this->nrOfActivePBs; i++)
-        if( this->locationList[dir][i] == 0.0f )
+    for (size_t i = 1; i <= this->nrOfActivePBs; i++)
+        if (this->locationList[dir][i] == 0.0f)
             nrOfInlets++;
 
-    newTL 		= this->paddedList(nrOfInlets, this->throatList,    2, this->nrOfConnections,   true);
-    newLL 		= this->paddedList(nrOfInlets, this->locationList,  3, this->nrOfActivePBs + 1, true);
-    newTC 		= this->paddedList(nrOfInlets, this->throatCounter, 2, this->nrOfActivePBs + 1, true);
-	newPBsize 	= this->paddedList(nrOfInlets, this->pb_sizeList, this->nrOfActivePBs + 1, true);
+    newTL = this->paddedList(nrOfInlets, this->throatList, 2, this->nrOfConnections, true);
+    newLL = this->paddedList(nrOfInlets, this->locationList, 3, this->nrOfActivePBs + 1, true);
+    newTC = this->paddedList(nrOfInlets, this->throatCounter, 2, this->nrOfActivePBs + 1, true);
+    newPBsize = this->paddedList(nrOfInlets, this->pb_sizeList, this->nrOfActivePBs + 1, true);
 
 
     size_t bound_index = 1;
-    for ( size_t i = 1; i <= this->nrOfActivePBs; i++){
-        if( this->locationList[dir][i] == 0.0f ){
+    for (size_t i = 1; i <= this->nrOfActivePBs; i++) {
+        if (this->locationList[dir][i] == 0.0f) {
             newTL[0][bound_index - 1] = (int) bound_index;
-            newTL[1][bound_index - 1] = (int) i + (int)nrOfInlets;
+            newTL[1][bound_index - 1] = (int) i + (int) nrOfInlets;
 
             // Loc_List, the trick here is that the OLD location of the pb to connect to is the location of the boundPB
             newLL[0][bound_index] = this->locationList[0][i];
@@ -814,49 +814,54 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
 
 
     // ------------ Outlets ---------------
-	float lastPbLocs = locationList[dir][this->nrOfActivePBs];
-	
-    nrOfOutlets = 0;
-    for( size_t i = 1; i <= this->nrOfActivePBs; i++)
-        if( this->locationList[dir][i] == lastPbLocs )
-            nrOfOutlets++;
+    //float lastPbLocs = locationList[dir][this->nrOfActivePBs];
+    float lastPbLocs = 0.0;
+    for (size_t i = 1; i <= this->nrOfActivePBs; i++)
+        lastPbLocs = this->locationList[dir][i] > lastPbLocs ? this->locationList[dir][i] : lastPbLocs;
+    std::cout << "Last Pb location: " << lastPbLocs << " For " << dir << std::endl;
 
+
+    nrOfOutlets = 0;
+    for (size_t i = 1; i <= this->nrOfActivePBs; i++)
+        if (this->locationList[dir][i] == lastPbLocs)
+            nrOfOutlets++;
 
 
     int **tempTL = newTL;
     int **tempTC = newTC;
-    float**tempLL = newLL;
-	float* tempPbs = newPBsize;
+    float **tempLL = newLL;
+    float *tempPbs = newPBsize;
 
     //Since the padded list is a deep copy of the given list
-    newTL 		= this->paddedList(nrOfOutlets, newTL, 2, this->nrOfConnections + nrOfInlets, 	false);
-    newLL 		= this->paddedList(nrOfOutlets, newLL, 3, this->nrOfActivePBs   + 1 + nrOfInlets, false);
-    newTC 		= this->paddedList(nrOfOutlets, newTC, 2, this->nrOfActivePBs   + 1 + nrOfInlets, false);
-	newPBsize 	= this->paddedList(nrOfOutlets, newPBsize, this->nrOfActivePBs + 1 + nrOfInlets, false);
+    newTL = this->paddedList(nrOfOutlets, newTL, 2, this->nrOfConnections + nrOfInlets, false);
+    newLL = this->paddedList(nrOfOutlets, newLL, 3, this->nrOfActivePBs + 1 + nrOfInlets, false);
+    newTC = this->paddedList(nrOfOutlets, newTC, 2, this->nrOfActivePBs + 1 + nrOfInlets, false);
+    newPBsize = this->paddedList(nrOfOutlets, newPBsize, this->nrOfActivePBs + 1 + nrOfInlets, false);
 
     // delete the old lists
-    delete [] tempLL;
-    delete [] tempTC;
-    delete [] tempTL;
-	delete [] tempPbs;
-	
+    delete[] tempLL;
+    delete[] tempTC;
+    delete[] tempTL;
+    delete[] tempPbs;
+
     tempLL = nullptr;
     tempTC = nullptr;
     tempTL = nullptr;
-	tempPbs = nullptr;
+    tempPbs = nullptr;
 
     size_t transform_TL = nrOfInlets + nrOfConnections - 1;
-    size_t transform_P  = nrOfInlets + nrOfActivePBs;
+    size_t transform_P = nrOfInlets + nrOfActivePBs;
 
     bound_index = 1;//nrOfInlets + this->nrOfActivePBs;
 
-    for ( size_t i = 1; i <= this->nrOfActivePBs; i++){
-        if( this->locationList[dir][i] == lastPbLocs ){
+    for (size_t i = 1; i <= this->nrOfActivePBs; i++) {
+        if (this->locationList[dir][i] == lastPbLocs) {
             // I is the old pbnr
-            newTL[0][bound_index + transform_TL] = (int) i + (int)nrOfInlets; // old pbnr + translation
-            newTL[1][bound_index + transform_TL] = (int) (bound_index + transform_P); // highest pbnr + ouletIndex = index of outlet
+            newTL[0][bound_index + transform_TL] = (int) i + (int) nrOfInlets; // old pbnr + translation
+            newTL[1][bound_index + transform_TL] = (int) (bound_index +
+                                                          transform_P); // highest pbnr + ouletIndex = index of outlet
 
-			// The Trick here is the same as with the inlets, BUT we have to add 2 times the pbdist! (once for the inlets and once for the outlets)
+            // The Trick here is the same as with the inlets, BUT we have to add 2 times the pbdist! (once for the inlets and once for the outlets)
             newLL[0][bound_index + transform_P] = this->locationList[0][i];
             newLL[1][bound_index + transform_P] = this->locationList[1][i];
             newLL[2][bound_index + transform_P] = this->locationList[2][i];
@@ -871,81 +876,82 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
     }
 
 
-	// ------------ Transform Inner Network ------------
+    // ------------ Transform Inner Network ------------
     size_t j = 0;
     for (size_t i = nrOfInlets; i < this->nrOfConnections + nrOfInlets; i++) {
         // -- update the ThroatList middlePart
         newTL[0][i] += nrOfInlets;
         newTL[1][i] += nrOfInlets;
-        
-		// -- register PeriodicThroats
+
+        // -- register PeriodicThroats
         if (newTL[0][i] > newTL[1][i]) {
-            this->periodicThroats[j] = (int)i;
+            this->periodicThroats[j] = (int) i;
             j++;
         }
     }
 
-    for(size_t i = nrOfInlets + 1; i <= this->nrOfActivePBs + nrOfInlets; i++){
+    for (size_t i = nrOfInlets + 1; i <= this->nrOfActivePBs + nrOfInlets; i++) {
         // --Translate a PbDistance
         newLL[dir][i] += inletThroatLength;
     }
 
     // --- Rebuild the accumulators
     int accumulator = 0;
-    for(size_t i = 1; i <= this->nrOfActivePBs + nrOfInlets + nrOfOutlets; i ++) {
+    for (size_t i = 1; i <= this->nrOfActivePBs + nrOfInlets + nrOfOutlets; i++) {
         newTC[1][i] = accumulator + newTC[0][i];
         accumulator = newTC[1][i];
     }
 
 
-	if (throatCounter) {
-        delete [] throatCounter[0];
+    if (throatCounter) {
+        delete[] throatCounter[0];
         throatCounter[0] = nullptr;
-        delete [] throatCounter;
+        delete[] throatCounter;
         throatCounter = nullptr;
     }
     if (throatList) {
-        delete [] throatList[0];
-        delete [] throatList;
+        delete[] throatList[0];
+        delete[] throatList;
         throatCounter = nullptr;
     }
     if (locationList) {
-        delete [] locationList[0];
+        delete[] locationList[0];
         locationList[0] = nullptr;
-        delete [] locationList;
+        delete[] locationList;
         locationList = nullptr;
     }
-	if (pb_sizeList){
-		delete [] pb_sizeList;
-		pb_sizeList = nullptr;
-	}
-	
+    if (pb_sizeList) {
+        delete[] pb_sizeList;
+        pb_sizeList = nullptr;
+    }
+
     this->throatList = newTL;
     this->throatCounter = newTC;
     this->locationList = newLL;
-	this->pb_sizeList = newPBsize;
-	
-	if(arr){
-		for (size_t i = 0; i < this->ns->Ni; i++)
-				for (size_t j = 0; j < this->ns->Nj; j++) {
-					delete [] arr[i][j];
-				}
-		delete [] arr;
-		arr = nullptr;
-	}
-		
-	
+    this->pb_sizeList = newPBsize;
+
+    if (arr) {
+        for (size_t i = 0; i < this->ns->Ni; i++)
+            for (size_t j = 0; j < this->ns->Nj; j++) {
+                delete[] arr[i][j];
+            }
+        delete[] arr;
+        arr = nullptr;
+    }
+
+
     // Update nrOfActivePBs
-	//std::cout << nrOfActivePBs << '\t' << nrOfConnections << std::endl;
-	
+    //std::cout << nrOfActivePBs << '\t' << nrOfConnections << std::endl;
+
     this->nrOfActivePBs += nrOfInlets + nrOfOutlets;
     this->nrOfConnections += nrOfInlets + nrOfOutlets;
-	
-	// Update the Pb_Sizes
-	for(size_t i = 1; i <= nrOfInlets; i++)
-		this->pb_sizeList[i] = inletSize;
-	for(size_t i = nrOfActivePBs - nrOfOutlets +1; i <= nrOfActivePBs; i++)
-		this->pb_sizeList[i] = outletSize;
+
+    // Update the Pb_Sizes
+    for (size_t i = 0; i < nrOfInlets; i++)
+        this->pb_sizeList[this->throatList[0][i]] = this->pb_sizeList[this->throatList[1][i]];
+
+    for (size_t i = nrOfConnections - nrOfOutlets; i <= nrOfConnections; i++)
+        this->pb_sizeList[this->throatList[1][i]] = this->pb_sizeList[this->throatList[0][i]];
 
 //	for(size_t i = 1; i <= nrOfActivePBs; i++)
 //		std::cout << locationList[0][i] << '\t' << locationList[1][i] << '\t' << locationList[2][i] << std::endl;
@@ -1056,35 +1062,40 @@ size_t PoreNetwork::generateFullConnectivity(){
     return maxConnections - 1;
 }
 
-void PoreNetwork::generatePbSizes(){
-	
-	std::cout << "Generating PoreBody Sizes" << std::endl;
-	if(!pb_sizeList)
-		pb_sizeList = new float[nrOfActivePBs+1];
-	else{
-		delete[] pb_sizeList;
-		pb_sizeList = new float[nrOfActivePBs+1];
-	}
-	
-	std::default_random_engine generator((unsigned int) time(0));
-	std::lognormal_distribution<float> distribution( log(ns->meanPBsize), ns->stdDev);
-	
-	
-	float number; size_t i = 1;
-	while(i <= nrOfActivePBs){
-        if(!ns->constantPBSize ){
-    		number = distribution(generator);
-    		if(number >= ns->minPbSize && number <= ns->maxPbSize){
-    			pb_sizeList[i] = number;
-    			i++;
-    			//std::cout << i << std::endl;
-	        } 
-        }
-        else{
+void PoreNetwork::generatePbSizes() {
+
+    std::cout << "Generating PoreBody Sizes" << std::endl;
+    if (!pb_sizeList)
+        pb_sizeList = new float[nrOfActivePBs + 1];
+    else {
+        delete[] pb_sizeList;
+        pb_sizeList = new float[nrOfActivePBs + 1];
+    }
+
+    if (ns->constantPBSize) {
+        for (size_t i = 1; i <= this->nrOfActivePBs; i++)
             pb_sizeList[i] = ns->meanPBsize;
-            i++;
+        return;
+    }
+    for (size_t i = 1; i <= this->nrOfActivePBs; i++)
+        pb_sizeList[i] = -1.0;
+
+
+    std::default_random_engine generator((unsigned int) time(0));
+    std::lognormal_distribution<float> distribution(log(ns->meanPBsize), ns->stdDev);
+
+    float number;
+    size_t i = 1;
+    while (i <= nrOfActivePBs) {
+        if (!ns->constantPBSize) {
+            number = distribution(generator);
+            if (number >= ns->minPbSize && number <= ns->maxPbSize) {
+                pb_sizeList[i] = number;
+                i++;
+                //std::cout << i << std::endl;
+            }
         }
-	}
+    }
 }
 
 

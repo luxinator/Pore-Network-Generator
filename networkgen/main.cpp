@@ -212,7 +212,7 @@ Command-Line Options:\n \
 
 		// Write network to file(s)
 	    vtkFile = cFile + Res->ns->name + ".vtk";
-		writeVTK(vtkFile, Res, Res->pb_sizeList);
+		writeVTK(vtkFile, Res, Res->pb_sizeList, true);
 		writeNetworkSpecs(cFile.c_str(), Res);
 		writeInterfacePores(cFile.c_str(), Res, combi);
 		writeConnectivity(cFile.c_str(), Res);
