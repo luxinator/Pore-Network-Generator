@@ -149,8 +149,22 @@ void Combinator::Combine(short side){
 					if(L == 0.0f)
 						std::cout << "CRAP!" << std::endl;
 
-					if( L <= this->SearchDist && d(e) < Survival)
-						Boundary_Layer.push_back( { (int)i, (int)pn } );
+					if( L <= this->SearchDist && d(e) < Survival) {
+						Boundary_Layer.push_back({(int) i, (int) pn});
+
+						float * t = new float[3];
+						t[0] = Bot->locationList[0][i];
+						t[1] = Bot->locationList[1][i];
+						t[2] = Bot->locationList[2][i];
+						this->BoundaryLocations.push_back(t);
+
+						t = new float[3];
+						t[0] = Top->locationList[0][i];
+						t[1] = Top->locationList[1][i];
+						t[2] = Top->locationList[2][i];
+						this->BoundaryLocations.push_back(t);
+
+					}
 				}// if top[side] 0.0
 			}// for Bot
 		}// if side
@@ -195,6 +209,7 @@ void Combinator::builtConnectionList(){
 	// Sort 
 	if(sortConnections)
 		bubbleSortList(Result->throatList, Result->nrOfConnections);
+
 
 
 }

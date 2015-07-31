@@ -131,11 +131,11 @@ void writeInterfacePores(const char * path, PoreNetwork *pn, Combinator *C){
         std::cerr<< "Error opening file [" << filename << ']' << std::endl;
         return;
     }
-    
-	std::vector<std::pair<int,int>> Boundary_Layer = C->getInterface();
-	
-	for (std::vector<std::pair<int,int>>::iterator it = Boundary_Layer.begin(); it != Boundary_Layer.end(); it++){
-		file << it->first << '\t' << it->second << '\n';
+
+    std::vector<float*> boundary_locs = C->getInterfaceLocations();
+
+	for (std::vector<float*>::iterator it = boundary_locs.begin(); it != boundary_locs.end(); it++){
+		file << it[0] << '\t' << it[1] << '\t' << it[2] << '\n';
 	}
 	
 	file.close();
@@ -153,7 +153,7 @@ void writeInterfacePores(const char * path, PoreNetwork *pn, Combinator *C){
 	file << "Separation Distance = " << C->getSeparation() << '\n';
 	file << "Search Distance = " << C->getSearchDist() << '\n';
 	file << "Survival = " << C->getSurvival() << '\n';
-	file << "Number of Interface Throats = "<< Boundary_Layer.size() << '\n';
+	file << "Number of Interface Throats = "<< boundary_locs.size() << '\n';
 	
 	file.close();
 	

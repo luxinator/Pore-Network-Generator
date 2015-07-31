@@ -40,7 +40,10 @@ void tolowercase(char *input, const int size = 0){
         input[i] = tolower(input[i]);
     }
 }
-
+/*
+ * This insane piece of code is to parse
+ * the specs file. Be carfull with it!
+ */
 NetworkSpecs *readSpecsFile(const char *filename){
     
     NetworkSpecs *NS = new NetworkSpecs;

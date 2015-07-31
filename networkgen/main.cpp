@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <limits>
 
 #include "ArrayFunctions.h"
 #include "vtk.h"
@@ -26,12 +27,16 @@ std::string lFile   = "./data/";
 std::string vtkFile = "./data/";
 
 int main(int argc, char *argv[]) {
-    
     std::cout << "\nPore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__<<std::endl;
-    std::cout << "Copyright Lucas van Oosterhout. GPLv2 see LICENSE \n\n" << std::endl;
-    
+    std::cout << "Copyright Lucas van Oosterhout. GPLv2 see LICENSE " << std::endl;
+    std::cout << "Contact : l.m.vanoosterhout@uu.nl\n\n" << std::endl;
+
+    const int min_int = std::numeric_limits<int>::min();
+    const int max_int = std::numeric_limits<int>::max();
+    std::cout << "Please be ABOSLUTELY SURE that no more then " << max_int << " Pore bodies\nare present in the System"  << std::endl;
+
     std::string helpText = "Options can be combined for different results.\n \
-Command-Line Options:\n \
+    Command-Line Options:\n \
     -h               \t Shows this help text\n \
     -ns [location]   \t Specify the location of the NetworkSpecs.in file if not given standard location is used [../data/NetworkSpecs.in]\n \
     -cfile [location] \t Specify the location of the connectiviy output file\n \

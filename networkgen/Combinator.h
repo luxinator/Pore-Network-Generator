@@ -25,6 +25,7 @@ private:
 //	this->Boundary_Layer[2].first + this->boundary_Layer.second;
 
 	std::vector<std::pair<int,int>> Boundary_Layer;
+	std::vector<float*> BoundaryLocations;
 
 	 float Survival;
 	 float Separation;
@@ -48,7 +49,8 @@ public:
 	PoreNetwork * getResult();
 	
 	const std::vector<std::pair<int,int>>& getInterface() { return Boundary_Layer; };
-	
+	const std::vector<float*>&getInterfaceLocations() { return BoundaryLocations; };
+
 	float getSurvival()  { return Survival; };
 	float getSeparation(){ return Separation; };
 	float getSearchDist(){ return SearchDist; };
