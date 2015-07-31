@@ -10,6 +10,7 @@
 #include <math.h>
 #include <fstream>
 #include <random>
+#include <string.h>
 #include "PoreNetwork.h"
 #include "inputParser.h"
 #include "ArrayFunctions.h"
@@ -270,7 +271,7 @@ PoreNetwork::PoreNetwork(const std::string networkSpecs_file) : PoreNetwork(){
     this->throatList[0] = t;
     this->throatList[1] = t + this->nrOfConnections;
 
-    this->periodicListLength = Ni*Nj + Nj*Nk + Nk*Ni;
+    this->periodicListLength = (int)(Ni*Nj + Nj*Nk + Nk*Ni);
 
     this->periodicThroats = new int[periodicListLength];
     for (size_t i = 0; i < periodicListLength; i++)
@@ -818,7 +819,7 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
     float lastPbLocs = 0.0;
     for (size_t i = 1; i <= this->nrOfActivePBs; i++)
         lastPbLocs = this->locationList[dir][i] > lastPbLocs ? this->locationList[dir][i] : lastPbLocs;
-    std::cout << "Last Pb location: " << lastPbLocs << " For " << dir << std::endl;
+    //std::cout << "Last Pb location: " << lastPbLocs << " For " << dir << std::endl;
 
 
     nrOfOutlets = 0;
@@ -912,7 +913,7 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
     if (throatList) {
         delete[] throatList[0];
         delete[] throatList;
-        throatCounter = nullptr;
+        throatList = nullptr;
     }
     if (locationList) {
         delete[] locationList[0];
@@ -950,7 +951,7 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
     for (size_t i = 0; i < nrOfInlets; i++)
         this->pb_sizeList[this->throatList[0][i]] = this->pb_sizeList[this->throatList[1][i]];
 
-    for (size_t i = nrOfConnections - nrOfOutlets; i <= nrOfConnections; i++)
+    for (size_t i = nrOfConnections - nrOfOutlets; i < nrOfConnections; i++)
         this->pb_sizeList[this->throatList[1][i]] = this->pb_sizeList[this->throatList[0][i]];
 
 //	for(size_t i = 1; i <= nrOfActivePBs; i++)
@@ -1038,10 +1039,7 @@ size_t PoreNetwork::generateFullConnectivity(){
 	// Shuts memchecker up
 	t = nullptr;
 
-    for(i = 0; i < maxConnections; i++){
-        connection[0][i] = 0;
-        connection[1][i] = 0;
-    }
+    memset(connection, 0, sizeof(int) * maxConnections*2);
 
     for(i = 0; i < halfLength; i++){
         //copy

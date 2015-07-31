@@ -188,13 +188,12 @@ void eliminateThroats(PoreNetwork *P_net){
  * Maybe INLINE?
  */
 
-size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
+inline static size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
     
     int pn = throatList[0][i];
-    while(throatList[0][i] == pn && i < max){
+    while(i < max && throatList[0][i] == pn) {
         i++;
     }
-    
     return (i);
 }
 
@@ -217,8 +216,10 @@ void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag,
     if(flagged_PB[TL[0][start]] == flag)
         return;
 	
-//	if(start > TL_Length)
-//		std::cout << "GODDAMN FUCK SHIT DFS ERROR" << std::endl;
+//	if(start > TL_Length) {
+//        std::cerr << "GODDAMN FUCK SHIT DFS ERROR" << std::endl;
+//        std::abort();
+//    }
     // Flag PB as discoverd and check all adjecent nodes
     flagged_PB[TL[0][start]] = flag;
 
@@ -270,7 +271,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
     }
     
     //Do a DepthFirst Search on all inlets
-    for(i = 0; P_net->throatList_full[0][i] <= P_net->nrOfInlets; i++){
+    for(i = 0; P_net->throatList_full[0][i] < P_net->nrOfInlets; i++){
         if(flagged_PB[P_net->throatList_full[0][i]] == 0){
                 DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)1, (char)0);
             if(verbose){
@@ -278,6 +279,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
             }
         }
     }
+    std::cout << "Checked Inlets" << std::endl;
     
 	
     if(verbose){
