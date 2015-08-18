@@ -214,6 +214,7 @@ int main(int argc, char *argv[]) {
 		if(!top->ns->keepDeadEnd || !bot->ns->keepDeadEnd){
 					Res->killDeadEndPores();
 		}
+        Res->rebuildThroatCounters();
 
 		// Write network to file(s)
 	    vtkFile = cFile + Res->ns->name + ".vtk";
@@ -276,11 +277,30 @@ int Finalize(PoreNetwork * pn){
             size_t lengthTL = P_Bound->generateFullConnectivity();
 
             char * pb_list = searchForIsolatedPB(P_Bound,lengthTL);
+            char * pb_list2 = searchForIsolatedPB_itertative(P_Bound, lengthTL);
+
+            if(!pb_list || !pb_list2){
+                std::cerr << "Have a NULL!" << std::endl;
+                std::abort();
+            }
+
+
+            for(size_t i = 1; i <= P_Bound->nrOfActivePBs; i++){
+                if(pb_list[i] != pb_list2[i]){
+                    std::cout << pb_list[i] << '\t' << pb_list2[i] << std::endl;
+                    std::cout << "List NOT the same!" << std::endl;
+                    std::abort();
+                }
+            }
+
+
             if(!pb_list){
                 std::cerr << "Network is Broken Aborting" << std::endl;
                 return -1;
             }
             P_Bound->removeFlaggedPBs(pb_list, (char)2);
+
+            P_Bound->rebuildThroatCounters();
 
             // This works WAY faster when done after searching
             if(!P_Bound->ns->keepDeadEnd)

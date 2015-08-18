@@ -168,12 +168,12 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName) : PoreNe
         this->throatCounter[0][pn] = other.throatCounter[0][pn];
         this->throatCounter[1][pn] = other.throatCounter[1][pn];
     }
-	
+
 	this->pb_sizeList = new float[other.nrOfActivePBs + 1];
 	for(pn = 1; pn <= other.nrOfActivePBs; pn++){
         this->pb_sizeList[pn] = other.pb_sizeList[pn];
     }
-	
+
     // -- periodicThroats
     this->periodicThroats = new int[other.periodicListLength];
     for (i = 0; i < other.periodicListLength; i ++){
@@ -189,7 +189,7 @@ PoreNetwork::PoreNetwork(const PoreNetwork& other, std::string newName) : PoreNe
     // Guard it against unvaild access!
     this->throatList_full =  nullptr;
 
-	
+
     std::cout << "Done Copying" << std::endl;
 
 }
@@ -229,10 +229,10 @@ PoreNetwork::~PoreNetwork(){
     }
     if(periodicThroats)
         delete[] periodicThroats;
-		
+
 	if(ns)
 		delete ns;
-	
+
 }
 
 
@@ -356,6 +356,36 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
 
 }
 
+int PoreNetwork::rebuildThroatCounters(){
+
+    std::cout << "Rebuilding ThroatCounters" << std::endl;
+    int accumulator = 0;
+    int counter = 0;
+    int pn = 1;
+    for(size_t i = 0; i < this->nrOfConnections; i++){
+        if(pn == this->throatList[0][i])
+            counter++;
+        else{
+            accumulator += counter;
+            this->throatCounter[0][pn] = counter;
+            this->throatCounter[1][pn] = accumulator;
+
+            //std::cout << i << '\t' << pn << '\t' << counter<< ':' << accumulator <<  std::endl;
+            counter = 1;
+            pn = this->throatList[0][i];
+
+        }
+    }
+
+    if(accumulator != this->nrOfConnections-1) {
+        std::cerr << "accumulator : nr of Throats!" << std::endl;
+        std::cerr << accumulator << '\t' << this->nrOfConnections << '\t' << this->nrOfConnections-1 - accumulator <<  std::endl;
+    }
+
+    return 0;
+
+}
+
 /*
  * Removes all porebodies who have a flag lower then minFlag (REMINDER: minFlags is a CHAR!)
  * renumbers the Throat counters and the location list as well, only the half map is renumberd!
@@ -374,7 +404,7 @@ int PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
 
 	size_t in = 0;
 	size_t out = 0;
-	
+
     for(i = 0; i < this->nrOfConnections; i++){
         //Delete the connection FROM a flagged Pore
         if (pb_flag_list[this->throatList[0][i]] < minFlag) {
@@ -386,7 +416,7 @@ int PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
             this->throatList[1][i] = -1;
         }
     }
-	
+
 	//Check for Inlet or Outlet changes
 	for(i = 0; i < this->nrOfInlets; i++){
 		if(this->throatList[0][i] == -1 )
@@ -395,15 +425,15 @@ int PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
 	for(i = nrOfConnections - nrOfOutlets; i < this->nrOfConnections; i++)
 		if(this->throatList[0][i] == -1)
 			out++;
-    
+
 	//std::cout << nrOfInlets - in << '\t' << nrOfOutlets - out << std::endl;
 	nrOfInlets -= in; nrOfOutlets-= out;
-	
+
     // Do the Actually Deleting of the Throats
     this->removeFlaggedThroats(-1);
-	
+
 	//std::cout << nrOfInlets << '\t' << nrOfOutlets << std::endl;
-	
+
 
     //pb_flag_list -> isolated pb's if minFlg
     //build a mask:
@@ -471,17 +501,11 @@ int PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
 		this->pb_sizeList[i] = 0.0f;
     }
 
-    //Rebuild the accumulator (throatCounter[1][pn])
-    int accumulator = 0;
-    for(i = 1; i <= this->nrOfActivePBs; i ++){
-        this->throatCounter[1][i] = accumulator + this->throatCounter[0][i];
-        accumulator = this->throatCounter[1][i];
-        //std::cout << this->throatCounter[0][i] << '\t' << this->throatCounter[1][i] << std::endl;
-    }
+    this->rebuildThroatCounters();
 
     delete[] pb_flag_list;
     delete[] mask;
-	
+
 	return cummulator;
 }
 
@@ -730,9 +754,9 @@ template <typename T> T** PoreNetwork::paddedList(size_t amount, T **List, size_
 
 template <typename T> T* PoreNetwork::paddedList(size_t amount, T *List, size_t currentSize, bool headPadding) {
     size_t i;
-	
+
     T *newList = new T[(currentSize + amount)];
-    
+
     for(i = 0; i < currentSize + amount; i++)
         newList[i] = (T)-1;
 
@@ -956,7 +980,7 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
 
 //	for(size_t i = 1; i <= nrOfActivePBs; i++)
 //		std::cout << locationList[0][i] << '\t' << locationList[1][i] << '\t' << locationList[2][i] << std::endl;
-//		
+//
 //    if ( dir == 0 ) {
 //        this->ns->Ni += 2;
 //    } else if (dir == 1) {
@@ -1033,14 +1057,14 @@ size_t PoreNetwork::generateFullConnectivity(){
 
     //For Details see [generateConnectivity]
     int *t = new int[maxConnections * 2];
+    memset(t, 0, sizeof(int) * maxConnections*2);
     int **connection = new int*[2];
     connection[0] = t;
     connection[1] = t + maxConnections;
 	// Shuts memchecker up
-	t = nullptr;
 
-    memset(connection, 0, sizeof(int) * maxConnections*2);
 
+    t = nullptr;
     for(i = 0; i < halfLength; i++){
         //copy
         connection[0][i * 2] = halfConnectivity[0][i];
@@ -1101,7 +1125,7 @@ void PoreNetwork::generatePbSizes() {
  * Generate a Coordination number per pb
  * if it is 2 or less, a pb is a dead end.
  * except for inlets and outlets
- */ 
+ */
 char * PoreNetwork::killDeadEndPores() {
 
     std::cout << "Killing dead end Pores" << std::endl;

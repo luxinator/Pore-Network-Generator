@@ -8,9 +8,11 @@
  */
 
 
+
 #include "Eliminator.h"
-#include "vtk.h"
+//#include "vtk.h"
 #include <random>
+#include <stack>
 
 /*
 
@@ -188,7 +190,7 @@ void eliminateThroats(PoreNetwork *P_net){
  * Maybe INLINE?
  */
 
-inline static size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
+inline size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
     
     int pn = throatList[0][i];
     while(i < max && throatList[0][i] == pn) {
@@ -210,24 +212,20 @@ inline static size_t returnAdjecentNodes(int **throatList, size_t i, size_t max)
  * Places a flag in the flagged_pb array, when check is found!
  */
 
-void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag, char check){
+void DFS(size_t node, int ** TL, char* flagged_PB, size_t TL_Length, char flag, char check){
  
     // Check if the pb has been visited
-    if(flagged_PB[TL[0][start]] == flag)
+    if(flagged_PB[TL[0][node]] == flag)
         return;
 	
-//	if(start > TL_Length) {
-//        std::cerr << "GODDAMN FUCK SHIT DFS ERROR" << std::endl;
-//        std::abort();
-//    }
-    // Flag PB as discoverd and check all adjecent nodes
-    flagged_PB[TL[0][start]] = flag;
+	// Flag PB as discoverd and check all adjecent nodes
+    flagged_PB[TL[0][node]] = flag;
 
-    // from TL[1][start] to TL[1][max] are connected pbs
-    size_t max = returnAdjecentNodes(TL, start, TL_Length);
+    // from TL[1][node] to TL[1][max] are connected pbs
+    size_t max = returnAdjecentNodes(TL, node, TL_Length);
 	    
     //For all throats connected to pb do:
-    for(size_t i = start; i < max; i++){
+    for(size_t i = node; i <= max; i++){
         if(flagged_PB[TL[1][i]] == check){
             //search edges of this node
             for(size_t j = 0; j < TL_Length; j++)
@@ -240,6 +238,52 @@ void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag,
     }
 }
 
+//1  procedure DFS-iterative(G,v):
+//2      let S be a stack
+//3      S.push(v)
+//4      while S is not empty
+//5            v = S.pop()
+//6            if v is not labeled as discovered:
+//7                label v as discovered
+//8                for all edges from v to w in G.adjacentEdges(v) do
+//9                    S.push(w)
+
+void DFS_iterative(size_t node, int ** TL, char* flagged_PB, size_t TL_Length, char flag, char check) {
+
+    std::stack<size_t> stack;
+    stack.push(node);
+
+    while (!stack.empty()) {
+        size_t v = stack.top();
+        stack.pop();
+
+        std::cout << "Traverse from pb: " << TL[0][v] << std::endl;
+
+        if (flagged_PB[TL[0][v]] != flag) {
+            flagged_PB[TL[0][v]] = flag;
+
+
+            size_t max = returnAdjecentNodes(TL, node, TL_Length);
+            std:: cout << " has " << max << " nodes" << std::endl;
+            std::cout << "Nodes: ";
+            for (size_t i = node; i <= max; i++) {
+                if (flagged_PB[TL[1][i]] == check) {
+                    for (size_t j = 0; j < TL_Length; j++) {
+                        if (TL[0][j] == TL[1][i]) {
+                            stack.push(j);
+                            std::cout << '[' << TL[0][j] << ',' << j << ']';
+                        }
+
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
+        else
+            std::cout << "Already Checked!" << std::endl;
+    }
+}
+
 
 /*
  * Search for isolated PoreBodies and return a Flagged Pore Bodies List
@@ -249,10 +293,9 @@ void DFS(size_t start, int ** TL, char* flagged_PB, size_t TL_Length, char flag,
  * Call removeFlaggedPBs when this has been run, the network is invalid!
  */
 
-
-char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
+char * searchForIsolatedPB_itertative(PoreNetwork *P_net, size_t lengthTL){
     
-    bool verbose = false;
+    bool verbose = true;
 	if(!P_net->throatList_full){
 		std::cerr << "ERROR: Full Connectivity Map Not Available, Check input!" << std::endl;
 	}
@@ -271,9 +314,9 @@ char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
     }
     
     //Do a DepthFirst Search on all inlets
-    for(i = 0; P_net->throatList_full[0][i] < P_net->nrOfInlets; i++){
+    for(i = 0; P_net->throatList_full[0][i] <= P_net->nrOfInlets; i++){
         if(flagged_PB[P_net->throatList_full[0][i]] == 0){
-                DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)1, (char)0);
+                DFS_iterative(i, P_net->throatList_full, flagged_PB, lengthTL, (char)1, (char)0);
             if(verbose){
                 std::cout << "root at pb: " << P_net->throatList_full[0][i] << std::endl;
             }
@@ -300,7 +343,7 @@ char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
     for(i = lengthTL - P_net->nrOfOutlets * 2; i < lengthTL; i++){
 	// Check if pb the qualifies
         if(flagged_PB[ P_net->throatList_full[0][i] ] == (char)1){
-            DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)2, (char)1);
+            DFS_iterative(i, P_net->throatList_full, flagged_PB, lengthTL, (char)2, (char)1);
             brokenNetwork = false;
             if(verbose){
                 std::cout << "root at pb: " << P_net->throatList_full[0][i] << std::endl;
@@ -326,35 +369,79 @@ char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
 }
 
 
+char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
 
-/*
- 1  procedure BFS(G,v) is
- 2      create a queue Q
- 3      create a set V
- 4      add v to V
- 5      enqueue v onto Q
- 6      while Q is not empty loop
- 7         t ← Q.dequeue()
- 8         if t is what we are looking for then
- 9            return t
- 10        end if
- 11        for all edges e in G.adjacentEdges(t) loop
- 12           u ← G.adjacentVertex(t,e)
- 13           if u is not in V then
- 14               add u to V
- 15               enqueue u onto Q
- 16           end if
- 17        end loop
- 18     end loop
- 19     return none
- 20 end BFS
- */
+    bool verbose = false;
+    if(!P_net->throatList_full){
+        std::cerr << "ERROR: Full Connectivity Map Not Available, Check input!" << std::endl;
+    }
+
+    std::cout<< "Starting Search for Isolated PBs and Clusters: \n "<< lengthTL << std::endl;
+
+    size_t i;
+
+    //size_t lengthTL = P_net->nrOfConnections * 2;
 
 
+    // Allocata a chunk of mem and set it to zero
+    char *flagged_PB = new char[P_net->nrOfActivePBs + 1];
+    for(i = 0; (int)i <= P_net->nrOfActivePBs; i++){
+        flagged_PB[i] = 0;
+    }
+
+    //Do a DepthFirst Search on all inlets
+    for(i = 0; P_net->throatList_full[0][i] < P_net->nrOfInlets; i++){
+        if(flagged_PB[P_net->throatList_full[0][i]] == 0){
+            DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)1, (char)0);
+            if(verbose){
+                std::cout << "root at pb: " << P_net->throatList_full[0][i] << std::endl;
+            }
+        }
+    }
+    std::cout << "Checked Inlets" << std::endl;
 
 
+    if(verbose){
+        for(int i = 1; i <= P_net->nrOfActivePBs; i ++){
+            if (flagged_PB[i] == (char) 0) {
+                std::cout << "Isolated PB: " <<i << " on:\t " << P_net->locationList[0][i] << '\t' << P_net->locationList[1][i] << '\t' << P_net->locationList[2][i] << std::endl;
+            } else {
+                std::cout << "Skipped: " << i << std::endl;
+            }
+        }
+        std::cout << "---" << std::endl;
+    }
 
+    bool brokenNetwork = true;
 
+    //Do a Depth First Search on all outlets
+    //for(i = lengthTL - P_net->nrOfOutlets; P_net->throatList_full[1][i] <= P_net->nrOfActivePBs; i++){
+    for(i = lengthTL - P_net->nrOfOutlets * 2; i < lengthTL; i++){
+        // Check if pb the qualifies
+        if(flagged_PB[ P_net->throatList_full[0][i] ] == (char)1){
+            DFS(i, P_net->throatList_full, flagged_PB, lengthTL, (char)2, (char)1);
+            brokenNetwork = false;
+            if(verbose){
+                std::cout << "root at pb: " << P_net->throatList_full[0][i] << std::endl;
+            }
+        } else if(verbose)
+            std::cout << "PB: " << i << " on:\t " << P_net->locationList[0][i] << '\t' << P_net->locationList[1][i] << '\t' << P_net->locationList[2][i] << std::endl;
+    }
 
+    if(verbose)
+        for(int i = 1; i <= P_net->nrOfActivePBs; i ++){
+            if (flagged_PB[i] == (char) 1) {
+                std::cout << "PB: " <<i << " on:\t " << P_net->locationList[0][i] << '\t' << P_net->locationList[1][i] << '\t' << P_net->locationList[2][i] << std::endl;
+            }
+        }
+    if (brokenNetwork){
+        std::cout << "!!! --- 2 : Network is Broken no Connection between Inlet and Outlet ---!!!" << std::endl;
+        return nullptr;
+    }
+
+    // we now have a flagged list of pb's which are connected to the inlets AND outlets
+    std::cout << "Done!"<< std::endl;
+    return flagged_PB;
+}
 
 
