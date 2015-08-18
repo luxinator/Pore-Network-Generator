@@ -193,14 +193,14 @@ int main(int argc, char *argv[]) {
     	combi->setSearchDist(c_search_dist);
     	combi->setSurvival(c_survival);
         combi->sortConnectionsList(false);
-    	combi->Combine(2);
+    	combi->Combine(0);
     	combi->builtConnectionList();
     	PoreNetwork *Res = combi->getResult(); // This is not a completely valid network! NetworkSpecs is mostly empty!
 		
 	// **** COMBINED networks are special and don't use Finalize
 
 		// Generate Boudnaries
-		Res->generateBoundary(2, bot->ns->meanPBsize,top->ns->meanPBsize, bot->ns->pbDist, top->ns->pbDist);
+		Res->generateBoundary(0, bot->ns->meanPBsize,top->ns->meanPBsize, bot->ns->pbDist, top->ns->pbDist);
 
 		size_t lengthTL = Res->generateFullConnectivity();
 
@@ -306,6 +306,7 @@ int Finalize(PoreNetwork * pn){
             if(!P_Bound->ns->keepDeadEnd)
                 P_Bound->killDeadEndPores();
 
+            P_Bound->rebuildThroatCounters();
             vtkFile = cFile + P_Bound->ns->name + ".vtk";
             writeVTK(vtkFile, P_Bound, P_Bound->pb_sizeList);
             writeConnectivity(cFile.c_str(), P_Bound);
