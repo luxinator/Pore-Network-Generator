@@ -270,7 +270,7 @@ PoreNetwork::PoreNetwork(const std::string networkSpecs_file) : PoreNetwork(){
     this->throatList[0] = t;
     this->throatList[1] = t + this->nrOfConnections;
 
-    this->periodicListLength = Ni*Nj + Nj*Nk + Nk*Ni;
+    this->periodicListLength = (int)(Ni*Nj + Nj*Nk + Nk*Ni);
 
     this->periodicThroats = new int[periodicListLength];
     for (size_t i = 0; i < periodicListLength; i++)
@@ -352,6 +352,36 @@ void PoreNetwork::removeFlaggedThroats(const int Flag){
     this->throatList[1] = newTL[1];
 
     this->nrOfConnections = newAmountOfConnections-1;
+
+}
+
+int PoreNetwork::rebuildThroatCounters(){
+
+    std::cout << "Rebuilding ThroatCounters" << std::endl;
+    int accumulator = 0;
+    int counter = 0;
+    int pn = 1;
+    for(size_t i = 0; i < this->nrOfConnections; i++){
+        if(pn == this->throatList[0][i])
+            counter++;
+        else{
+            accumulator += counter;
+            this->throatCounter[0][pn] = counter;
+            this->throatCounter[1][pn] = accumulator;
+            
+			//std::cout << i << '\t' << pn << '\t' << counter<< ':' << accumulator <<  std::endl;
+            counter = 1;
+            pn = this->throatList[0][i];
+
+        }
+    }
+
+    if(accumulator != this->nrOfConnections-1) {
+        std::cerr << "accumulator : nr of Throats!" << std::endl;
+        std::cerr << accumulator << '\t' << this->nrOfConnections << '\t' << this->nrOfConnections-1 - accumulator <<  std::endl;
+    }
+
+    return 0;
 
 }
 
@@ -468,14 +498,6 @@ int PoreNetwork::removeFlaggedPBs(char *pb_flag_list, char minFlag){
         this->locationList[1][i] = -1.0f;
         this->locationList[2][i] = -1.0f;
 		this->pb_sizeList[i] = 0.0f;
-    }
-
-    //Rebuild the accumulator (throatCounter[1][pn])
-    int accumulator = 0;
-    for(i = 1; i <= this->nrOfActivePBs; i ++){
-        this->throatCounter[1][i] = accumulator + this->throatCounter[0][i];
-        accumulator = this->throatCounter[1][i];
-        //std::cout << this->throatCounter[0][i] << '\t' << this->throatCounter[1][i] << std::endl;
     }
 
     delete[] pb_flag_list;
@@ -818,7 +840,7 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
     float lastPbLocs = 0.0;
     for (size_t i = 1; i <= this->nrOfActivePBs; i++)
         lastPbLocs = this->locationList[dir][i] > lastPbLocs ? this->locationList[dir][i] : lastPbLocs;
-    std::cout << "Last Pb location: " << lastPbLocs << " For " << dir << std::endl;
+    //std::cout << "Last Pb location: " << lastPbLocs << " For " << dir << std::endl;
 
 
     nrOfOutlets = 0;
@@ -912,7 +934,7 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
     if (throatList) {
         delete[] throatList[0];
         delete[] throatList;
-        throatCounter = nullptr;
+        throatList = nullptr;
     }
     if (locationList) {
         delete[] locationList[0];
@@ -950,7 +972,7 @@ void PoreNetwork::generateBoundary(size_t dir, float inletSize, float outletSize
     for (size_t i = 0; i < nrOfInlets; i++)
         this->pb_sizeList[this->throatList[0][i]] = this->pb_sizeList[this->throatList[1][i]];
 
-    for (size_t i = nrOfConnections - nrOfOutlets; i <= nrOfConnections; i++)
+    for (size_t i = nrOfConnections - nrOfOutlets; i < nrOfConnections; i++)
         this->pb_sizeList[this->throatList[1][i]] = this->pb_sizeList[this->throatList[0][i]];
 
 //	for(size_t i = 1; i <= nrOfActivePBs; i++)

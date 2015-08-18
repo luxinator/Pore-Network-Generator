@@ -74,6 +74,8 @@ public:
     void generateBoundary(size_t dir, float inletSize, float outletSize, float inletThroatLength, float outletThroatLength);
     
     void removeFlaggedThroats(const int Flag = 0);
+	
+		int rebuildThroatCounters();
 
     int removeFlaggedPBs(char *pb_flag_list, char minFlag);
 
