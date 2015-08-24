@@ -75,9 +75,8 @@ public:
     
     void removeFlaggedThroats(const int Flag = 0);
 	
-		int rebuildThroatCounters();
+	int rebuildThroatCounters();
 
-    int rebuildThroatCounters();
 
     int removeFlaggedPBs(char *pb_flag_list, char minFlag);
 

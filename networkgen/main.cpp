@@ -300,13 +300,11 @@ int Finalize(PoreNetwork * pn){
             }
             P_Bound->removeFlaggedPBs(pb_list, (char)2);
 
-            P_Bound->rebuildThroatCounters();
-
             // This works WAY faster when done after searching
             if(!P_Bound->ns->keepDeadEnd)
                 P_Bound->killDeadEndPores();
-
             P_Bound->rebuildThroatCounters();
+
             vtkFile = cFile + P_Bound->ns->name + ".vtk";
             writeVTK(vtkFile, P_Bound, P_Bound->pb_sizeList);
             writeConnectivity(cFile.c_str(), P_Bound);
