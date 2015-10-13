@@ -207,8 +207,10 @@ void Combinator::builtConnectionList(){
 	}
 	
 	// Sort 
-	if(sortConnections)
-		bubbleSortList(Result->throatList, Result->nrOfConnections);
+	if(sortConnections) {
+//		bubbleSortList(Result->throatList, Result->nrOfConnections);
+		quicksort_iterative(Result->throatList, Result->nrOfConnections);
+	}
 
 
 

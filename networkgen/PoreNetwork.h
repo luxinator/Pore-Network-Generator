@@ -49,6 +49,7 @@ public:
     int **throatCounter; //number of prore throats per pb nr (1 based!) and number of throats preceding.
     int **throatList; // Connection map from pb nr -> pb nr. Is the half map!
     int **throatList_full; //Full Connection map
+    int **throatList_full2; //Full Connection map
     size_t nrOfConnections;
     size_t nrOfActivePBs;
     size_t nrOfInlets, nrOfOutlets;
@@ -77,7 +78,6 @@ public:
 	
 	int rebuildThroatCounters();
 
-
     int removeFlaggedPBs(char *pb_flag_list, char minFlag);
 
     void generateLocation();
@@ -85,7 +85,9 @@ public:
     void generateConnectivity();
     
     size_t generateFullConnectivity();
-    
+
+    size_t generateFullConnectivity_NearlySorted();
+
     void generate_naive_array();
 	
 	void generatePbSizes();

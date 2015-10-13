@@ -24,7 +24,9 @@ inline void deflatten_3d(size_t i, const unsigned int Ni, const unsigned int Nj,
     
 }
 
-void bubbleSortList(int **list, size_t l);
-void bubbleSortList(int **list, int l);
+//void bubbleSortList(int **list, size_t l);
+//void bubbleSortList(int **list, int l);
+
+void quicksort_iterative(int **array, size_t len);
 
 #endif /* defined(__networkgen__ArrayFunctions__) */

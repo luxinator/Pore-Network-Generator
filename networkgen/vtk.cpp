@@ -343,6 +343,8 @@ void writeVTK(std::string filename, const PoreNetwork *P_net, char * pb_values, 
 
 }
 
+
+
 //void writeVTK(std::string filename, const PoreNetwork *P_net) {
 //    double * empty = nullptr;
 //    writeVTK(filename, P_net, empty);

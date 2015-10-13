@@ -190,7 +190,7 @@ void eliminateThroats(PoreNetwork *P_net){
  * Maybe INLINE?
  */
 
-inline size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
+size_t returnAdjecentNodes(int **throatList, size_t i, size_t max){
     
     int pn = throatList[0][i];
     while(i < max && throatList[0][i] == pn) {
@@ -250,38 +250,55 @@ void DFS(size_t node, int ** TL, char* flagged_PB, size_t TL_Length, char flag, 
 
 void DFS_iterative(size_t node, int ** TL, char* flagged_PB, size_t TL_Length, char flag, char check) {
 
+//Node is the position in the throatlist[0][node]
+
+    // simplest to use, not really the fastest
     std::stack<size_t> stack;
+
+    int counter = 0;
+
+    size_t stackSize = 0;
     stack.push(node);
 
     while (!stack.empty()) {
         size_t v = stack.top();
         stack.pop();
 
-        std::cout << "Traverse from pb: " << TL[0][v] << std::endl;
+//        std::cout << "Root at pb: " << TL[0][v] << std::endl;
 
         if (flagged_PB[TL[0][v]] != flag) {
             flagged_PB[TL[0][v]] = flag;
 
 
-            size_t max = returnAdjecentNodes(TL, node, TL_Length);
-            std:: cout << " has " << max << " nodes" << std::endl;
-            std::cout << "Nodes: ";
-            for (size_t i = node; i <= max; i++) {
-                if (flagged_PB[TL[1][i]] == check) {
-                    for (size_t j = 0; j < TL_Length; j++) {
-                        if (TL[0][j] == TL[1][i]) {
-                            stack.push(j);
-                            std::cout << '[' << TL[0][j] << ',' << j << ']';
-                        }
+            size_t Last_AJ_index = returnAdjecentNodes(TL, v, TL_Length);
+//            std:: cout << " has " << Last_AJ_index - v << " nodes" << std::endl;
+//            std::cout << "Nodes: ";
 
+            for (size_t i = v; i < Last_AJ_index; i++) { // each neightbour of v
+                size_t pb_neighbor = TL[1][i];
+//                std::cout << pb_neighbor << ' ';
+                if (flagged_PB[pb_neighbor] == check) { // if not visited
+
+                    //Find the position in throatlist for pb_neighbor
+                    //and push it to the stack
+                    for (size_t j = 0; j < TL_Length; j++) {
+                        if (TL[0][j] == pb_neighbor) {
+                            stack.push(j);
+                            break;
+                        }
                     }
                 }
             }
-            std::cout << std::endl;
         }
-        else
-            std::cout << "Already Checked!" << std::endl;
+        if(stack.size() > stackSize)
+            stackSize = stack.size();
+
+//        else
+//            std::cout << "Already Checked!" << std::endl;
+
+//        std::cout << std::endl;
     }
+//    std::cout << "Largest Stack : " << stackSize << ", is " << stackSize* sizeof(size_t)/1000 << " kbytes" << std::endl;
 }
 
 
@@ -293,9 +310,9 @@ void DFS_iterative(size_t node, int ** TL, char* flagged_PB, size_t TL_Length, c
  * Call removeFlaggedPBs when this has been run, the network is invalid!
  */
 
-char * searchForIsolatedPB_itertative(PoreNetwork *P_net, size_t lengthTL){
+char *searchForIsolatedPB_iterative(PoreNetwork *P_net, size_t lengthTL){
     
-    bool verbose = true;
+    bool verbose = false;
 	if(!P_net->throatList_full){
 		std::cerr << "ERROR: Full Connectivity Map Not Available, Check input!" << std::endl;
 	}
@@ -370,6 +387,7 @@ char * searchForIsolatedPB_itertative(PoreNetwork *P_net, size_t lengthTL){
 
 
 char * searchForIsolatedPB(PoreNetwork *P_net, size_t lengthTL){
+    std::cerr << "Warning: Non-iterative Searching is Decrapted!" << std::endl;
 
     bool verbose = false;
     if(!P_net->throatList_full){
