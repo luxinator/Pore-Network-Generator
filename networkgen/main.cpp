@@ -8,7 +8,6 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
-#include <time.h>
 
 #include "ArrayFunctions.h"
 #include "vtk.h"
@@ -31,30 +30,31 @@ std::string vtkFile = "./data/";
 int main(int argc, char *argv[]) {
     std::cout << "\nPore Network Generator Compiled at " << __DATE__ << ' ' << __TIME__ << std::endl;
     std::cout << "Copyright Lucas van Oosterhout. GPLv2 see LICENSE " << std::endl;
-    std::cout << "Contact : l.m.vanoosterhout@uu.nl\n\n" << std::endl;
+    std::cout << "Contact : l.m.vanoosterhout@uu.nl\n" << std::endl;
 
     const int min_int = std::numeric_limits<int>::min();
     const int max_int = std::numeric_limits<int>::max();
     std::cout << "Please be ABOSLUTELY SURE that no more then " << max_int <<
-    " Pore bodies\nare present in the System" << std::endl;
+    " Pore bodies\nare present in the System\n\n" << std::endl;
 
     std::string helpText = "Options can be combined for different results.\n \
     Command-Line Options:\n \
-    -h               \t Shows this help text\n \
-    -ns [location]   \t Specify the location of the NetworkSpecs.in file if not given standard location is used [../data/NetworkSpecs.in]\n \
-    -cfile [location] \t Specify the location of the connectiviy output file\n \
-    -fcfile [location]\t Specify the location of the fullconnectivity output file\n \
-    -lfile [location] \t Specify the location of the locations file\n \
-    -vtk [location]   \t Specify if a vtk file is to be written and where\n \
-    -inner [location] \t Load Inner Network from file(s) and Generate with Boundaries as specified in the NetworkSpecs.in\n \
-    -combine [top_network] [bottom_network] [Separation Dist] [Search Dist] [Survival] combines (innner) networks into one network with boundaries as specified in bot_network/NetworkSpecs.in \n";
+    -h          \t Shows this help text\n\n \
+    -ns [arg]   \t Specify the location of the NetworkSpecs.in file \ \
+    \n\t\t\t\t     if not given standard location is used [../data/NetworkSpecs.in]\n\n \
+    -cfile [arg] \t Specify the location of the connectiviy output file\n \
+    -fcfile [arg]\t Specify the location of the fullconnectivity output file\n \
+    -lfile [arg] \t Specify the location of the locations file\n \
+    -vtk [arg]   \t Specify if a vtk file is to be written and where\n \
+    -inner [arg] \t Load Inner Network from file(s) and Generate with Boundaries as specified in the NetworkSpecs.in\n\n \
+    -combine [top_network] [bottom_network] [separation dist] [search dist] [survival]\n \
+                 \t Combines (inner) networks into one network with boundaries as specified in [bottom_network]/NetworkSpecs.in \n";
 
 
     nSpecs = "./data/NetworkSpecs.in";
     cFile = "./data/";
     fcFile = "./data/";
     lFile = "./data/";
-
     vtkFile = "./data/";
 
     std::string name = "";
