@@ -218,11 +218,12 @@ int main(int argc, char *argv[]) {
         // **** COMBINED networks are special and don't use Finalize
 
         // Generate Boudnaries
+
         Res->generateBoundary(0, bot->ns->meanPBsize, top->ns->meanPBsize, bot->ns->pbDist, top->ns->pbDist);
 
         size_t lengthTL = Res->generateFullConnectivity();
 
-        char *pb_list = searchForIsolatedPB(Res, lengthTL);
+        char *pb_list = searchForIsolatedPB_iterative(Res, lengthTL);
         if (!pb_list) {
             std::cout << "Network is Broken Aborting" << std::endl;
             return 1;
@@ -393,7 +394,7 @@ int Finalize_iterative(PoreNetwork * pn){
                 P_Bound->killDeadEndPores();
             P_Bound->rebuildThroatCounters();
 
-            vtkFile = cFile + P_Bound->ns->name + "iter.vtk";
+            vtkFile = cFile + P_Bound->ns->name + ".vtk";
             writeVTK(vtkFile, P_Bound, P_Bound->pb_sizeList);
             writeConnectivity(cFile.c_str(), P_Bound);
 

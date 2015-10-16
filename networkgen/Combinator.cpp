@@ -51,6 +51,7 @@ Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name) {
 	result->ns->Nj = 0;
 	result->ns->Nk = 0;
 	result->nrOfActivePBs = top->nrOfActivePBs + bot->nrOfActivePBs;
+    result->isCombined = true;
 
 	float * t = new float[3 * result->nrOfActivePBs + 3];
 

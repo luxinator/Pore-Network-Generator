@@ -40,7 +40,7 @@ private:
     template <typename T> T** paddedList(size_t amount, T **List, size_t nrOfCols ,size_t currentSize, bool headPadding);
 	template <typename T> T*  paddedList(size_t amount, T *List, size_t currentSize, bool headPadding);
     void cleanPeriodic(size_t flowDir);
-    
+
 public:
 
     NetworkSpecs *ns;
@@ -54,6 +54,7 @@ public:
     size_t nrOfActivePBs;
     size_t nrOfInlets, nrOfOutlets;
     size_t periodicListLength;
+    bool isCombined;
 
     float **locationList; // Location of a pb using its nr as index
     int *periodicThroats; // position in the throaList which has a periodic connection
