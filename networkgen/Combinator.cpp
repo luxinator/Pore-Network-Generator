@@ -112,28 +112,27 @@ void Combinator::Combine(short side){
 
 	// ------ Location ------//
 	float translation[] = { 0.0f, 0.0f, 0.0f };
-	translation[side] = Separation + Bot->locationList[side][Bot->nrOfActivePBs];
+	translation[side] += Separation + Bot->locationList[side][Bot->nrOfActivePBs];
 
 	// add the lower half to the Result network
-
 	for(std::size_t i = 1; i <= Bot->nrOfActivePBs; i++ ){
 		this->Result->locationList[0][i] = this->Bot->locationList[0][i];
 		this->Result->locationList[1][i] = this->Bot->locationList[1][i];
 		this->Result->locationList[2][i] = this->Bot->locationList[2][i];
 	}
-	// add the top part to the Results network
 
+	// add the top part to the Results network
 	for (size_t i = 1; i <= Top->nrOfActivePBs; i++){
 		this->Result->locationList[0][i + Bot->nrOfActivePBs] = this->Top->locationList[0][i] + translation[0];
 		this->Result->locationList[1][i + Bot->nrOfActivePBs] = this->Top->locationList[1][i] + translation[1];
 		this->Result->locationList[2][i + Bot->nrOfActivePBs] = this->Top->locationList[2][i] + translation[2];
 	}
 
-// Naive but simple approach, loop all pb's if at interface do tests
-	 //Set up Random Generator
-	    std::random_device r_dev{};
-	    std::default_random_engine e{r_dev()};
-	    std::uniform_real_distribution<float> d{0.0f,1.0f};
+	// Naive but simple approach, loop all pb's if at interface and do tests
+	//Set up Random Generator
+	std::random_device r_dev{};
+	std::default_random_engine e{r_dev()};
+	std::uniform_real_distribution<float> d{0.0f,1.0f};
 
 	for(std::size_t i = 1; i <= Bot->nrOfActivePBs; i++){
 		if (Bot->locationList[side][i] == Bot->locationList[side][this->Bot->nrOfActivePBs]){
@@ -160,7 +159,7 @@ void Combinator::Combine(short side){
 						this->BoundaryLocations.push_back(t);
 
 						t = new float[3];
-						t[0] = Top->locationList[0][i];
+						t[0] = Top->locationList[0][i]; // sigsev here
 						t[1] = Top->locationList[1][i];
 						t[2] = Top->locationList[2][i];
 						this->BoundaryLocations.push_back(t);

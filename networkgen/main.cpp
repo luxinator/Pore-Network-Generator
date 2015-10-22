@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
         // --- Write the Inner network to file, no search for isolated pbs!
 
         vtkFile = cFile + innerNetwork->ns->name + ".vtk";
-        writeVTK(vtkFile, innerNetwork, innerNetwork->pb_sizeList);
+        writeVTK(vtkFile, innerNetwork, innerNetwork->pb_sizeList, true);
         writeConnectivity(cFile.c_str(), innerNetwork);
 
         writeLocation(lFile.c_str(), innerNetwork);
@@ -395,7 +395,7 @@ int Finalize_iterative(PoreNetwork * pn){
             P_Bound->rebuildThroatCounters();
 
             vtkFile = cFile + P_Bound->ns->name + ".vtk";
-            writeVTK(vtkFile, P_Bound, P_Bound->pb_sizeList);
+            writeVTK(vtkFile, P_Bound, P_Bound->pb_sizeList,true);
             writeConnectivity(cFile.c_str(), P_Bound);
 
             writeLocation(lFile.c_str(), P_Bound);
