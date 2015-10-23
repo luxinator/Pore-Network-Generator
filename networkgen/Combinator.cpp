@@ -141,7 +141,7 @@ void Combinator::Combine(short side){
 			for(std::size_t j = 1; j <= Top->nrOfActivePBs; j++){
 
 				if( Top->locationList[side][j] == 0.0f){
-					std::size_t pn = Bot->nrOfActivePBs + j;
+					std::size_t pn = Bot->nrOfActivePBs + j; //porebody nr in combined network
 
 					double L = sqrt(pow((double) (Result->locationList[0][i] - Result->locationList[0][pn]), 2) +
 									pow((double) (Result->locationList[1][i] - Result->locationList[1][pn]), 2) +
@@ -152,17 +152,17 @@ void Combinator::Combine(short side){
 					if( L <= this->SearchDist && d(e) < Survival) {
 						Boundary_Layer.push_back({(int) i, (int) pn});
 
-						float * t = new float[3];
-						t[0] = Bot->locationList[0][i];
-						t[1] = Bot->locationList[1][i];
-						t[2] = Bot->locationList[2][i];
-						this->BoundaryLocations.push_back(t);
-
-						t = new float[3];
-						t[0] = Top->locationList[0][i]; // sigsev here
-						t[1] = Top->locationList[1][i];
-						t[2] = Top->locationList[2][i];
-						this->BoundaryLocations.push_back(t);
+//						float * t = new float[3];
+//						t[0] = Bot->locationList[0][i];
+//						t[1] = Bot->locationList[1][i];
+//						t[2] = Bot->locationList[2][i];
+//						this->BoundaryLocations.push_back(t);
+//
+//						t = new float[3];
+//						t[0] = Top->locationList[0][i]; // sigsev here on
+//						t[1] = Top->locationList[1][i];
+//						t[2] = Top->locationList[2][i];
+//						this->BoundaryLocations.push_back(t);
 
 					}
 				}// if top[side] 0.0

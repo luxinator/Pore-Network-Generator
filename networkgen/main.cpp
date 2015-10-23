@@ -17,7 +17,6 @@
 #include "Combinator.h"
 
 // Forward Declaration
-int Finalize(PoreNetwork * pn);
 int Finalize_iterative(PoreNetwork * pn);
 
 std::string nSpecs = "./data/NetworkSpecs.in";
@@ -267,64 +266,6 @@ int main(int argc, char *argv[]) {
     }
 }
 
-
-
-int Finalize(PoreNetwork * pn){
-
-    std::string suffix;
-
-    for(int dir = 0; dir <= 2; dir++){
-        if(pn->ns->flowDirs[dir]){
-
-            switch (dir) {
-                case 0:
-                    suffix = "_x";
-                    break;
-
-                case 1:
-                    suffix = "_y";
-                    break;
-
-                case 2:
-                    suffix = "_z";
-                    break;
-            }
-
-            PoreNetwork *P_Bound = new PoreNetwork(*pn, pn->ns->name + suffix);
-
-            P_Bound->generateBoundary(dir, P_Bound->ns->meanPBsize, P_Bound->ns->meanPBsize, pn->ns->pbDist, pn->ns->pbDist);
-
-            size_t lengthTL = P_Bound->generateFullConnectivity();
-
-            clock_t t = clock();
-            char * pb_list = searchForIsolatedPB(P_Bound, lengthTL);
-            std::cout << "Took " << ((float) t /CLOCKS_PER_SEC) << " seconds" << std::endl;
-
-            if(!pb_list){
-                std::cerr << "Network is Broken Aborting" << std::endl;
-                return -1;
-            }
-            P_Bound->removeFlaggedPBs(pb_list, (char)2);
-
-            // This works WAY faster when done after searching
-            if(!P_Bound->ns->keepDeadEnd)
-                P_Bound->killDeadEndPores();
-            P_Bound->rebuildThroatCounters();
-
-            vtkFile = cFile + P_Bound->ns->name + ".vtk";
-            writeVTK(vtkFile, P_Bound, P_Bound->pb_sizeList);
-            writeConnectivity(cFile.c_str(), P_Bound);
-
-            writeLocation(lFile.c_str(), P_Bound);
-            writeNetworkSpecs(cFile.c_str(), P_Bound);
-
-            delete P_Bound;
-            std::cout << std::endl;
-        }
-    }
-
-    return 0;
-}
 
 
 int Finalize_iterative(PoreNetwork * pn){
