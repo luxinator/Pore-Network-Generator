@@ -87,42 +87,42 @@ Combinator::Combinator(PoreNetwork *top, PoreNetwork *bot, std::string name) {
 }
 
 
-void Combinator::Combine(short side){
+void Combinator::Combine(short side) {
 
 
-	if(side > 2 || side < 0){
-		std::cerr<< "Invalid Side given in Combinator::Combine!" << std::endl;
+	if (side > 2 || side < 0) {
+		std::cerr << "Invalid Side given in Combinator::Combine!" << std::endl;
 		return;
 	}
-	if( this->Separation < 0.0f){
+	if (this->Separation < 0.0f) {
 		std::cerr << "Please set the Separation Distance!" << std::endl;
 		return;
 	}
-	if( this->SearchDist < 0.0f) {
+	if (this->SearchDist < 0.0f) {
 		std::cerr << "Please set the Search Distance!" << std::endl;
 		return;
 	}
-	if( this->Survival < 0.0f) {
-			std::cerr << "Please set the Survival Chance!" << std::endl;
-			return;
-		}
+	if (this->Survival < 0.0f) {
+		std::cerr << "Please set the Survival Chance!" << std::endl;
+		return;
+	}
 	std::cout << "Separation Distance: " << Separation << std::endl;
 	std::cout << "Seaching Distance: " << SearchDist << std::endl;
 	std::cout << "Survival: " << Survival << std::endl;
 
 	// ------ Location ------//
-	float translation[] = { 0.0f, 0.0f, 0.0f };
+	float translation[] = {0.0f, 0.0f, 0.0f};
 	translation[side] += Separation + Bot->locationList[side][Bot->nrOfActivePBs];
 
 	// add the lower half to the Result network
-	for(std::size_t i = 1; i <= Bot->nrOfActivePBs; i++ ){
+	for (std::size_t i = 1; i <= Bot->nrOfActivePBs; i++) {
 		this->Result->locationList[0][i] = this->Bot->locationList[0][i];
 		this->Result->locationList[1][i] = this->Bot->locationList[1][i];
 		this->Result->locationList[2][i] = this->Bot->locationList[2][i];
 	}
 
 	// add the top part to the Results network
-	for (size_t i = 1; i <= Top->nrOfActivePBs; i++){
+	for (size_t i = 1; i <= Top->nrOfActivePBs; i++) {
 		this->Result->locationList[0][i + Bot->nrOfActivePBs] = this->Top->locationList[0][i] + translation[0];
 		this->Result->locationList[1][i + Bot->nrOfActivePBs] = this->Top->locationList[1][i] + translation[1];
 		this->Result->locationList[2][i + Bot->nrOfActivePBs] = this->Top->locationList[2][i] + translation[2];
@@ -132,42 +132,25 @@ void Combinator::Combine(short side){
 	//Set up Random Generator
 	std::random_device r_dev{};
 	std::default_random_engine e{r_dev()};
-	std::uniform_real_distribution<float> d{0.0f,1.0f};
+	std::uniform_real_distribution<float> d{0.0f, 1.0f};
 
-	for(std::size_t i = 1; i <= Bot->nrOfActivePBs; i++){
-		if (Bot->locationList[side][i] == Bot->locationList[side][this->Bot->nrOfActivePBs]){
-			// To keep it generic, we search ALL the porebodies
+	for (std::size_t i = 1; i <= Bot->nrOfActivePBs; i++) {
+		// To keep it generic, we search ALL the porebodies
 
-			for(std::size_t j = 1; j <= Top->nrOfActivePBs; j++){
+		for (std::size_t j = 1; j <= Top->nrOfActivePBs; j++) {
+			std::size_t pn = Bot->nrOfActivePBs + j; //porebody nr in combined network
 
-				if( Top->locationList[side][j] == 0.0f){
-					std::size_t pn = Bot->nrOfActivePBs + j; //porebody nr in combined network
+			double L = sqrt(pow((double) (Result->locationList[0][i] - Result->locationList[0][pn]), 2) +
+							pow((double) (Result->locationList[1][i] - Result->locationList[1][pn]), 2) +
+							pow((double) (Result->locationList[2][i] - Result->locationList[2][pn]), 2));
+			if (L == 0.0f)
+				std::cout << "CRAP!" << std::endl;
 
-					double L = sqrt(pow((double) (Result->locationList[0][i] - Result->locationList[0][pn]), 2) +
-									pow((double) (Result->locationList[1][i] - Result->locationList[1][pn]), 2) +
-									pow((double) (Result->locationList[2][i] - Result->locationList[2][pn]), 2) );
-					if(L == 0.0f)
-						std::cout << "CRAP!" << std::endl;
+			if (L <= this->SearchDist && d(e) < Survival) {
+				Boundary_Layer.push_back({(int) i, (int) pn});
 
-					if( L <= this->SearchDist && d(e) < Survival) {
-						Boundary_Layer.push_back({(int) i, (int) pn});
-
-//						float * t = new float[3];
-//						t[0] = Bot->locationList[0][i];
-//						t[1] = Bot->locationList[1][i];
-//						t[2] = Bot->locationList[2][i];
-//						this->BoundaryLocations.push_back(t);
-//
-//						t = new float[3];
-//						t[0] = Top->locationList[0][i]; // sigsev here on
-//						t[1] = Top->locationList[1][i];
-//						t[2] = Top->locationList[2][i];
-//						this->BoundaryLocations.push_back(t);
-
-					}
-				}// if top[side] 0.0
-			}// for Bot
-		}// if side
+			}
+		}// for Bot
 	} // for Top
 
 	// We now have a List of Boundary layer connections

@@ -16,4 +16,5 @@ void writeNetworkSpecs(const char * path, PoreNetwork *pn);
 
 void writeInterfacePores(const char * path, PoreNetwork *pn, Combinator *C);
 
+
 #endif
