@@ -27,7 +27,7 @@ inline void deflatten_3d(size_t i, const unsigned int Ni, const unsigned int Nj,
 
 inline double randomBetween(double min, double max, double rand){
 
-    return (max - min + 1.0) * rand + min;
+    return min + (max - min) * rand ;
 }
 
 //void bubbleSortList(int **list, size_t l);

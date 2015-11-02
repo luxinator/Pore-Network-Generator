@@ -32,8 +32,8 @@ struct NetworkSpecs {
 };
 
 class PoreNetwork{
-    
-    
+
+
 private:
 
     int checkInput();
@@ -49,12 +49,10 @@ public:
     int **throatCounter; //number of prore throats per pb nr (1 based!) and number of throats preceding.
     int **throatList; // Connection map from pb nr -> pb nr. Is the half map!
     int **throatList_full; //Full Connection map
-    int **throatList_full2; //Full Connection map
     size_t nrOfConnections;
     size_t nrOfActivePBs;
     size_t nrOfInlets, nrOfOutlets;
     size_t periodicListLength;
-    bool isCombined;
 
     float **locationList; // Location of a pb using its nr as index
     int *periodicThroats; // position in the throaList which has a periodic connection

@@ -54,6 +54,7 @@ NetworkSpecs *readSpecsFile(const char *filename){
     file.open(filename, std::ios::in);
     if(!file){
         std::cerr<< "Error in opening file [" << filename << ']' << std::endl;
+        std::cerr << strerror(errno) << std::endl;
 		delete NS;
         return nullptr;
     }

@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <string>
+#include <string.h>
 
 
 void writeConnectivity(const char * path, PoreNetwork *pn){
@@ -24,6 +24,7 @@ void writeConnectivity(const char * path, PoreNetwork *pn){
     file.open(filename.c_str(), std::ios::trunc);
     if(!file){
         std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        std::cerr << strerror(errno) << std::endl;
         return;
     }
     
@@ -60,12 +61,14 @@ void writeLocation(const char * path, PoreNetwork *P){
     file.open(filename.c_str(), std::ios::trunc);
     if(!file){
         std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        std::cerr << strerror(errno) << std::endl;
         return;
     }
     
     size_t pn;
     // set output type to scientific
     file.setf(std::ios_base::scientific);
+    file.precision(12);
     for(pn = 1; pn <= P->nrOfActivePBs; pn++){
         
         //file << '[' << pn << ']' << '\t';
@@ -75,7 +78,7 @@ void writeLocation(const char * path, PoreNetwork *P){
         file << std::setw(8)<< P->throatCounter[0][pn] << ' ';
         file << std::setw(8)<< P->throatCounter[1][pn] << '\t' ;
 		if(P->pb_sizeList)
-			file << P->pb_sizeList[pn] << '\n';
+			file << std::setw(10) << P->pb_sizeList[pn] << '\n';
 		else
 			file << '\n';
         //std::cout<< throatCounters[0][pn] << '\t' <<  throatCounters[1][pn] << std::endl;
@@ -129,6 +132,7 @@ void writeInterfacePores(const char * path, PoreNetwork *pn, Combinator *C){
     file.open(filename.c_str(), std::ios::trunc);
     if(!file){
         std::cerr<< "Error opening file [" << filename << ']' << std::endl;
+        std::cerr << strerror(errno) << std::endl;
         return;
     }
 

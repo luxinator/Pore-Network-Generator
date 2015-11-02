@@ -1091,73 +1091,63 @@ size_t PoreNetwork::generateFullConnectivity(){
 }
 
 
-/*
- * Returns a sorted list of throats with connect[0][i] is source pb
- * Array is exactly as long as needed, guard by an entry of [0,0]
- */
-size_t PoreNetwork::generateFullConnectivity_NearlySorted() {
-
-    int **halfConnectivity = this->throatList;
-
-    std::cout << "Generating Full Connectivity" << std::endl;
-    size_t halfLength = this->nrOfConnections;
-// Full connectivity is twice the size of half connectivity, and we need one extra place for the [0][0] guards
-    size_t maxConnections = halfLength * 2 + 1;
-
-    //For Details see [generateConnectivity]
-    int *t = new int[maxConnections * 2];
-    int **connection = new int *[2];
-    connection[0] = t;
-    connection[1] = t + maxConnections;
-    // Shuts memchecker up
-    t = nullptr;
-    memset(connection[0], -1, sizeof(int) * maxConnections * 2);
-    size_t k = 0;
-    int thisPb = -1;
-    size_t j;
-
-    for (size_t i = 0; i < halfLength - this->nrOfOutlets; i++) {
-        if (thisPb != halfConnectivity[0][i])
-            for (j = 0; j < i; j++) {
-                if (halfConnectivity[1][j] == halfConnectivity[0][i]) {
-                    connection[0][k] = halfConnectivity[1][j];
-                    connection[1][k] = halfConnectivity[0][j];
-
-                    //DEBUG
-                    std::cout << '*' << k << "\t[" << connection[0][k] << ':' << connection[1][k] << "]\t J:  " << j <<
-                    "\t[" <<
-                    halfConnectivity[1][j] << ':' << halfConnectivity[0][j] << ']' << std::endl;
-
-                    k++;
-                }
-            }
-        thisPb = halfConnectivity[0][i];
-
-        connection[0][k] = halfConnectivity[0][i];
-        connection[1][k] = halfConnectivity[1][i];
-
-        //DEBUG
-        std::cout << '+' << k << "\t[" << connection[0][k] << ':' << connection[1][k] << "]\t I:  " << i <<
-        "\t[" <<
-        halfConnectivity[0][i] << ':' << halfConnectivity[1][i] << ']' << std::endl;
-
-        k++;
-
-    }
-    for(size_t i = halfLength - this->nrOfOutlets - 1; i < halfLength; i++){
-
-        connection[0][k] = halfConnectivity[1][i];
-        connection[1][k] = halfConnectivity[0][i];
-
-        //DEBUG
-        std::cout << '-' << k << "\t[" << connection[0][k] << ':' << connection[1][k] << "]\t I:  " << i <<
-        "\t[" <<
-        halfConnectivity[0][i] << ':' << halfConnectivity[1][i] << ']' << std::endl;
-
-        k++;
-
+///*
+// * Returns a sorted list of throats with connect[0][i] is source pb
+// * Array is exactly as long as needed, guard by an entry of [0,0]
+// */
+//size_t PoreNetwork::generateFullConnectivity_NearlySorted() {
+//
+//    int **halfConnectivity = this->throatList;
+//
+//    std::cout << "Generating Full Connectivity" << std::endl;
+//    size_t halfLength = this->nrOfConnections;
+//// Full connectivity is twice the size of half connectivity, and we need one extra place for the [0][0] guards
+//    size_t maxConnections = halfLength * 2 + 1;
+//
+//    //For Details see [generateConnectivity]
+//    int *t = new int[maxConnections * 2];
+//    int **connection = new int *[2];
+//    connection[0] = t;
+//    connection[1] = t + maxConnections;
+//    // Shuts memchecker up
+//    t = nullptr;
+//    memset(connection[0], -1, sizeof(int) * maxConnections * 2);
+//    size_t k = 0;
+//    int thisPb = -1;
+//    size_t j;
+//
+//    for (size_t i = 0; i < halfLength - this->nrOfOutlets; i++) {
+//        if (thisPb != halfConnectivity[0][i])
+//            for (j = 0; j < i; j++) {
+//                if (halfConnectivity[1][j] == halfConnectivity[0][i]) {
+//                    connection[0][k] = halfConnectivity[1][j];
+//                    connection[1][k] = halfConnectivity[0][j];
+//
+//                    //DEBUG
+//                    std::cout << '*' << k << "\t[" << connection[0][k] << ':' << connection[1][k] << "]\t J:  " << j <<
+//                    "\t[" <<
+//                    halfConnectivity[1][j] << ':' << halfConnectivity[0][j] << ']' << std::endl;
+//
+//                    k++;
+//                }
+//            }
+//        thisPb = halfConnectivity[0][i];
+//
 //        connection[0][k] = halfConnectivity[0][i];
 //        connection[1][k] = halfConnectivity[1][i];
+//
+//        //DEBUG
+//        std::cout << '+' << k << "\t[" << connection[0][k] << ':' << connection[1][k] << "]\t I:  " << i <<
+//        "\t[" <<
+//        halfConnectivity[0][i] << ':' << halfConnectivity[1][i] << ']' << std::endl;
+//
+//        k++;
+//
+//    }
+//    for(size_t i = halfLength - this->nrOfOutlets - 1; i < halfLength; i++){
+//
+//        connection[0][k] = halfConnectivity[1][i];
+//        connection[1][k] = halfConnectivity[0][i];
 //
 //        //DEBUG
 //        std::cout << '-' << k << "\t[" << connection[0][k] << ':' << connection[1][k] << "]\t I:  " << i <<
@@ -1165,17 +1155,27 @@ size_t PoreNetwork::generateFullConnectivity_NearlySorted() {
 //        halfConnectivity[0][i] << ':' << halfConnectivity[1][i] << ']' << std::endl;
 //
 //        k++;
-
-    }
-
-    std::cout << "KKKKKK: " << k << std::endl;
-    quicksort_iterative(connection, maxConnections - 1);
-//    bubbleSortList(connection, maxConnections - 1); // Do NOT sort WITH the guards...
-
-    this->throatList_full2 = connection;
-
-    return maxConnections - 1;
-}
+//
+////        connection[0][k] = halfConnectivity[0][i];
+////        connection[1][k] = halfConnectivity[1][i];
+////
+////        //DEBUG
+////        std::cout << '-' << k << "\t[" << connection[0][k] << ':' << connection[1][k] << "]\t I:  " << i <<
+////        "\t[" <<
+////        halfConnectivity[0][i] << ':' << halfConnectivity[1][i] << ']' << std::endl;
+////
+////        k++;
+//
+//    }
+//
+//    std::cout << "KKKKKK: " << k << std::endl;
+//    quicksort_iterative(connection, maxConnections - 1);
+////    bubbleSortList(connection, maxConnections - 1); // Do NOT sort WITH the guards...
+//
+//    this->throatList_full2 = connection;
+//
+//    return maxConnections - 1;
+//}
 
 void PoreNetwork::generatePbSizes() {
 
